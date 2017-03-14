@@ -157,6 +157,12 @@ namespace ITM_ISM_Fixture
             this.Refresh();
 
 
+            BK1685B_INIT initBK1685B = new BK1685B_INIT();
+
+
+
+            initBK1685B.Run();
+
             // init picoscope
             if (instumentStatus == 0)
                 instumentStatus = initScope();
@@ -193,7 +199,12 @@ namespace ITM_ISM_Fixture
             if (instumentStatus == 0)
             {
 
+                BK1685C_0N BK1685bOn = new BK1685C_0N();
 
+
+                BK1685bOn.Run();
+
+                Thread.Sleep(2500);  // stablize
 
 
 
@@ -216,14 +227,28 @@ namespace ITM_ISM_Fixture
                 led3.OffColor = Color.Yellow;
                 this.Refresh();
 
+
+              
+                
+               
+
+                
+
+               
+                /*
                 MessageBox.Show("Swich fixture to TP102.",
                                 "Error",
                                 MessageBoxButtons.OK,
                                 MessageBoxIcon.Exclamation,
                                 MessageBoxDefaultButton.Button1);
 
-                Test_TP102();
+                */
+                switchChannel0(0);
 
+                Test_TP102();
+                this.Refresh();
+
+                /*
 
                 MessageBox.Show("Swich fixture to TP116.",
                                 "Error",
@@ -231,25 +256,34 @@ namespace ITM_ISM_Fixture
                                 MessageBoxIcon.Exclamation,
                                 MessageBoxDefaultButton.Button1);
 
-
-
+                */
+                switchChannel0(1);
                 Test_TP116();
+                this.Refresh();
 
-
+                /*
                 MessageBox.Show("Swich fixture to TP115.",
                 "Error",
                 MessageBoxButtons.OK,
                 MessageBoxIcon.Exclamation,
                 MessageBoxDefaultButton.Button1);
-                Test_TP115();
+                */
 
+                switchChannel0(2);
+                Test_TP115();
+                this.Refresh();
+
+                /*
                 MessageBox.Show("Swich fixture to TP130.",
                 "Error",
                 MessageBoxButtons.OK,
                 MessageBoxIcon.Exclamation,
                 MessageBoxDefaultButton.Button1);
+                */
 
+                switchChannel0(3);
                 Test_TP130();
+                this.Refresh();
 
 
 
@@ -277,7 +311,7 @@ namespace ITM_ISM_Fixture
 
             }
 
-
+            this.Refresh();
 
                 // program the board
            // ExecuteCommand("flashme.bat");
@@ -286,7 +320,7 @@ namespace ITM_ISM_Fixture
 
 
 
-
+            /*  remark out program step for now
 
             if (instumentStatus == 0)
             {
@@ -336,7 +370,7 @@ namespace ITM_ISM_Fixture
 
 
             }
-
+            
 
 
                 // Do not wait for the child process to exit before
@@ -407,7 +441,7 @@ namespace ITM_ISM_Fixture
                 progressBar1.Visible = false;
 
            
-              
+              */
 
 
             // test Aux inputs
@@ -420,11 +454,18 @@ namespace ITM_ISM_Fixture
                     led7.OffColor = Color.Yellow;   /// seems to be crashing here!!!!!!
                     this.Refresh();
 
+
+                    /*
                     MessageBox.Show("Switch Out to Tp402 and In/Out to Aux R.",
                     "Error",
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Exclamation,
                     MessageBoxDefaultButton.Button1);
+                     * */
+
+                    switchChannel0(5);
+                    switchChannel1(0);  // inject signal
+
 
 
                     short status;
@@ -451,26 +492,28 @@ namespace ITM_ISM_Fixture
 
 
 
-
+                    /*
                     MessageBox.Show("Switch Out to Tp402 and In/Out to Aux L.",
                     "Error",
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Exclamation,
                     MessageBoxDefaultButton.Button1);
-
-
+                    */
+                    this.Refresh();
+                   // switchChannel0(5);
+                    switchChannel1(1);
                     GetChanB();
 
                     // get value for aux from label
                     rmsValue = Regex.Match(label19.Text, @"\d+").Value;
 
                     AudioInMeasurements[1] = Convert.ToDouble(rmsValue);
-
+                    this.Refresh();
 
 
                     // validate measurements
 
-                    if ((AudioInMeasurements[0] > 340) & (AudioInMeasurements[0] < 370) & (AudioInMeasurements[1] > 340) & (AudioInMeasurements[1] < 370))
+                    if ((AudioInMeasurements[0] > 90) & (AudioInMeasurements[0] < 120) & (AudioInMeasurements[1] > 90) & (AudioInMeasurements[1] < 120))
                     {
 
                         AuxResult = true;
@@ -490,7 +533,7 @@ namespace ITM_ISM_Fixture
                     }
 
 
-
+                    this.Refresh();
 
                 }
 
@@ -546,6 +589,60 @@ namespace ITM_ISM_Fixture
 
 
                     }
+
+
+
+                }
+
+
+                // charge current test
+
+                if (instumentStatus == 0)
+                {
+
+
+                    // 1.  apply 5 V on VBUSS to enter charge mode
+
+                    try
+                    {
+                        using (Task digitalWriteTask = new Task())
+                        {
+                            digitalWriteTask.DOChannels.CreateChannel("NI-USB-6501/port1/line6", "",
+                                ChannelLineGrouping.OneChannelForAllLines);
+                            bool[] dataArray = new bool[1];
+                            dataArray[0] = false;
+                            DigitalSingleChannelWriter writer = new DigitalSingleChannelWriter(digitalWriteTask.Stream);
+                            writer.WriteSingleSampleMultiLine(true, dataArray);
+                        }
+                    }
+                    catch (DaqException ex)
+                    {
+                        MessageBox.Show(ex.Message);
+                    }
+                    finally
+                    {
+                        
+                    }
+
+
+
+                    
+
+                    // 2.  measure charge current
+
+
+                    ReadChargeCurrent();
+
+
+
+
+
+                    // 3. turn charge off in shell
+
+
+
+
+
 
 
 
@@ -662,7 +759,12 @@ namespace ITM_ISM_Fixture
          * 
          */
 
+        private void ReadChargeCurrent()
+        {
 
+
+
+        }
 
         private void Test_ONCurrent()
         {
@@ -698,7 +800,7 @@ namespace ITM_ISM_Fixture
             powerupCurrent = Math.Abs(Ccurrent);
 
 
-            if ((powerupCurrent > 0.02) & (powerupCurrent < 0.04))
+            if ((powerupCurrent > 0.02) & (powerupCurrent < 0.2))  // takes a bit to settle back on boot
             {
                 PowerUpCurrentResult = true;
                 led2.OffColor = Color.LimeGreen;
@@ -709,6 +811,17 @@ namespace ITM_ISM_Fixture
             {
                 PowerUpCurrentResult = false;
                 led2.OffColor = Color.Red;
+
+                /*
+                BK1685B_OFF BK1685bOff = new BK1685B_OFF();
+
+                BK1685bOff.Run();
+
+                */
+                // ToDo   exit test!
+
+
+                instumentStatus = 1;
 
             }
 
@@ -894,7 +1007,7 @@ namespace ITM_ISM_Fixture
 
             VoltageMeasurements[3] = Vvalue;
 
-            if ((Vvalue > 1.8) & (Vvalue < 2.0))
+            if ((Vvalue > 1.5) & (Vvalue < 1.7))
             {
                 TP130Result = true;
 
@@ -1741,6 +1854,110 @@ namespace ITM_ISM_Fixture
         private void button3_Click(object sender, EventArgs e)
         {
             GetChanB();
+
+        }
+
+
+
+        private void switchChannel0(byte RelayNo)
+        {
+
+
+            uint relaydata = 0x01;
+
+
+            uint indx;
+
+            for (indx = 0; indx < RelayNo; indx++)
+                relaydata = (relaydata << 1);
+
+
+
+
+
+
+            try
+            {
+
+              
+
+                uint[] generatedData = new uint[writePort_0Component1.NumberOfChannelsToWrite];
+
+
+      
+
+             
+                //throw new System.NotImplementedException("You must populate the data to write before writing the data.");
+                generatedData[0] = ~relaydata;   // TURN on relay requested.
+              
+
+                writePort_0Component1.WriteAsync(generatedData);
+
+               
+
+                double[] controlData = NationalInstruments.DataConverter.Convert<double[]>(generatedData);
+               // numericEditArray1.SetValues(controlData);  // used for control
+            }
+            catch (NationalInstruments.DAQmx.DaqException ex)
+            {
+                MessageBox.Show(ex.Message, "DAQ Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                // button1.Enabled = true;
+                Close();
+
+
+            }
+
+        }
+
+
+
+        private void switchChannel1(byte RelayNo)
+        {
+
+
+            uint relaydata = 0x01;
+
+
+            uint indx;
+
+            for (indx = 0; indx < RelayNo; indx++)
+                relaydata = (relaydata << 1);
+
+
+
+
+
+
+            try
+            {
+
+
+
+                uint[] generatedData = new uint[writePort_1Component1.NumberOfChannelsToWrite];
+
+
+
+
+
+                //throw new System.NotImplementedException("You must populate the data to write before writing the data.");
+                generatedData[0] = ~relaydata;   // TURN on relay requested.
+
+
+                writePort_1Component1.WriteAsync(generatedData);
+
+
+
+                double[] controlData = NationalInstruments.DataConverter.Convert<double[]>(generatedData);
+                // numericEditArray1.SetValues(controlData);  // used for control
+            }
+            catch (NationalInstruments.DAQmx.DaqException ex)
+            {
+                MessageBox.Show(ex.Message, "DAQ Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                // button1.Enabled = true;
+                Close();
+
+
+            }
 
         }
 

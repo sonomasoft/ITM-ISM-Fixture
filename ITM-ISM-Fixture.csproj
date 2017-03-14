@@ -84,6 +84,7 @@
     <Reference Include="NationalInstruments.DAQmx, Version=15.5.40.109, Culture=neutral, PublicKeyToken=dc6ad606294fc298, processorArchitecture=x86">
       <Private>False</Private>
     </Reference>
+    <Reference Include="NationalInstruments.DAQmx.ComponentModel, Version=15.5.40.109, Culture=neutral, PublicKeyToken=dc6ad606294fc298, processorArchitecture=MSIL" />
     <Reference Include="NationalInstruments.NetworkVariable, Version=15.0.40.49153, Culture=neutral, PublicKeyToken=dc6ad606294fc298, processorArchitecture=MSIL" />
     <Reference Include="NationalInstruments.NI4882, Version=13.0.40.159, Culture=neutral, PublicKeyToken=dc6ad606294fc298, processorArchitecture=MSIL" />
     <Reference Include="NationalInstruments.Tdms, Version=15.0.40.49153, Culture=neutral, PublicKeyToken=dc6ad606294fc298, processorArchitecture=MSIL" />
@@ -102,6 +103,21 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BK1685B_INIT.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>BK1685B_INIT.mxb</DependentUpon>
+    </Compile>
+    <Compile Include="BK1685B_OFF.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>BK1685B_OFF.mxb</DependentUpon>
+    </Compile>
+    <Compile Include="BK1685C_0N.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>BK1685C_0N.mxb</DependentUpon>
+    </Compile>
     <Compile Include="BK2831E_ReadCurrent.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -122,6 +138,22 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>BK2831E_SetVoltage.mxb</DependentUpon>
     </Compile>
+    <Compile Include="ChargeOff.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ChargeOff.mxb</DependentUpon>
+    </Compile>
+    <Compile Include="ChargeOff.User.cs">
+      <DependentUpon>ChargeOff.mxb</DependentUpon>
+    </Compile>
+    <Compile Include="ChargeOn.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ChargeOn.mxb</DependentUpon>
+    </Compile>
+    <Compile Include="ChargeOn.User.cs">
+      <DependentUpon>ChargeOn.mxb</DependentUpon>
+    </Compile>
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -137,6 +169,30 @@
     </Compile>
     <Compile Include="PS5000Imports.cs" />
     <Compile Include="PS5000PinnedArray.cs" />
+    <Compile Include="Relay_1_ON.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Relay_1_ON.mxb</DependentUpon>
+    </Compile>
+    <Compile Include="Relay_1_ON.User.cs">
+      <DependentUpon>Relay_1_ON.mxb</DependentUpon>
+    </Compile>
+    <Compile Include="WritePort_0.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>WritePort_0.mxb</DependentUpon>
+    </Compile>
+    <Compile Include="WritePort_0.User.cs">
+      <DependentUpon>WritePort_0.mxb</DependentUpon>
+    </Compile>
+    <Compile Include="WritePort_1.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>WritePort_1.mxb</DependentUpon>
+    </Compile>
+    <Compile Include="WritePort_1.User.cs">
+      <DependentUpon>WritePort_1.mxb</DependentUpon>
+    </Compile>
     <EmbeddedResource Include="MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -151,6 +207,18 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <None Include="app.config" />
+    <None Include="BK1685B_INIT.mxb">
+      <Generator>NationalInstruments.MeasurementStudio.Tools.DotNET.MxbCodeGenerator.2010</Generator>
+      <LastGenOutput>BK1685B_INIT.cs</LastGenOutput>
+    </None>
+    <None Include="BK1685B_OFF.mxb">
+      <Generator>NationalInstruments.MeasurementStudio.Tools.DotNET.MxbCodeGenerator.2010</Generator>
+      <LastGenOutput>BK1685B_OFF.cs</LastGenOutput>
+    </None>
+    <None Include="BK1685C_0N.mxb">
+      <Generator>NationalInstruments.MeasurementStudio.Tools.DotNET.MxbCodeGenerator.2010</Generator>
+      <LastGenOutput>BK1685C_0N.cs</LastGenOutput>
+    </None>
     <None Include="BK2831E_ReadCurrent.mxb">
       <Generator>NationalInstruments.MeasurementStudio.Tools.DotNET.MxbCodeGenerator.2010</Generator>
       <LastGenOutput>BK2831E_ReadCurrent.cs</LastGenOutput>
@@ -167,6 +235,14 @@
       <Generator>NationalInstruments.MeasurementStudio.Tools.DotNET.MxbCodeGenerator.2010</Generator>
       <LastGenOutput>BK2831E_SetVoltage.cs</LastGenOutput>
     </None>
+    <None Include="ChargeOff.mxb">
+      <Generator>NationalInstruments.MeasurementStudio.Tools.DotNET.MxbCodeGenerator.2010</Generator>
+      <LastGenOutput>ChargeOff.cs</LastGenOutput>
+    </None>
+    <None Include="ChargeOn.mxb">
+      <Generator>NationalInstruments.MeasurementStudio.Tools.DotNET.MxbCodeGenerator.2010</Generator>
+      <LastGenOutput>ChargeOn.cs</LastGenOutput>
+    </None>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -179,6 +255,18 @@
     <None Include="pingBK2831e.mxb">
       <Generator>NationalInstruments.MeasurementStudio.Tools.DotNET.MxbCodeGenerator.2010</Generator>
       <LastGenOutput>pingBK2831e.cs</LastGenOutput>
+    </None>
+    <None Include="Relay_1_ON.mxb">
+      <Generator>NationalInstruments.MeasurementStudio.Tools.DotNET.MxbCodeGenerator.2010</Generator>
+      <LastGenOutput>Relay_1_ON.cs</LastGenOutput>
+    </None>
+    <None Include="WritePort_0.mxb">
+      <Generator>NationalInstruments.MeasurementStudio.Tools.DotNET.MxbCodeGenerator.2010</Generator>
+      <LastGenOutput>WritePort_0.cs</LastGenOutput>
+    </None>
+    <None Include="WritePort_1.mxb">
+      <Generator>NationalInstruments.MeasurementStudio.Tools.DotNET.MxbCodeGenerator.2010</Generator>
+      <LastGenOutput>WritePort_1.cs</LastGenOutput>
     </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
