@@ -23,18 +23,18 @@ namespace ITM_ISM_Fixture
     /// <summary>
     /// Class that contains the parsed values from an Instrument I/O task.  The task's Run method will return an instance of this class populated with the parsed values.
     /// </summary>    
-    public sealed class BK2831E_ReadVoltageResults
+    public sealed class DUTMfgModeResults
     {
-        private double _token;
-        private double _token2;
+        private string _token;
+        private string _token2;
         
-        public double Token
+        public string Token
         {
             get { return _token; }
             set { _token = value; }
         }
         
-        public double Token2
+        public string Token2
         {
             get { return _token2; }
             set { _token2 = value; }
@@ -42,26 +42,26 @@ namespace ITM_ISM_Fixture
     }
     
 
-    public sealed class BK2831E_ReadVoltage : IDisposable
+    public sealed class DUTMfgMode : IDisposable
     {
         MessageBasedSession _instrumentSession = null;
         bool _handleSessionLifetime = true;
         MessageBasedSessionReader _reader;
 
-        private const string DefaultSessionName = "BK2831E";
+        private const string DefaultSessionName = "DUT";
         
         private static MessageBasedSession OpenSession(string sessionName)
         {
             if (sessionName == null)
                 throw new ArgumentNullException("sessionName");
 
-            return (MessageBasedSession)ResourceManager.GetLocalManager().Open(sessionName, (AccessModes)4, 0);
+            return (MessageBasedSession)ResourceManager.GetLocalManager().Open(sessionName, (AccessModes)0, 0);
         }
         
         /// <summary>
         /// This task will open a MessageBasedSession for the VISA resource name configured in the I/O Assistant.  The task will close the MessageBasedSession when the task is disposed.
         /// </summary>
-        public BK2831E_ReadVoltage() : this(DefaultSessionName)
+        public DUTMfgMode() : this(DefaultSessionName)
         {
         }
 
@@ -69,7 +69,7 @@ namespace ITM_ISM_Fixture
         /// This task will open a MessageBasedSession for the VISA resource name passed in.  The task will close the MessageBasedSession when the task is disposed.
         /// </summary>
         /// <param name="sessionName">The VISA resource name of the instrument for which the task will open a MessageBasedSession.  The task will close the MessageBasedSession when the task is disposed.</param>
-        public BK2831E_ReadVoltage(string sessionName) : this (OpenSession(sessionName), true)
+        public DUTMfgMode(string sessionName) : this (OpenSession(sessionName), true)
         {
         }
         
@@ -77,7 +77,7 @@ namespace ITM_ISM_Fixture
         /// This task will use the MessageBasedSession passed in.  The task will not close the MessageBasedSession when the task is disposed; the caller is responsible for closing the session.
         /// </summary>
         /// <param name="session">MessageBasedSession used by this task.</param>
-        public BK2831E_ReadVoltage(MessageBasedSession session) : this(session, false)
+        public DUTMfgMode(MessageBasedSession session) : this(session, false)
         {
         }
 
@@ -86,15 +86,13 @@ namespace ITM_ISM_Fixture
         /// </summary>
         /// <param name="session">MessageBasedSession used by this task.</param>
         /// <param name="taskHandlesSessionLifetime">If true, the task will close session when the task is disposed. If false, the caller is responsible for closing session.</param>
-        public BK2831E_ReadVoltage(MessageBasedSession session, bool taskHandlesSessionLifetime)
+        public DUTMfgMode(MessageBasedSession session, bool taskHandlesSessionLifetime)
         {
             if (session == null)
                 throw new ArgumentNullException("session");
 
             _instrumentSession = session;
             _instrumentSession.Timeout = 2000;
-            SerialSession ss = (SerialSession)_instrumentSession;
-            ss.ReadTermination = SerialTerminationMethod.TerminationCharacter;
             _instrumentSession.TerminationCharacterEnabled = true;
             _instrumentSession.TerminationCharacter = 10;
             
@@ -123,27 +121,28 @@ namespace ITM_ISM_Fixture
         /// <summary>
         /// Executes the instrument I/O task.
         /// </summary>
-        public BK2831E_ReadVoltageResults Run( )
+        public DUTMfgModeResults Run( )
         {
             if (_instrumentSession == null)
                 throw new ArgumentNullException("_instrumentSession");
         
-            BK2831E_ReadVoltageResults outputs = new BK2831E_ReadVoltageResults();
+            DUTMfgModeResults outputs = new DUTMfgModeResults();
 
             // Query step
             // Does a VISA Write
-            _instrumentSession.Write(":FETC?\n");
-            // Parses out one ASCII number separated by one or more delimiters
-            outputs.Token = _reader.ReadDouble();
+            _instrumentSession.Write("mfgt= 1\n");
+            // Parses out one ASCII string separated by one or more delimiters
+            outputs.Token = _reader.ReadMismatch(",;\r\n\t");
             _reader.ReadMatch(",;\r\n\t");
             // Read and discard the rest of the response
-            _reader.DiscardUnreadData();
+            //_reader.DiscardUnreadData();
 
-            // Query step
-            // Does a VISA Write
-            _instrumentSession.Write(":FETC?\n");
-            // Parses out one ASCII number separated by one or more delimiters
-            outputs.Token2 = _reader.ReadDouble();
+            // Read step
+            // Read and discard unparsed response data
+            _reader.ReadMismatch(",;\r\n\t");
+            _reader.ReadMatch(",;\r\n\t");
+            // Parses out one ASCII string separated by one or more delimiters
+            outputs.Token2 = _reader.ReadMismatch(",;\r\n\t");
             _reader.ReadMatch(",;\r\n\t");
             // Read and discard the rest of the response
             _reader.DiscardUnreadData();

@@ -23,32 +23,32 @@ namespace ITM_ISM_Fixture
     /// <summary>
     /// Class that contains the parsed values from an Instrument I/O task.  The task's Run method will return an instance of this class populated with the parsed values.
     /// </summary>    
-    public sealed class BK2831E_ReadVoltageResults
+    public sealed class DUTBootResults
     {
-        private double _token;
-        private double _token2;
+        private string _token2;
+        private string _token;
         
-        public double Token
-        {
-            get { return _token; }
-            set { _token = value; }
-        }
-        
-        public double Token2
+        public string Token2
         {
             get { return _token2; }
             set { _token2 = value; }
         }
+        
+        public string Token
+        {
+            get { return _token; }
+            set { _token = value; }
+        }
     }
     
 
-    public sealed class BK2831E_ReadVoltage : IDisposable
+    public sealed class DUTBoot : IDisposable
     {
         MessageBasedSession _instrumentSession = null;
         bool _handleSessionLifetime = true;
         MessageBasedSessionReader _reader;
 
-        private const string DefaultSessionName = "BK2831E";
+        private const string DefaultSessionName = "DUT";
         
         private static MessageBasedSession OpenSession(string sessionName)
         {
@@ -61,7 +61,7 @@ namespace ITM_ISM_Fixture
         /// <summary>
         /// This task will open a MessageBasedSession for the VISA resource name configured in the I/O Assistant.  The task will close the MessageBasedSession when the task is disposed.
         /// </summary>
-        public BK2831E_ReadVoltage() : this(DefaultSessionName)
+        public DUTBoot() : this(DefaultSessionName)
         {
         }
 
@@ -69,7 +69,7 @@ namespace ITM_ISM_Fixture
         /// This task will open a MessageBasedSession for the VISA resource name passed in.  The task will close the MessageBasedSession when the task is disposed.
         /// </summary>
         /// <param name="sessionName">The VISA resource name of the instrument for which the task will open a MessageBasedSession.  The task will close the MessageBasedSession when the task is disposed.</param>
-        public BK2831E_ReadVoltage(string sessionName) : this (OpenSession(sessionName), true)
+        public DUTBoot(string sessionName) : this (OpenSession(sessionName), true)
         {
         }
         
@@ -77,7 +77,7 @@ namespace ITM_ISM_Fixture
         /// This task will use the MessageBasedSession passed in.  The task will not close the MessageBasedSession when the task is disposed; the caller is responsible for closing the session.
         /// </summary>
         /// <param name="session">MessageBasedSession used by this task.</param>
-        public BK2831E_ReadVoltage(MessageBasedSession session) : this(session, false)
+        public DUTBoot(MessageBasedSession session) : this(session, false)
         {
         }
 
@@ -86,7 +86,7 @@ namespace ITM_ISM_Fixture
         /// </summary>
         /// <param name="session">MessageBasedSession used by this task.</param>
         /// <param name="taskHandlesSessionLifetime">If true, the task will close session when the task is disposed. If false, the caller is responsible for closing session.</param>
-        public BK2831E_ReadVoltage(MessageBasedSession session, bool taskHandlesSessionLifetime)
+        public DUTBoot(MessageBasedSession session, bool taskHandlesSessionLifetime)
         {
             if (session == null)
                 throw new ArgumentNullException("session");
@@ -123,27 +123,28 @@ namespace ITM_ISM_Fixture
         /// <summary>
         /// Executes the instrument I/O task.
         /// </summary>
-        public BK2831E_ReadVoltageResults Run( )
+        public DUTBootResults Run( )
         {
             if (_instrumentSession == null)
                 throw new ArgumentNullException("_instrumentSession");
         
-            BK2831E_ReadVoltageResults outputs = new BK2831E_ReadVoltageResults();
+            DUTBootResults outputs = new DUTBootResults();
 
             // Query step
             // Does a VISA Write
-            _instrumentSession.Write(":FETC?\n");
-            // Parses out one ASCII number separated by one or more delimiters
-            outputs.Token = _reader.ReadDouble();
+            _instrumentSession.Write("ver\n");
+            // Parses out one ASCII string separated by one or more delimiters
+            outputs.Token2 = _reader.ReadMismatch(",;\r\n\t");
             _reader.ReadMatch(",;\r\n\t");
             // Read and discard the rest of the response
-            _reader.DiscardUnreadData();
+            //_reader.DiscardUnreadData();
 
-            // Query step
-            // Does a VISA Write
-            _instrumentSession.Write(":FETC?\n");
-            // Parses out one ASCII number separated by one or more delimiters
-            outputs.Token2 = _reader.ReadDouble();
+            // Read step
+            // Read and discard unparsed response data
+            _reader.ReadMismatch(",;\r\n\t");
+            _reader.ReadMatch(",;\r\n\t");
+            // Parses out one ASCII string separated by one or more delimiters
+            outputs.Token = _reader.ReadMismatch(",;\r\n\t");
             _reader.ReadMatch(",;\r\n\t");
             // Read and discard the rest of the response
             _reader.DiscardUnreadData();

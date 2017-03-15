@@ -154,6 +154,21 @@
     <Compile Include="ChargeOn.User.cs">
       <DependentUpon>ChargeOn.mxb</DependentUpon>
     </Compile>
+    <Compile Include="DUTBoot.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>DUTBoot.mxb</DependentUpon>
+    </Compile>
+    <Compile Include="DUTMfgMode.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>DUTMfgMode.mxb</DependentUpon>
+    </Compile>
+    <Compile Include="IrLEDOn.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>IrLEDOn.mxb</DependentUpon>
+    </Compile>
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -176,6 +191,31 @@
     </Compile>
     <Compile Include="Relay_1_ON.User.cs">
       <DependentUpon>Relay_1_ON.mxb</DependentUpon>
+    </Compile>
+    <Compile Include="SetChannel_A.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>SetChannel_A.mxb</DependentUpon>
+    </Compile>
+    <Compile Include="SetChannel_B.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>SetChannel_B.mxb</DependentUpon>
+    </Compile>
+    <Compile Include="SetChannel_C.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>SetChannel_C.mxb</DependentUpon>
+    </Compile>
+    <Compile Include="SetChannel_D.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>SetChannel_D.mxb</DependentUpon>
+    </Compile>
+    <Compile Include="SetChannel_E.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>SetChannel_E.mxb</DependentUpon>
     </Compile>
     <Compile Include="WritePort_0.cs">
       <AutoGen>True</AutoGen>
@@ -243,6 +283,18 @@
       <Generator>NationalInstruments.MeasurementStudio.Tools.DotNET.MxbCodeGenerator.2010</Generator>
       <LastGenOutput>ChargeOn.cs</LastGenOutput>
     </None>
+    <None Include="DUTBoot.mxb">
+      <Generator>NationalInstruments.MeasurementStudio.Tools.DotNET.MxbCodeGenerator.2010</Generator>
+      <LastGenOutput>DUTBoot.cs</LastGenOutput>
+    </None>
+    <None Include="DUTMfgMode.mxb">
+      <Generator>NationalInstruments.MeasurementStudio.Tools.DotNET.MxbCodeGenerator.2010</Generator>
+      <LastGenOutput>DUTMfgMode.cs</LastGenOutput>
+    </None>
+    <None Include="IrLEDOn.mxb">
+      <Generator>NationalInstruments.MeasurementStudio.Tools.DotNET.MxbCodeGenerator.2010</Generator>
+      <LastGenOutput>IrLEDOn.cs</LastGenOutput>
+    </None>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -259,6 +311,26 @@
     <None Include="Relay_1_ON.mxb">
       <Generator>NationalInstruments.MeasurementStudio.Tools.DotNET.MxbCodeGenerator.2010</Generator>
       <LastGenOutput>Relay_1_ON.cs</LastGenOutput>
+    </None>
+    <None Include="SetChannel_A.mxb">
+      <Generator>NationalInstruments.MeasurementStudio.Tools.DotNET.MxbCodeGenerator.2010</Generator>
+      <LastGenOutput>SetChannel_A.cs</LastGenOutput>
+    </None>
+    <None Include="SetChannel_B.mxb">
+      <Generator>NationalInstruments.MeasurementStudio.Tools.DotNET.MxbCodeGenerator.2010</Generator>
+      <LastGenOutput>SetChannel_B.cs</LastGenOutput>
+    </None>
+    <None Include="SetChannel_C.mxb">
+      <Generator>NationalInstruments.MeasurementStudio.Tools.DotNET.MxbCodeGenerator.2010</Generator>
+      <LastGenOutput>SetChannel_C.cs</LastGenOutput>
+    </None>
+    <None Include="SetChannel_D.mxb">
+      <Generator>NationalInstruments.MeasurementStudio.Tools.DotNET.MxbCodeGenerator.2010</Generator>
+      <LastGenOutput>SetChannel_D.cs</LastGenOutput>
+    </None>
+    <None Include="SetChannel_E.mxb">
+      <Generator>NationalInstruments.MeasurementStudio.Tools.DotNET.MxbCodeGenerator.2010</Generator>
+      <LastGenOutput>SetChannel_E.cs</LastGenOutput>
     </None>
     <None Include="WritePort_0.mxb">
       <Generator>NationalInstruments.MeasurementStudio.Tools.DotNET.MxbCodeGenerator.2010</Generator>

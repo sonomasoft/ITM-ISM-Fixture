@@ -82,6 +82,14 @@ namespace ITM_ISM_Fixture
         public bool MicResult = true;
 
 
+        public bool BootResult = true;
+
+
+
+        public bool ChargeCurrentResult = true;
+
+
+
 
         public bool ProgramInProgress = false;
 
@@ -112,6 +120,10 @@ namespace ITM_ISM_Fixture
         public double[] AudioInMeasurements = new double[] { 0, 0, 0 };
 
         public double powerupCurrent = 0;  // power up current
+
+
+        public double ChargeCurrent = 0;
+
 
 
 
@@ -148,7 +160,7 @@ namespace ITM_ISM_Fixture
             // forces exception
          // VoltageMeasurements[10] = 0;
 
-
+            chgOff();
 
             //Test_01();
 
@@ -218,6 +230,9 @@ namespace ITM_ISM_Fixture
             }
 
 
+            Thread.Sleep(1000);  // stablize
+
+
             // check our power supplies
             if (instumentStatus == 0)
             {
@@ -226,6 +241,8 @@ namespace ITM_ISM_Fixture
 
                 led3.OffColor = Color.Yellow;
                 this.Refresh();
+
+              
 
 
               
@@ -603,26 +620,12 @@ namespace ITM_ISM_Fixture
 
                     // 1.  apply 5 V on VBUSS to enter charge mode
 
-                    try
-                    {
-                        using (Task digitalWriteTask = new Task())
-                        {
-                            digitalWriteTask.DOChannels.CreateChannel("NI-USB-6501/port1/line6", "",
-                                ChannelLineGrouping.OneChannelForAllLines);
-                            bool[] dataArray = new bool[1];
-                            dataArray[0] = false;
-                            DigitalSingleChannelWriter writer = new DigitalSingleChannelWriter(digitalWriteTask.Stream);
-                            writer.WriteSingleSampleMultiLine(true, dataArray);
-                        }
-                    }
-                    catch (DaqException ex)
-                    {
-                        MessageBox.Show(ex.Message);
-                    }
-                    finally
-                    {
-                        
-                    }
+
+
+
+
+                    chgOn();
+
 
 
 
@@ -635,10 +638,216 @@ namespace ITM_ISM_Fixture
 
 
 
+                    // 3. connect to shell to make sure boot worked.
 
 
-                    // 3. turn charge off in shell
+                  
 
+                    // 4.  run boot test
+
+
+                    BootTest();
+                    Thread.Sleep(500);  // need delay between transactions
+
+                   
+
+
+                }
+
+
+                 // set up DUT for mfg test and run
+
+                if (instumentStatus == 0)
+                {
+
+
+                    // turn charge circuit off
+
+
+
+                    timer2.Interval = 1000;
+
+
+                    // unmute
+
+                    IrLedOn();
+
+                    Thread.Sleep(500);  // need delay between transactions
+
+                    SetMFGMode();
+
+
+                    Thread.Sleep(500);  // need delay between transactions
+
+                    // set to channel A via shell
+
+                    SetChannel(1);
+
+
+                    led9.OffColor = Color.Yellow;
+
+                    this.Refresh();
+
+                    // measure duty cycle
+                    button2.PerformClick();
+
+                    timer2.Enabled = true;
+
+
+                    while (timer2.Enabled == true)
+                    {
+
+                        Application.DoEvents();
+
+                    }
+
+
+                    // Adjust to 25%
+
+
+                    // measure Current
+
+
+                    // adjust to desired value
+
+
+
+                    SetChannel(2);
+
+
+                    led10.OffColor = Color.Yellow;
+
+                    this.Refresh();
+
+                    // measure duty cycle
+                    button2.PerformClick();
+
+
+                    timer2.Enabled = true;
+
+
+                    while (timer2.Enabled == true)
+                    {
+
+                        Application.DoEvents();
+
+                    }
+
+                    // Adjust to 25%
+
+
+                    // measure Current
+
+
+                    // adjust to desired value
+
+                    SetChannel(3);
+
+
+                    led11.OffColor = Color.Yellow;
+
+                    this.Refresh();
+
+                    // measure duty cycle
+                    button2.PerformClick();
+
+                    timer2.Enabled = true;
+
+
+                    while (timer2.Enabled == true)
+                    {
+
+                        Application.DoEvents();
+
+                    }
+
+
+                    // Adjust to 25%
+
+
+                    // measure Current
+
+
+                    // adjust to desired value
+
+                    SetChannel(4);
+
+
+                    led12.OffColor = Color.Yellow;
+
+                    this.Refresh();
+
+                    // measure duty cycle
+                    button2.PerformClick();
+
+
+                    timer2.Enabled = true;
+
+
+                    while (timer2.Enabled == true)
+                    {
+
+                        Application.DoEvents();
+
+                    }
+                    // Adjust to 25%
+
+
+                    // measure Current
+
+
+                    // adjust to desired value
+
+
+
+                    SetChannel(5);
+
+
+                    led13.OffColor = Color.Yellow;
+
+                    this.Refresh();
+
+                    // measure duty cycle
+                    button2.PerformClick();
+
+                    timer2.Enabled = true;
+
+
+                    while (timer2.Enabled == true)
+                    {
+
+                        Application.DoEvents();
+
+                    }
+
+                    // Adjust to 25%
+
+
+                    // measure Current
+
+
+                    // adjust to desired value
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                    
+
+
+
+
+
+                    // look at output signal
 
 
 
@@ -651,6 +860,9 @@ namespace ITM_ISM_Fixture
 
 
 
+
+
+               // chgOff(); // turn off charge voltage
 
         }
 
@@ -741,12 +953,214 @@ namespace ITM_ISM_Fixture
 
 //------------------------------------------------------------------------------------------------------
 
+        private void SetChannel(int Channel)
+        {
+
+
+            SetChannel_A Ch_A = new SetChannel_A();
+
+            SetChannel_B Ch_B = new SetChannel_B();
+
+            SetChannel_C Ch_C = new SetChannel_C();
+
+            SetChannel_D Ch_D = new SetChannel_D();
+
+            SetChannel_E Ch_E = new SetChannel_E();
+
+
+
+
+            switch (Channel)
+            {
+                case 1:
+                    Ch_A.Run();
+
+                    break;
+                case 2:
+
+                    Ch_B.Run();
+                    break;
+
+                case 3:
+
+                    Ch_C.Run();
+                    break;
+
+                case 4:
+
+                    Ch_D.Run();
+                    break;
+
+                case 5:
+                    Ch_E.Run();
+                    break;
+
+
+
+
+
+                default:
+                    Ch_A.Run();
+
+                    break;
+
+
+            }
+
+
+
+
+
+        }
+
+
+
+
+        private void IrLedOn()
+        {
+
+            IrLEDOn IRON = new IrLEDOn();
+
+
+            IRON.Run();
+
+
+
+        }
+        
+        private void SetMFGMode()
+        {
+            DUTMfgMode MFGMode = new DUTMfgMode();
+
+            DUTMfgModeResults results = MFGMode.Run();
+
+
+            string returnstring = results.Token2;
+
+
+            if (returnstring.Contains("mfgtest = 1"))
+            {
+
+                Debug.Print(" DUT now in MFG Mode!");
+
+
+            }
+
+
+
+        }
+        private void BootTest()
+        {
+
+
+            led5.OffColor = Color.Yellow;
+
+            this.Refresh();
+
+            DUTBoot DBoot = new DUTBoot();
+
+            DUTBootResults results = DBoot.Run();
+
+            // BK2831E_ReadCurrentResults results = myReadCurrent.Run();
 
 
 
 
 
 
+
+            string DUTVer = results.Token;
+
+
+
+            if (DUTVer.Contains("Firmware: 1.02"))
+            {
+
+                led5.OffColor = Color.LimeGreen;
+
+                BootResult = true;
+                instumentStatus = 0;
+
+
+
+
+            }
+            else
+            {
+                led5.OffColor = Color.Red;
+
+                BootResult = false;
+
+                instumentStatus = 1;
+            }
+
+
+
+            this.Refresh();
+
+
+
+        }
+
+
+
+        private void chgOn()
+        {
+            try
+            {
+                using (Task digitalWriteTask = new Task())
+                {
+                    digitalWriteTask.DOChannels.CreateChannel("NI-USB-6501/port1/line6", "",
+                        ChannelLineGrouping.OneChannelForAllLines);
+                    bool[] dataArray = new bool[1];
+                    dataArray[0] = false;
+                    DigitalSingleChannelWriter writer = new DigitalSingleChannelWriter(digitalWriteTask.Stream);
+                    writer.WriteSingleSampleMultiLine(true, dataArray);
+                }
+            }
+            catch (DaqException ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+
+            }
+
+
+
+
+
+        }
+
+
+        private void chgOff()
+        {
+
+            try
+            {
+                using (Task digitalWriteTask = new Task())
+                {
+                    digitalWriteTask.DOChannels.CreateChannel("NI-USB-6501/port1/line6", "",
+                        ChannelLineGrouping.OneChannelForAllLines);
+                    bool[] dataArray = new bool[1];
+                    dataArray[0] = true;
+                    DigitalSingleChannelWriter writer = new DigitalSingleChannelWriter(digitalWriteTask.Stream);
+                    writer.WriteSingleSampleMultiLine(true, dataArray);
+                }
+            }
+            catch (DaqException ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+
+            }
+
+
+
+        }
 
 
 
@@ -761,6 +1175,66 @@ namespace ITM_ISM_Fixture
 
         private void ReadChargeCurrent()
         {
+            TPLabel.Text = "Charge Current";
+            led29.OffColor = Color.Yellow;
+            this.Refresh();
+
+
+            BK2831E_SetCurrent SetCurrent = new BK2831E_SetCurrent();
+
+
+            BK2831E_SetVoltage SetVoltage = new BK2831E_SetVoltage();
+
+
+            SetCurrent.Run();
+
+
+
+
+            //MAY HAVE TO PUT A DELAY HERE
+
+            Thread.Sleep(1000);
+
+            BK2831E_ReadCurrent myReadCurrent = new BK2831E_ReadCurrent();
+            BK2831E_ReadCurrentResults results = myReadCurrent.Run();
+
+            double Ccurrent;
+            Ccurrent = Convert.ToDouble(results.Token2);
+
+            MeterReading.Text = (Math.Abs(Ccurrent) * 1000).ToString() + " mA";
+
+            ChargeCurrent = Math.Abs(Ccurrent);
+
+
+
+            if ((ChargeCurrent > 0.01) & (powerupCurrent < 0.2))  // takes a bit to settle back on boot
+            {
+                ChargeCurrentResult = true;
+                led29.OffColor = Color.LimeGreen;
+
+
+            }
+            else
+            {
+                ChargeCurrentResult = false;
+                led29.OffColor = Color.Red;
+
+                /*
+                BK1685B_OFF BK1685bOff = new BK1685B_OFF();
+
+                BK1685bOff.Run();
+
+                */
+                // ToDo   exit test!
+
+
+                instumentStatus = 1;
+
+            }
+
+            this.Refresh();
+
+            SetVoltage.Run();  // switch back to voltage measurents.
 
 
 
@@ -1958,6 +2432,12 @@ namespace ITM_ISM_Fixture
 
 
             }
+
+        }
+
+        private void timer2_Tick(object sender, EventArgs e)
+        {
+            timer2.Enabled = false;
 
         }
 
