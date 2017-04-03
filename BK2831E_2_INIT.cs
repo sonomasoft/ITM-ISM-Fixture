@@ -20,12 +20,11 @@ namespace ITM_ISM_Fixture
 {
 
 
-    public sealed class SetChannel_A : IDisposable
+    public sealed class BK2831E_2_INIT : IDisposable
     {
         MessageBasedSession _instrumentSession = null;
         bool _handleSessionLifetime = true;
-        MessageBasedSessionWriter _writer;
-        private const string DefaultSessionName = "DUT";
+        private const string DefaultSessionName = "";
         
         private static MessageBasedSession OpenSession(string sessionName)
         {
@@ -38,7 +37,7 @@ namespace ITM_ISM_Fixture
         /// <summary>
         /// This task will open a MessageBasedSession for the VISA resource name configured in the I/O Assistant.  The task will close the MessageBasedSession when the task is disposed.
         /// </summary>
-        public SetChannel_A() : this(DefaultSessionName)
+        public BK2831E_2_INIT() : this(DefaultSessionName)
         {
         }
 
@@ -46,7 +45,7 @@ namespace ITM_ISM_Fixture
         /// This task will open a MessageBasedSession for the VISA resource name passed in.  The task will close the MessageBasedSession when the task is disposed.
         /// </summary>
         /// <param name="sessionName">The VISA resource name of the instrument for which the task will open a MessageBasedSession.  The task will close the MessageBasedSession when the task is disposed.</param>
-        public SetChannel_A(string sessionName) : this (OpenSession(sessionName), true)
+        public BK2831E_2_INIT(string sessionName) : this (OpenSession(sessionName), true)
         {
         }
         
@@ -54,7 +53,7 @@ namespace ITM_ISM_Fixture
         /// This task will use the MessageBasedSession passed in.  The task will not close the MessageBasedSession when the task is disposed; the caller is responsible for closing the session.
         /// </summary>
         /// <param name="session">MessageBasedSession used by this task.</param>
-        public SetChannel_A(MessageBasedSession session) : this(session, false)
+        public BK2831E_2_INIT(MessageBasedSession session) : this(session, false)
         {
         }
 
@@ -63,23 +62,20 @@ namespace ITM_ISM_Fixture
         /// </summary>
         /// <param name="session">MessageBasedSession used by this task.</param>
         /// <param name="taskHandlesSessionLifetime">If true, the task will close session when the task is disposed. If false, the caller is responsible for closing session.</param>
-        public SetChannel_A(MessageBasedSession session, bool taskHandlesSessionLifetime)
+        public BK2831E_2_INIT(MessageBasedSession session, bool taskHandlesSessionLifetime)
         {
             if (session == null)
                 throw new ArgumentNullException("session");
 
             _instrumentSession = session;
             _instrumentSession.Timeout = 2000;
-            _instrumentSession.TerminationCharacterEnabled = true;
-            _instrumentSession.TerminationCharacter = 10;
+            _instrumentSession.TerminationCharacterEnabled = false;
+            _instrumentSession.TerminationCharacter = 0;
             
             // The caller can control the VISA session lifetime by passing in false for taskHandlesSessionLifetime.  If taskHandlesSessionLifetime
             // is true, then the VISA session will be closed when the caller disposes this task.
             _handleSessionLifetime = taskHandlesSessionLifetime;
-        
-            // The MessageBasedSessionWriter is used to write formatted data to the instrument
-            _writer = new MessageBasedSessionWriter(_instrumentSession);
-        }
+                }
     
         public void Dispose()
         {
@@ -91,7 +87,6 @@ namespace ITM_ISM_Fixture
                     _instrumentSession = null;
                 }
             }
-            _writer = null;
             GC.SuppressFinalize(this);
         }
     
@@ -104,12 +99,6 @@ namespace ITM_ISM_Fixture
                 throw new ArgumentNullException("_instrumentSession");
         
             
-
-            // Write step
-            // Format input value into the write buffer
-            _writer.Write("CHI = 0\n");
-            // Send buffered data to the instrument
-            _writer.Flush();
         }
     }
 }

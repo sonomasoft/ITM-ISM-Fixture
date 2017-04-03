@@ -20,25 +20,48 @@ namespace ITM_ISM_Fixture
 {
 
 
-    public sealed class SetChannel_A : IDisposable
+    /// <summary>
+    /// Class that contains the parsed values from an Instrument I/O task.  The task's Run method will return an instance of this class populated with the parsed values.
+    /// </summary>    
+    public sealed class BK1685B_2_GETDResults
+    {
+        private string _token;
+        private string _token2;
+        
+        public string Token
+        {
+            get { return _token; }
+            set { _token = value; }
+        }
+        
+        public string Token2
+        {
+            get { return _token2; }
+            set { _token2 = value; }
+        }
+    }
+    
+
+    public sealed class BK1685B_2_GETD : IDisposable
     {
         MessageBasedSession _instrumentSession = null;
         bool _handleSessionLifetime = true;
-        MessageBasedSessionWriter _writer;
-        private const string DefaultSessionName = "DUT";
+        MessageBasedSessionReader _reader;
+
+        private const string DefaultSessionName = "BK1685B-2";
         
         private static MessageBasedSession OpenSession(string sessionName)
         {
             if (sessionName == null)
                 throw new ArgumentNullException("sessionName");
 
-            return (MessageBasedSession)ResourceManager.GetLocalManager().Open(sessionName, (AccessModes)0, 0);
+            return (MessageBasedSession)ResourceManager.GetLocalManager().Open(sessionName, (AccessModes)4, 0);
         }
         
         /// <summary>
         /// This task will open a MessageBasedSession for the VISA resource name configured in the I/O Assistant.  The task will close the MessageBasedSession when the task is disposed.
         /// </summary>
-        public SetChannel_A() : this(DefaultSessionName)
+        public BK1685B_2_GETD() : this(DefaultSessionName)
         {
         }
 
@@ -46,7 +69,7 @@ namespace ITM_ISM_Fixture
         /// This task will open a MessageBasedSession for the VISA resource name passed in.  The task will close the MessageBasedSession when the task is disposed.
         /// </summary>
         /// <param name="sessionName">The VISA resource name of the instrument for which the task will open a MessageBasedSession.  The task will close the MessageBasedSession when the task is disposed.</param>
-        public SetChannel_A(string sessionName) : this (OpenSession(sessionName), true)
+        public BK1685B_2_GETD(string sessionName) : this (OpenSession(sessionName), true)
         {
         }
         
@@ -54,7 +77,7 @@ namespace ITM_ISM_Fixture
         /// This task will use the MessageBasedSession passed in.  The task will not close the MessageBasedSession when the task is disposed; the caller is responsible for closing the session.
         /// </summary>
         /// <param name="session">MessageBasedSession used by this task.</param>
-        public SetChannel_A(MessageBasedSession session) : this(session, false)
+        public BK1685B_2_GETD(MessageBasedSession session) : this(session, false)
         {
         }
 
@@ -63,22 +86,24 @@ namespace ITM_ISM_Fixture
         /// </summary>
         /// <param name="session">MessageBasedSession used by this task.</param>
         /// <param name="taskHandlesSessionLifetime">If true, the task will close session when the task is disposed. If false, the caller is responsible for closing session.</param>
-        public SetChannel_A(MessageBasedSession session, bool taskHandlesSessionLifetime)
+        public BK1685B_2_GETD(MessageBasedSession session, bool taskHandlesSessionLifetime)
         {
             if (session == null)
                 throw new ArgumentNullException("session");
 
             _instrumentSession = session;
             _instrumentSession.Timeout = 2000;
+            SerialSession ss = (SerialSession)_instrumentSession;
+            ss.ReadTermination = SerialTerminationMethod.TerminationCharacter;
             _instrumentSession.TerminationCharacterEnabled = true;
-            _instrumentSession.TerminationCharacter = 10;
+            _instrumentSession.TerminationCharacter = 13;
             
             // The caller can control the VISA session lifetime by passing in false for taskHandlesSessionLifetime.  If taskHandlesSessionLifetime
             // is true, then the VISA session will be closed when the caller disposes this task.
             _handleSessionLifetime = taskHandlesSessionLifetime;
         
-            // The MessageBasedSessionWriter is used to write formatted data to the instrument
-            _writer = new MessageBasedSessionWriter(_instrumentSession);
+            // The MessageBasedSessionReader is used to read and parse data returned from the instrument
+            _reader = new MessageBasedSessionReader(_instrumentSession);
         }
     
         public void Dispose()
@@ -91,25 +116,39 @@ namespace ITM_ISM_Fixture
                     _instrumentSession = null;
                 }
             }
-            _writer = null;
+            _reader = null;
             GC.SuppressFinalize(this);
         }
     
         /// <summary>
         /// Executes the instrument I/O task.
         /// </summary>
-        public void Run( )
+        public BK1685B_2_GETDResults Run( )
         {
             if (_instrumentSession == null)
                 throw new ArgumentNullException("_instrumentSession");
         
-            
+            BK1685B_2_GETDResults outputs = new BK1685B_2_GETDResults();
 
-            // Write step
-            // Format input value into the write buffer
-            _writer.Write("CHI = 0\n");
-            // Send buffered data to the instrument
-            _writer.Flush();
+            // Query step
+            // Does a VISA Write
+            _instrumentSession.Write("GETD\r");
+            // Parses out one ASCII string separated by one or more delimiters
+            outputs.Token = _reader.ReadMismatch(",;\r\n\t");
+            _reader.ReadMatch(",;\r\n\t");
+            // Read and discard the rest of the response
+            _reader.DiscardUnreadData();
+
+            // Query step
+            // Does a VISA Write
+            _instrumentSession.Write("GETD\r");
+            // Parses out one ASCII string separated by one or more delimiters
+            outputs.Token2 = _reader.ReadMismatch(",;\r\n\t");
+            _reader.ReadMatch(",;\r\n\t");
+            // Read and discard the rest of the response
+            _reader.DiscardUnreadData();
+
+            return outputs;
         }
     }
 }

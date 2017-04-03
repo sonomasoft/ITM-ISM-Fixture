@@ -135,7 +135,7 @@ namespace ITM_ISM_Fixture
             outputs.Token = _reader.ReadMismatch(",;\r\n\t");
             _reader.ReadMatch(",;\r\n\t");
             // Read and discard the rest of the response
-            //_reader.DiscardUnreadData();
+            _reader.DiscardUnreadData();
 
             // Read step
             // Read and discard unparsed response data

@@ -14,6 +14,7 @@ using NationalInstruments.Analysis.Monitoring;
 using NationalInstruments.Analysis.SignalGeneration;
 using NationalInstruments.Tdms;
 using NationalInstruments.UI.WindowsForms;
+
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -28,11 +29,18 @@ using System.IO;
 using System.Timers;
 using System.Text.RegularExpressions;
 
+using Microsoft.Win32;
+using System.IO.Ports;
+
+using System.Net;
 
 
 
 namespace ITM_ISM_Fixture
 {
+    using System.Management;
+    
+
     public partial class MainForm : Form
     {
         private Imports.ps5000aBlockReady _callbackDelegate;
@@ -96,6 +104,15 @@ namespace ITM_ISM_Fixture
         public bool ProgramResult = false;
         public string flashstring = "Data";
 
+        public string IxM_port = null;
+
+        public string Txresponse = null;
+
+        public string comResponseString = null;
+        public bool comResponse = false;
+
+
+
 
 
 
@@ -125,7 +142,27 @@ namespace ITM_ISM_Fixture
         public double ChargeCurrent = 0;
 
 
+        static List<USBDeviceInfo> GetUSBDevices()
+        {
+            List<USBDeviceInfo> devices = new List<USBDeviceInfo>();
 
+
+            ManagementObjectCollection collection;
+            using (var searcher = new ManagementObjectSearcher(@"Select * FROM Win32_SerialPort"))
+                collection = searcher.Get();
+
+            foreach (var device in collection)
+            {
+                devices.Add(new USBDeviceInfo(
+                (string)device.GetPropertyValue("DeviceID"),
+                (string)device.GetPropertyValue("PNPDeviceID"),
+                (string)device.GetPropertyValue("Description")
+                ));
+            }
+
+            collection.Dispose();
+            return devices;
+        }
 
 
 
@@ -216,11 +253,11 @@ namespace ITM_ISM_Fixture
 
                 BK1685bOn.Run();
 
-                Thread.Sleep(2500);  // stablize
+                Thread.Sleep(4000);  // stablize
 
 
 
-                Test_ONCurrent();
+               Test_ONCurrent();  // move this to the power supply for measurement 
 
 
                 
@@ -631,6 +668,75 @@ namespace ITM_ISM_Fixture
 
                     
 
+ 
+
+
+                  
+
+                    // 2.  run boot test
+
+
+                    // need to wait for tx to enumerate 
+
+                    // do not enable charge until we have enumerated.  Keep termister out of circuit until we connect.
+                    // begin a timer here for valid boot.  It takes about 30 seconds to boot.
+
+                    led5.OffColor = Color.Yellow;
+
+                    this.Refresh();
+
+                    timer3.Interval = 20000; // 40 seconds
+                    timer3.Enabled = true;
+
+                    IxM_port = findIxM();
+
+                    while (IxM_port == "NoIxM")
+                    {
+
+                        IxM_port = findIxM();
+                        Application.DoEvents();
+
+                    }
+
+
+
+                    Console.WriteLine("Found Transmitter on {0}", IxM_port);
+
+
+                    DUTport.PortName = IxM_port;
+
+                    DUTport.Open();
+                    Txresponse = TxCommand("ver");
+                    timer3.Enabled = false;
+
+
+                    Console.WriteLine("Response From Juno: {0}", Txresponse); // may have to capture this as soon as we have cr
+
+                    //BootTest();
+                    Thread.Sleep(500);  // need delay between transactions
+
+
+
+                    if (Txresponse.Contains("Firmware:"))
+                    {
+
+                        led5.OffColor = Color.LimeGreen;
+
+
+                    }
+                    else
+                    {
+                        led5.OffColor = Color.Red;
+
+
+                    }
+
+
+                    this.Refresh();
+
+
+
+
                     // 2.  measure charge current
 
 
@@ -641,15 +747,6 @@ namespace ITM_ISM_Fixture
                     // 3. connect to shell to make sure boot worked.
 
 
-                  
-
-                    // 4.  run boot test
-
-
-                    BootTest();
-                    Thread.Sleep(500);  // need delay between transactions
-
-                   
 
 
                 }
@@ -661,7 +758,26 @@ namespace ITM_ISM_Fixture
                 {
 
 
-                    // turn charge circuit off
+                    float IRDutycyle = 0;
+                    // turn LED's ON  
+
+                    Txresponse = TxCommand("IRLED = 1");
+                    timer3.Enabled = false;
+
+
+                    Console.WriteLine("Response From Juno: {0}", Txresponse); // may have to capture this as soon as we have cr
+                   
+                    
+                    
+                    // setup mfg mode
+
+
+
+                    Txresponse = TxCommand("mfgt= 1");
+                    timer3.Enabled = false;
+
+
+                    Console.WriteLine("Response From Juno: {0}", Txresponse); // may have to capture this as soon as we have cr
 
 
 
@@ -670,18 +786,24 @@ namespace ITM_ISM_Fixture
 
                     // unmute
 
-                    IrLedOn();
+                   // IrLedOn();
 
                     Thread.Sleep(500);  // need delay between transactions
 
-                    SetMFGMode();
+                   // SetMFGMode();
 
 
                     Thread.Sleep(500);  // need delay between transactions
 
                     // set to channel A via shell
 
-                    SetChannel(1);
+                    // SetChannel(1);  CHI = 0
+
+                    Txresponse = TxCommand("CHI = 0");
+                    timer3.Enabled = false;
+
+
+                    Console.WriteLine("Response From Juno: {0}", Txresponse); // may have to capture this as soon as we have cr
 
 
                     led9.OffColor = Color.Yellow;
@@ -689,9 +811,17 @@ namespace ITM_ISM_Fixture
                     this.Refresh();
 
                     // measure duty cycle
-                    button2.PerformClick();
-
+                    //button2.PerformClick();
                     timer2.Enabled = true;
+
+
+                    // Adjust to 25%
+                    IRDutycyle = getdutycycle();
+
+
+
+                    if ((IRDutycyle > 27) | (IRDutycyle < 23))
+                        AdjustDuty();
 
 
                     while (timer2.Enabled == true)
@@ -702,17 +832,74 @@ namespace ITM_ISM_Fixture
                     }
 
 
-                    // Adjust to 25%
+                    // validate
+
+
+                    IRDutycyle = getdutycycle();
+                    if ((IRDutycyle < 27) | (IRDutycyle > 23))
+                    {
+                        led9.OffColor = Color.LimeGreen;
+
+
+                    }
+                    else
+                    {
+                        led9.OffColor = Color.Red;
+
+                    }
+
+                    this.Refresh();
+                   
 
 
                     // measure Current
+
+
+                    //BK2831E_2_SetCurrent setupCurrent = new BK2831E_2_SetCurrent();
+
+                    BK2831E_2_ReadCurrent GetIRCurrent = new BK2831E_2_ReadCurrent();
+
+
+
+                    //setupCurrent.Run();
+
+
+                    // set to low coverage mode
+
+                    Txresponse = TxCommand("cov = 1");
+                    timer3.Enabled = false;
+
+
+                    Console.WriteLine("Response From Juno: {0}", Txresponse); // may have to capture this as soon as we have cr
+
+
+                    BK2831E_2_ReadCurrentResults results = GetIRCurrent.Run();
+
+                    string myCurrent = results.Token2.ToString();
+
+
+
+                    double IRCurrent = Convert.ToDouble(myCurrent);
+
+
+
+
 
 
                     // adjust to desired value
 
 
 
-                    SetChannel(2);
+                  //  SetChannel(2);
+
+
+                    Txresponse = TxCommand("CHI = 1");
+                    timer3.Enabled = false;
+
+
+
+
+                    Console.WriteLine("Response From Juno: {0}", Txresponse); // may have to capture this as soon as we have cr
 
 
                     led10.OffColor = Color.Yellow;
@@ -720,10 +907,18 @@ namespace ITM_ISM_Fixture
                     this.Refresh();
 
                     // measure duty cycle
-                    button2.PerformClick();
+                   // button2.PerformClick();
 
 
                     timer2.Enabled = true;
+
+                    // Adjust to 25%
+                    IRDutycyle = getdutycycle();
+
+
+
+                    if ((IRDutycyle > 27) | (IRDutycyle < 23))
+                        AdjustDuty();
 
 
                     while (timer2.Enabled == true)
@@ -733,6 +928,24 @@ namespace ITM_ISM_Fixture
 
                     }
 
+                    // validate
+
+
+                    IRDutycyle = getdutycycle();
+                    if ((IRDutycyle < 27) | (IRDutycyle > 23))
+                    {
+                        led10.OffColor = Color.LimeGreen;
+
+
+                    }
+                    else
+                    {
+                        led10.OffColor = Color.Red;
+
+                    }
+
+                    this.Refresh();
+
                     // Adjust to 25%
 
 
@@ -741,7 +954,13 @@ namespace ITM_ISM_Fixture
 
                     // adjust to desired value
 
-                    SetChannel(3);
+                    //SetChannel(3);
+
+                    Txresponse = TxCommand("CHI = 2");
+                    timer3.Enabled = false;
+
+
+                    Console.WriteLine("Response From Juno: {0}", Txresponse); // may have to capture this as soon as we have cr
 
 
                     led11.OffColor = Color.Yellow;
@@ -749,9 +968,18 @@ namespace ITM_ISM_Fixture
                     this.Refresh();
 
                     // measure duty cycle
-                    button2.PerformClick();
+                   // button2.PerformClick();
 
                     timer2.Enabled = true;
+
+
+                    // Adjust to 25%
+                    IRDutycyle = getdutycycle();
+
+
+
+                    if ((IRDutycyle > 27) | (IRDutycyle < 23))
+                        AdjustDuty();
 
 
                     while (timer2.Enabled == true)
@@ -762,6 +990,21 @@ namespace ITM_ISM_Fixture
                     }
 
 
+                    IRDutycyle = getdutycycle();
+                    if ((IRDutycyle < 27) | (IRDutycyle > 23))
+                    {
+                        led11.OffColor = Color.LimeGreen;
+
+
+                    }
+                    else
+                    {
+                        led11.OffColor = Color.Red;
+
+                    }
+
+                    this.Refresh();
+
                     // Adjust to 25%
 
 
@@ -770,7 +1013,13 @@ namespace ITM_ISM_Fixture
 
                     // adjust to desired value
 
-                    SetChannel(4);
+                  //  SetChannel(4);
+
+                    Txresponse = TxCommand("CHI = 3");
+                    timer3.Enabled = false;
+
+
+                    Console.WriteLine("Response From Juno: {0}", Txresponse); // may have to capture this as soon as we have cr
 
 
                     led12.OffColor = Color.Yellow;
@@ -778,10 +1027,18 @@ namespace ITM_ISM_Fixture
                     this.Refresh();
 
                     // measure duty cycle
-                    button2.PerformClick();
+                   // button2.PerformClick();
 
 
                     timer2.Enabled = true;
+
+                    // Adjust to 25%
+                    IRDutycyle = getdutycycle();
+
+
+
+                    if ((IRDutycyle > 27) | (IRDutycyle < 23))
+                        AdjustDuty();
 
 
                     while (timer2.Enabled == true)
@@ -790,6 +1047,22 @@ namespace ITM_ISM_Fixture
                         Application.DoEvents();
 
                     }
+
+
+                    IRDutycyle = getdutycycle();
+                    if ((IRDutycyle < 27) | (IRDutycyle > 23))
+                    {
+                        led12.OffColor = Color.LimeGreen;
+
+
+                    }
+                    else
+                    {
+                        led12.OffColor = Color.Red;
+
+                    }
+
+                    this.Refresh();
                     // Adjust to 25%
 
 
@@ -800,7 +1073,14 @@ namespace ITM_ISM_Fixture
 
 
 
-                    SetChannel(5);
+                  //  SetChannel(5);
+
+
+                    Txresponse = TxCommand("CHI = 4");
+                    timer3.Enabled = false;
+
+
+                    Console.WriteLine("Response From Juno: {0}", Txresponse); // may have to capture this as soon as we have cr
 
 
                     led13.OffColor = Color.Yellow;
@@ -808,9 +1088,17 @@ namespace ITM_ISM_Fixture
                     this.Refresh();
 
                     // measure duty cycle
-                    button2.PerformClick();
+                    //button2.PerformClick();
 
                     timer2.Enabled = true;
+
+                    // Adjust to 25%
+                    IRDutycyle = getdutycycle();
+
+
+
+                    if ((IRDutycyle > 27) | (IRDutycyle < 23))
+                        AdjustDuty();
 
 
                     while (timer2.Enabled == true)
@@ -820,13 +1108,22 @@ namespace ITM_ISM_Fixture
 
                     }
 
-                    // Adjust to 25%
+                    IRDutycyle = getdutycycle();
+                    if ((IRDutycyle < 27) | (IRDutycyle > 23))
+                    {
+                        led13.OffColor = Color.LimeGreen;
 
 
-                    // measure Current
+                    }
+                    else
+                    {
+                        led13.OffColor = Color.Red;
 
+                    }
 
-                    // adjust to desired value
+                    this.Refresh();
+
+                    // Save Settings!!
 
 
 
@@ -863,6 +1160,64 @@ namespace ITM_ISM_Fixture
 
 
                // chgOff(); // turn off charge voltage
+
+        }
+
+
+        private void AdjustDuty()
+        {
+            // start at .25 IRPW and step by .005 until we get to 25%
+
+            float IRDutycycle;
+            float setduty = 0.25f;
+            bool dutyOK = false;
+            string txcommandstring;
+
+
+
+
+
+
+
+
+
+            do
+            {
+
+
+                txcommandstring = "irpw = " + setduty.ToString();
+
+                Txresponse = TxCommand(txcommandstring);
+
+
+
+                Console.WriteLine("Response From Juno: {0}", Txresponse); // may have to capture this as soon as we have cr
+
+                IRDutycycle = getdutycycle();
+
+                this.Refresh();
+
+
+
+
+                if ((IRDutycycle < 27) & (IRDutycycle > 23))
+                {
+
+                    dutyOK = true;
+                }
+                else
+                {
+
+                    setduty = setduty - .005f;
+
+                }
+
+            } while (!dutyOK);
+
+
+
+
+
 
         }
 
@@ -1057,9 +1412,9 @@ namespace ITM_ISM_Fixture
 
             this.Refresh();
 
-            DUTBoot DBoot = new DUTBoot();
+          //  DUTBoot DBoot = new DUTBoot();
 
-            DUTBootResults results = DBoot.Run();
+          //  DUTBootResults results = DBoot.Run();
 
             // BK2831E_ReadCurrentResults results = myReadCurrent.Run();
 
@@ -1069,10 +1424,10 @@ namespace ITM_ISM_Fixture
 
 
 
-            string DUTVer = results.Token;
+            //string DUTVer = results.Token;
 
 
-
+            /*
             if (DUTVer.Contains("Firmware: 1.02"))
             {
 
@@ -1094,7 +1449,7 @@ namespace ITM_ISM_Fixture
                 instumentStatus = 1;
             }
 
-
+            */
 
             this.Refresh();
 
@@ -1102,6 +1457,60 @@ namespace ITM_ISM_Fixture
 
         }
 
+
+        private void Ton()
+        {
+            try
+            {
+                using (Task digitalWriteTask = new Task())
+                {
+                    digitalWriteTask.DOChannels.CreateChannel("NI-USB-6501/port1/line7", "",
+                        ChannelLineGrouping.OneChannelForAllLines);
+                    bool[] dataArray = new bool[1];
+                    dataArray[0] = false;
+                    DigitalSingleChannelWriter writer = new DigitalSingleChannelWriter(digitalWriteTask.Stream);
+                    writer.WriteSingleSampleMultiLine(true, dataArray);
+                }
+            }
+            catch (DaqException ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+
+            }
+
+
+
+        }
+
+        private void Toff()
+        {
+
+            try
+            {
+                using (Task digitalWriteTask = new Task())
+                {
+                    digitalWriteTask.DOChannels.CreateChannel("NI-USB-6501/port1/line7", "",
+                        ChannelLineGrouping.OneChannelForAllLines);
+                    bool[] dataArray = new bool[1];
+                    dataArray[0] = true;
+                    DigitalSingleChannelWriter writer = new DigitalSingleChannelWriter(digitalWriteTask.Stream);
+                    writer.WriteSingleSampleMultiLine(true, dataArray);
+                }
+            }
+            catch (DaqException ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+
+            }
+
+
+        }
 
 
         private void chgOn()
@@ -1180,14 +1589,47 @@ namespace ITM_ISM_Fixture
             this.Refresh();
 
 
-            BK2831E_SetCurrent SetCurrent = new BK2831E_SetCurrent();
+      
 
 
-            BK2831E_SetVoltage SetVoltage = new BK2831E_SetVoltage();
+            BK1685B_2_INIT BKPS2_INIT = new BK1685B_2_INIT();
 
 
-            SetCurrent.Run();
 
+         
+
+            BK1685B_2_GETD ReadChargeCurrent = new BK1685B_2_GETD();
+
+
+            
+            
+           
+            
+            // put thermistor in circut to activate charge
+
+            Ton();
+
+
+            Thread.Sleep(3000);
+
+
+            // read charge current
+            
+            
+            
+            
+            BK1685B_2_GETDResults results = ReadChargeCurrent.Run();
+
+
+            // display results
+
+
+
+
+            Toff();   // remove thermistor
+
+
+       
 
 
 
@@ -1195,19 +1637,18 @@ namespace ITM_ISM_Fixture
 
             Thread.Sleep(1000);
 
-            BK2831E_ReadCurrent myReadCurrent = new BK2831E_ReadCurrent();
-            BK2831E_ReadCurrentResults results = myReadCurrent.Run();
+            string current = results.Token.Substring(results.Token.Length - 3);
 
             double Ccurrent;
-            Ccurrent = Convert.ToDouble(results.Token2);
+            Ccurrent = Convert.ToDouble(current);
 
-            MeterReading.Text = (Math.Abs(Ccurrent) * 1000).ToString() + " mA";
+            MeterReading.Text = Ccurrent.ToString() + " mA";
 
             ChargeCurrent = Math.Abs(Ccurrent);
 
 
 
-            if ((ChargeCurrent > 0.01) & (powerupCurrent < 0.2))  // takes a bit to settle back on boot
+            if ((ChargeCurrent > 200) & (powerupCurrent < 520))  // takes a bit to settle back on boot
             {
                 ChargeCurrentResult = true;
                 led29.OffColor = Color.LimeGreen;
@@ -1234,7 +1675,7 @@ namespace ITM_ISM_Fixture
 
             this.Refresh();
 
-            SetVoltage.Run();  // switch back to voltage measurents.
+      
 
 
 
@@ -1248,33 +1689,32 @@ namespace ITM_ISM_Fixture
             led2.OffColor = Color.Yellow;
             this.Refresh();
 
-            BK2831E_SetCurrent SetCurrent = new BK2831E_SetCurrent();
+
+            BK1685BGETD ReadChargeCurrent = new BK1685BGETD();
 
 
-            BK2831E_SetVoltage SetVoltage = new BK2831E_SetVoltage();
+
+            BK1685BGETDResults results = ReadChargeCurrent.Run();
 
 
-            SetCurrent.Run();
+            // CURRENT IS LAST THREE DIGITS
 
-            
-            
+            string current = results.Token2.Substring(results.Token2.Length - 3);
 
-            //MAY HAVE TO PUT A DELAY HERE
+          
 
             Thread.Sleep(1000);
 
-            BK2831E_ReadCurrent myReadCurrent = new BK2831E_ReadCurrent();
-            BK2831E_ReadCurrentResults results = myReadCurrent.Run();
 
-            double Ccurrent;
-            Ccurrent = Convert.ToDouble(results.Token2);
+            double Ccurrent = 0;
+             Ccurrent = Convert.ToDouble(current);
 
-            MeterReading.Text = (Math.Abs(Ccurrent)*1000).ToString() + " mA";
+            MeterReading.Text = Ccurrent.ToString() + " mA";
 
             powerupCurrent = Math.Abs(Ccurrent);
 
 
-            if ((powerupCurrent > 0.02) & (powerupCurrent < 0.2))  // takes a bit to settle back on boot
+            if ((powerupCurrent > 20) & (powerupCurrent < 50))  // takes a bit to settle back on boot
             {
                 PowerUpCurrentResult = true;
                 led2.OffColor = Color.LimeGreen;
@@ -1301,7 +1741,7 @@ namespace ITM_ISM_Fixture
 
             this.Refresh();
 
-            SetVoltage.Run();  // switch back to voltage measurents.
+          //  SetVoltage.Run();  // switch back to voltage measurents.
 
 
            
@@ -2193,14 +2633,14 @@ namespace ITM_ISM_Fixture
                        {
 
                            if(RisingEdge==0)
-                           if(mVBuf[x]>1000)
-                           if (mVBuf[x - 1] < 1000)
+                           if(mVBuf[x]>1700)
+                           if (mVBuf[x - 1] < 1700)
                                RisingEdge = x;
 
                            if(RisingEdge>0)  // only do after we find the first rising edge
                            if(FallingEdge==0)
-                               if (mVBuf[x] < 1000)    // find the next rising edge for 1 full cycle
-                               if (mVBuf[x - 1] > 1000)
+                               if (mVBuf[x] < 1600)    // find the next rising edge for 1 full cycle
+                               if (mVBuf[x - 1] > 1600)
                                    FallingEdge = x;
 
                        }
@@ -2211,8 +2651,8 @@ namespace ITM_ISM_Fixture
                        for (x = FallingEdge; x < sampleCount; x++)
                        {
                            if (Risingedge2==0)
-                               if (mVBuf[x] > 1000)
-                                   if (mVBuf[x - 1] < 1000)
+                               if (mVBuf[x] > 1700)
+                                   if (mVBuf[x - 1] < 1700)
                                        Risingedge2 = x;
 
                        }
@@ -2221,7 +2661,7 @@ namespace ITM_ISM_Fixture
 
                        for (x = RisingEdge; x < Risingedge2; x++)
                        {
-                           if (mVBuf[x] < 1000)
+                           if (mVBuf[x] < 1700)
                            {
                                low++;
                            }
@@ -2262,6 +2702,301 @@ namespace ITM_ISM_Fixture
             {
                 Console.WriteLine("data collection aborted\n");
             }
+
+        }
+
+
+
+
+        public float getdutycycle()
+        {
+            //' Setup channel A
+
+            short status;
+            long total = 0;
+            float ave = 0;
+            float dutycycle=0;
+
+
+            status = Imports.SetChannel(handle, Imports.Channel.ChannelA, 1, 1, Imports.Range.Range_5V, 0);  // dC coupled.  
+
+            // Turn off other channels (just b for this model)
+
+            status = Imports.SetChannel(handle, Imports.Channel.ChannelB, 0, 1, Imports.Range.Range_5V, 0);
+
+
+
+            //Find maximum ADC count (resolution dependent)
+
+            status = Imports.MaximumValue(handle, out maxADCValue);
+
+            Console.WriteLine("maxADCValue : {0}", maxADCValue);
+
+
+
+            timebase = 1;  // was 65
+            numPreTriggerSamples = 0;
+            numPostTriggerSamples = 0;  // was 10k
+            totalSamples = numPreTriggerSamples + numPostTriggerSamples;
+
+            timeIntervalNs = 0;  // this was a CSng directive in vb
+            maxSamples = 0;
+            segmentIndex = 0;
+            getTimebase2Status = 14; // Initialise as invalid timebase
+
+
+            while (getTimebase2Status != 0)
+            {
+                //getTimebase2Status = ps5000aGetTimebase2(handle, timebase, totalSamples, timeIntervalNs, maxSamples, segmentIndex)
+                getTimebase2Status = Imports.GetTimebase(handle, timebase, totalSamples, out timeIntervalNs, out maxSamples, segmentIndex);
+
+                if (getTimebase2Status != 0)
+                    timebase++;
+
+
+            }
+
+            Console.WriteLine("Timebase: {0} Sample interval: {1}ns, Max Samples: {2}", timebase, timeIntervalNs, maxSamples);
+
+
+            // Setup trigger
+
+
+
+
+            threshold = mvToAdc(0, (int)Imports.Range.Range_5V);
+
+            Console.WriteLine("Trigger threshold: {0}mV ({1} ADC Counts)", threshold, 200);
+
+            delay = 0;
+            autoTriggerMs = 0;
+            int timeIndisposed;
+
+
+            bool retry;
+            uint sampleCount = 2048;
+
+            string data;
+            int x;
+            int _channelCount = 1;
+
+
+            short[] minBuffers = new short[sampleCount];
+            short[] maxBuffers = new short[sampleCount];
+            PinnedArray<short>[] minPinned = new PinnedArray<short>[_channelCount];
+            PinnedArray<short>[] maxPinned = new PinnedArray<short>[_channelCount];
+
+            minPinned[0] = new PinnedArray<short>(minBuffers);
+            maxPinned[0] = new PinnedArray<short>(maxBuffers);
+            status = Imports.SetDataBuffers(handle, Imports.Channel.ChannelA, maxBuffers, minBuffers, (int)sampleCount, 0, Imports.RatioMode.None);
+            Console.WriteLine("BlockData\n");
+
+
+            status = Imports.SetSimpleTrigger(handle, 0, Imports.Channel.ChannelA, threshold, Imports.ThresholdDirection.Rising, delay, autoTriggerMs);
+
+
+            //Capture block
+
+            //Create instance of delegate
+            //ps5000aBlockCallback = New ps5000aBlockReady(AddressOf BlockCallback)
+
+
+
+
+            _ready = false;
+            _callbackDelegate = BlockCallback;
+
+
+
+            Thread.Sleep(500);
+
+            do
+            {
+                retry = false;
+                status = Imports.RunBlock(handle, 0, (int)sampleCount, timebase, out timeIndisposed, 0, _callbackDelegate, IntPtr.Zero);
+                if (status == (short)Imports.PICO_POWER_SUPPLY_CONNECTED || status == (short)Imports.PICO_POWER_SUPPLY_NOT_CONNECTED || status == (short)Imports.PICO_POWER_SUPPLY_UNDERVOLTAGE)
+                {
+                    retry = true;
+                }
+                else
+                {
+                    Console.WriteLine("Run Block Called\n");
+                }
+            }
+            while (retry);
+
+            Console.WriteLine("Waiting for Data\n");
+
+            while (!_ready)
+            {
+                Thread.Sleep(100);
+            }
+
+            Imports.Stop(handle);
+
+            int[] mVBuf = new int[2048];
+
+            float high = 0;
+            float low = 0;
+
+            int cyclecount = 0;
+            bool iscountinglow = false;
+            bool iscountinghigh = false;
+
+            bool isTriggered = false;
+
+
+
+
+
+
+
+
+            Mitov.SignalLab.RealBuffer DataBuffer = new Mitov.SignalLab.RealBuffer(2048);  // set up buffer for anylisis
+
+            if (_ready)
+            {
+                short overflow;
+                status = Imports.GetValues(handle, 0, ref sampleCount, 1, Imports.DownSamplingMode.None, 0, out overflow);
+                if (status == (short)Imports.PICO_OK)
+                {
+
+                    Console.WriteLine("Have Data\n");
+                    for (x = 0; x < sampleCount; x++)
+                    {
+                        //data = maxBuffers[x].ToString();
+
+                        //textData.AppendText("\n");
+
+                        // keep a running total for averaging our samples
+                        // 5V = 32768 (16 bit) So we need to scale our values accorddingly
+
+
+
+                        int mymV = adcToMv(maxBuffers[x], (int)Imports.Range.Range_5V);
+                        //data = mymV.ToString();
+                        //Console.WriteLine(data);
+
+                        mVBuf[x] = mymV;
+
+                        // calculate duty cycle on one full cycle of wave form
+
+
+
+
+
+  
+                        total = ((Math.Abs(mymV * mymV))) + total;  // convert to mV  // don't square
+
+                        // for duty cycle calculation set high Threshold to
+                        // set low threshold 
+
+                        DataBuffer[x] = Convert.ToDouble(mymV);
+
+
+
+
+
+                    }
+
+
+
+
+                    // calculate average over our 1000 samples
+
+
+                    genericReal1.SendData(DataBuffer); // send the data we have
+
+
+
+                    // calculate duty cycle  = (time on/ time off) *100
+
+
+                    // find full cycle between peeks
+
+                    int RisingEdge = 0;
+                    int FallingEdge = 0;
+                    int Risingedge2 = 0;
+
+
+                    for (x = 1; x < sampleCount; x++)
+                    {
+
+                        if (RisingEdge == 0)
+                            if (mVBuf[x] > 1700)
+                                if (mVBuf[x - 1] < 1700)
+                                    RisingEdge = x;
+
+                        if (RisingEdge > 0)  // only do after we find the first rising edge
+                            if (FallingEdge == 0)
+                                if (mVBuf[x] < 1600)    // find the next rising edge for 1 full cycle
+                                    if (mVBuf[x - 1] > 1600)
+                                        FallingEdge = x;
+
+                    }
+
+
+
+
+                    for (x = FallingEdge; x < sampleCount; x++)
+                    {
+                        if (Risingedge2 == 0)
+                            if (mVBuf[x] > 1700)
+                                if (mVBuf[x - 1] < 1700)
+                                    Risingedge2 = x;
+
+                    }
+
+
+
+                    for (x = RisingEdge; x < Risingedge2; x++)
+                    {
+                        if (mVBuf[x] < 1700)
+                        {
+                            low++;
+                        }
+                        else
+                        {
+
+                            high++;
+                        }
+
+
+
+
+                    }
+
+
+                    
+
+                    dutycycle = (high / (high + low)) * 100;
+
+                    label17.Text = "Duty Cycle = " + (dutycycle.ToString());
+
+                    // for frequency we just need to kno the sample period  and count the wavelength and invert
+                    double frequency;
+                    frequency = 1 / (2e-9 * (high + low));
+
+
+                    // label18.Text = "Frequency = " + (frequency.ToString());
+
+
+                }
+                else
+                {
+                    Console.WriteLine("No Data\n");
+
+                }
+            }
+            else
+            {
+                Console.WriteLine("data collection aborted\n");
+            }
+
+
+
+            return dutycycle;
+
 
         }
 
@@ -2442,5 +3177,183 @@ namespace ITM_ISM_Fixture
         }
 
 
+
+
+        public string findIxM()
+        {
+            bool success = false;
+            string myIxM = null;
+
+            var usbDevices = GetUSBDevices();
+
+            foreach (var usbDevice in usbDevices)
+            {
+                Console.WriteLine("Device ID: {0}, PNP Device ID: {1}, Description: {2}",
+                    usbDevice.DeviceID, usbDevice.PnpDeviceID, usbDevice.Description);
+
+
+                // test
+
+                if (usbDevice.Description == "FrontRow ISM-01 Pass-around Microphone")
+                {
+                    Console.WriteLine("Got it!!!!!!!!!!!!!!!!!!");
+
+                    Console.WriteLine(usbDevice.DeviceID);
+                    // save the port name;
+                    myIxM = usbDevice.DeviceID;
+                    success = true;
+
+                }
+
+                if (usbDevice.Description == "FrontRow ITM-01 Pendant Microphone")
+                {
+                    Console.WriteLine("Got it!!!!!!!!!!!!!!!!!!");
+
+                    Console.WriteLine(usbDevice.DeviceID);
+                    // save the port name;
+                    myIxM = usbDevice.DeviceID;
+                    success = true;
+
+                }
+            }
+
+            if (!success)
+            {
+                /*
+                MessageBox.Show("Juno not found.  Check your setup.",
+               "Error",
+               MessageBoxButtons.OK,
+               MessageBoxIcon.Exclamation,
+               MessageBoxDefaultButton.Button1);
+                instumentStatus = 0;
+                 */
+                //Close();
+
+
+
+                return "NoIxM";
+            }
+
+
+
+            return myIxM;
+
+
+
+        }
+
+        private void timer3_Tick(object sender, EventArgs e)
+        {
+
+            timer3.Enabled = false;
+
+            MessageBox.Show("No Transmitter found.  Check your setup.",
+           "Error",
+           MessageBoxButtons.OK,
+           MessageBoxIcon.Exclamation,
+           MessageBoxDefaultButton.Button1);
+            instumentStatus = 1;
+
+            IxM_port = "Error!!!";
+        }
+
+
+
+        public string TxCommand(string command)
+        {
+            string theResponse;
+
+            DUTport.Write(command + "\n\r");
+
+            // wait for response
+            // set a timer for timeouts
+            timer4.Interval = 30000;
+            timer4.Enabled = true;
+
+
+
+            while (!comResponse)
+            {
+                Application.DoEvents();
+
+                //TODO  look for timeout
+            }
+
+            Thread.Sleep(200);  // allow for slow com port
+
+            // parse response
+
+            // Console.WriteLine("Response From Juno: {0}", comResponseString); // may have to capture this as soon as we have cr
+
+            theResponse = comResponseString;
+
+            comResponse = false;
+
+            //if (!JunoSeralClearLine)
+                comResponseString = null;
+
+            return theResponse;
+
+
+
+        }
+
+        private void timer4_Tick(object sender, EventArgs e)
+        {
+            // timeout on com port;
+
+            timer4.Enabled = false;
+            comResponse = true;   // so we don't get stuck
+        }
+
+
+        private void DUTport_DataReceived(object sender, SerialDataReceivedEventArgs e)
+        {
+
+
+            // Show all the incoming data in the port's buffer
+
+            // we need to wait until there is a cr
+
+
+            comResponseString = comResponseString + DUTport.ReadExisting();
+
+            // test for CR
+            //if (!JunoSeralClearLine)   // so we can use with fsk, we use a timer to set comResponse on a FSK task
+                if (comResponseString.Contains((char)13))
+                    comResponse = true;
+
+
+
+
+            // Console.WriteLine(comResponseString);
+
+        }
+
+        private void DUTport_DataReceived_1(object sender, SerialDataReceivedEventArgs e)
+        {
+            comResponseString = comResponseString + DUTport.ReadExisting();
+
+            // test for CR
+            //if (!JunoSeralClearLine)   // so we can use with fsk, we use a timer to set comResponse on a FSK task
+            if (comResponseString.Contains((char)13))
+                comResponse = true;
+        }
+
+
+    }
+
+
+    class USBDeviceInfo
+    {
+        public USBDeviceInfo(string deviceID, string pnpDeviceID, string description)
+        {
+            this.DeviceID = deviceID;
+            this.PnpDeviceID = pnpDeviceID;
+            this.Description = description;
+        }
+        public string DeviceID { get; private set; }
+        public string PnpDeviceID { get; private set; }
+        public string Description { get; private set; }
     }
 }

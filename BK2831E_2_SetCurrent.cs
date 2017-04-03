@@ -20,25 +20,25 @@ namespace ITM_ISM_Fixture
 {
 
 
-    public sealed class SetChannel_A : IDisposable
+    public sealed class BK2831E_2_SetCurrent : IDisposable
     {
         MessageBasedSession _instrumentSession = null;
         bool _handleSessionLifetime = true;
         MessageBasedSessionWriter _writer;
-        private const string DefaultSessionName = "DUT";
+        private const string DefaultSessionName = "BK2831E_2";
         
         private static MessageBasedSession OpenSession(string sessionName)
         {
             if (sessionName == null)
                 throw new ArgumentNullException("sessionName");
 
-            return (MessageBasedSession)ResourceManager.GetLocalManager().Open(sessionName, (AccessModes)0, 0);
+            return (MessageBasedSession)ResourceManager.GetLocalManager().Open(sessionName, (AccessModes)4, 0);
         }
         
         /// <summary>
         /// This task will open a MessageBasedSession for the VISA resource name configured in the I/O Assistant.  The task will close the MessageBasedSession when the task is disposed.
         /// </summary>
-        public SetChannel_A() : this(DefaultSessionName)
+        public BK2831E_2_SetCurrent() : this(DefaultSessionName)
         {
         }
 
@@ -46,7 +46,7 @@ namespace ITM_ISM_Fixture
         /// This task will open a MessageBasedSession for the VISA resource name passed in.  The task will close the MessageBasedSession when the task is disposed.
         /// </summary>
         /// <param name="sessionName">The VISA resource name of the instrument for which the task will open a MessageBasedSession.  The task will close the MessageBasedSession when the task is disposed.</param>
-        public SetChannel_A(string sessionName) : this (OpenSession(sessionName), true)
+        public BK2831E_2_SetCurrent(string sessionName) : this (OpenSession(sessionName), true)
         {
         }
         
@@ -54,7 +54,7 @@ namespace ITM_ISM_Fixture
         /// This task will use the MessageBasedSession passed in.  The task will not close the MessageBasedSession when the task is disposed; the caller is responsible for closing the session.
         /// </summary>
         /// <param name="session">MessageBasedSession used by this task.</param>
-        public SetChannel_A(MessageBasedSession session) : this(session, false)
+        public BK2831E_2_SetCurrent(MessageBasedSession session) : this(session, false)
         {
         }
 
@@ -63,13 +63,15 @@ namespace ITM_ISM_Fixture
         /// </summary>
         /// <param name="session">MessageBasedSession used by this task.</param>
         /// <param name="taskHandlesSessionLifetime">If true, the task will close session when the task is disposed. If false, the caller is responsible for closing session.</param>
-        public SetChannel_A(MessageBasedSession session, bool taskHandlesSessionLifetime)
+        public BK2831E_2_SetCurrent(MessageBasedSession session, bool taskHandlesSessionLifetime)
         {
             if (session == null)
                 throw new ArgumentNullException("session");
 
             _instrumentSession = session;
             _instrumentSession.Timeout = 2000;
+            SerialSession ss = (SerialSession)_instrumentSession;
+            ss.ReadTermination = SerialTerminationMethod.TerminationCharacter;
             _instrumentSession.TerminationCharacterEnabled = true;
             _instrumentSession.TerminationCharacter = 10;
             
@@ -107,7 +109,7 @@ namespace ITM_ISM_Fixture
 
             // Write step
             // Format input value into the write buffer
-            _writer.Write("CHI = 0\n");
+            _writer.Write(":FUNC CURR:DC\n");
             // Send buffered data to the instrument
             _writer.Flush();
         }

@@ -60,7 +60,7 @@
     <DebugType>full</DebugType>
     <PlatformTarget>x86</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
-    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
     <OutputPath>bin\x86\Release\</OutputPath>
@@ -93,6 +93,7 @@
     <Reference Include="NationalInstruments.VisaNS, Version=13.0.40.167, Culture=neutral, PublicKeyToken=dc6ad606294fc298, processorArchitecture=MSIL" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Management" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -103,6 +104,21 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BK1685B_2_GETD.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>BK1685B_2_GETD.mxb</DependentUpon>
+    </Compile>
+    <Compile Include="BK1685B_2_INIT.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>BK1685B_2_INIT.mxb</DependentUpon>
+    </Compile>
+    <Compile Include="BK1685BGETD.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>BK1685BGETD.mxb</DependentUpon>
+    </Compile>
     <Compile Include="BK1685B_INIT.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -117,6 +133,16 @@
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>BK1685C_0N.mxb</DependentUpon>
+    </Compile>
+    <Compile Include="BK2831E_2_ReadCurrent.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>BK2831E_2_ReadCurrent.mxb</DependentUpon>
+    </Compile>
+    <Compile Include="BK2831E_2_SetCurrent.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>BK2831E_2_SetCurrent.mxb</DependentUpon>
     </Compile>
     <Compile Include="BK2831E_ReadCurrent.cs">
       <AutoGen>True</AutoGen>
@@ -153,11 +179,6 @@
     </Compile>
     <Compile Include="ChargeOn.User.cs">
       <DependentUpon>ChargeOn.mxb</DependentUpon>
-    </Compile>
-    <Compile Include="DUTBoot.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>DUTBoot.mxb</DependentUpon>
     </Compile>
     <Compile Include="DUTMfgMode.cs">
       <AutoGen>True</AutoGen>
@@ -217,6 +238,22 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>SetChannel_E.mxb</DependentUpon>
     </Compile>
+    <Compile Include="Thermistor_OFF.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Thermistor_OFF.mxb</DependentUpon>
+    </Compile>
+    <Compile Include="Thermistor_OFF.User.cs">
+      <DependentUpon>Thermistor_OFF.mxb</DependentUpon>
+    </Compile>
+    <Compile Include="Thermistor_ON.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Thermistor_ON.mxb</DependentUpon>
+    </Compile>
+    <Compile Include="Thermistor_ON.User.cs">
+      <DependentUpon>Thermistor_ON.mxb</DependentUpon>
+    </Compile>
     <Compile Include="WritePort_0.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -247,6 +284,18 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <None Include="app.config" />
+    <None Include="BK1685B_2_GETD.mxb">
+      <Generator>NationalInstruments.MeasurementStudio.Tools.DotNET.MxbCodeGenerator.2010</Generator>
+      <LastGenOutput>BK1685B_2_GETD.cs</LastGenOutput>
+    </None>
+    <None Include="BK1685B_2_INIT.mxb">
+      <Generator>NationalInstruments.MeasurementStudio.Tools.DotNET.MxbCodeGenerator.2010</Generator>
+      <LastGenOutput>BK1685B_2_INIT.cs</LastGenOutput>
+    </None>
+    <None Include="BK1685BGETD.mxb">
+      <Generator>NationalInstruments.MeasurementStudio.Tools.DotNET.MxbCodeGenerator.2010</Generator>
+      <LastGenOutput>BK1685BGETD.cs</LastGenOutput>
+    </None>
     <None Include="BK1685B_INIT.mxb">
       <Generator>NationalInstruments.MeasurementStudio.Tools.DotNET.MxbCodeGenerator.2010</Generator>
       <LastGenOutput>BK1685B_INIT.cs</LastGenOutput>
@@ -258,6 +307,14 @@
     <None Include="BK1685C_0N.mxb">
       <Generator>NationalInstruments.MeasurementStudio.Tools.DotNET.MxbCodeGenerator.2010</Generator>
       <LastGenOutput>BK1685C_0N.cs</LastGenOutput>
+    </None>
+    <None Include="BK2831E_2_ReadCurrent.mxb">
+      <Generator>NationalInstruments.MeasurementStudio.Tools.DotNET.MxbCodeGenerator.2010</Generator>
+      <LastGenOutput>BK2831E_2_ReadCurrent.cs</LastGenOutput>
+    </None>
+    <None Include="BK2831E_2_SetCurrent.mxb">
+      <Generator>NationalInstruments.MeasurementStudio.Tools.DotNET.MxbCodeGenerator.2010</Generator>
+      <LastGenOutput>BK2831E_2_SetCurrent.cs</LastGenOutput>
     </None>
     <None Include="BK2831E_ReadCurrent.mxb">
       <Generator>NationalInstruments.MeasurementStudio.Tools.DotNET.MxbCodeGenerator.2010</Generator>
@@ -282,10 +339,6 @@
     <None Include="ChargeOn.mxb">
       <Generator>NationalInstruments.MeasurementStudio.Tools.DotNET.MxbCodeGenerator.2010</Generator>
       <LastGenOutput>ChargeOn.cs</LastGenOutput>
-    </None>
-    <None Include="DUTBoot.mxb">
-      <Generator>NationalInstruments.MeasurementStudio.Tools.DotNET.MxbCodeGenerator.2010</Generator>
-      <LastGenOutput>DUTBoot.cs</LastGenOutput>
     </None>
     <None Include="DUTMfgMode.mxb">
       <Generator>NationalInstruments.MeasurementStudio.Tools.DotNET.MxbCodeGenerator.2010</Generator>
@@ -331,6 +384,14 @@
     <None Include="SetChannel_E.mxb">
       <Generator>NationalInstruments.MeasurementStudio.Tools.DotNET.MxbCodeGenerator.2010</Generator>
       <LastGenOutput>SetChannel_E.cs</LastGenOutput>
+    </None>
+    <None Include="Thermistor_OFF.mxb">
+      <Generator>NationalInstruments.MeasurementStudio.Tools.DotNET.MxbCodeGenerator.2010</Generator>
+      <LastGenOutput>Thermistor_OFF.cs</LastGenOutput>
+    </None>
+    <None Include="Thermistor_ON.mxb">
+      <Generator>NationalInstruments.MeasurementStudio.Tools.DotNET.MxbCodeGenerator.2010</Generator>
+      <LastGenOutput>Thermistor_ON.cs</LastGenOutput>
     </None>
     <None Include="WritePort_0.mxb">
       <Generator>NationalInstruments.MeasurementStudio.Tools.DotNET.MxbCodeGenerator.2010</Generator>

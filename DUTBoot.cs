@@ -48,7 +48,7 @@ namespace ITM_ISM_Fixture
         bool _handleSessionLifetime = true;
         MessageBasedSessionReader _reader;
 
-        private const string DefaultSessionName = "DUT";
+        private const string DefaultSessionName = "COM3";
         
         private static MessageBasedSession OpenSession(string sessionName)
         {
@@ -137,7 +137,7 @@ namespace ITM_ISM_Fixture
             outputs.Token2 = _reader.ReadMismatch(",;\r\n\t");
             _reader.ReadMatch(",;\r\n\t");
             // Read and discard the rest of the response
-            //_reader.DiscardUnreadData();
+            _reader.DiscardUnreadData();
 
             // Read step
             // Read and discard unparsed response data
