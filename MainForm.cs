@@ -820,7 +820,7 @@ namespace ITM_ISM_Fixture
 
 
 
-                    if ((IRDutycyle > 27) | (IRDutycyle < 23))
+                    if ((IRDutycyle > 33) | (IRDutycyle < 27) | (Double.IsNaN(IRDutycyle)))
                         AdjustDuty();
 
 
@@ -836,7 +836,7 @@ namespace ITM_ISM_Fixture
 
 
                     IRDutycyle = getdutycycle();
-                    if ((IRDutycyle < 27) | (IRDutycyle > 23))
+                    if ((IRDutycyle < 33) | (IRDutycyle > 27))
                     {
                         led9.OffColor = Color.LimeGreen;
 
@@ -855,7 +855,7 @@ namespace ITM_ISM_Fixture
                     // measure Current
 
 
-                    //BK2831E_2_SetCurrent setupCurrent = new BK2831E_2_SetCurrent();
+                    BK2831E_2_SetCurrent setupCurrent = new BK2831E_2_SetCurrent();
 
                     BK2831E_2_ReadCurrent GetIRCurrent = new BK2831E_2_ReadCurrent();
 
@@ -876,17 +876,170 @@ namespace ITM_ISM_Fixture
                     BK2831E_2_ReadCurrentResults results = GetIRCurrent.Run();
 
                     string myCurrent = results.Token2.ToString();
+                    Thread.Sleep(250); // add delay
 
 
 
                     double IRCurrent = Convert.ToDouble(myCurrent);
 
+                    double ReturnCurrent = 0;
+
+
+                    led14.OffColor = Color.Yellow;
+
+                    this.Refresh();
+
+
+                    //  if current is out of spec, run cal
+
+                    if ((IRCurrent < .095) | (IRCurrent > .105))
+                    {
+                        ReturnCurrent=IRSetCurrent(1);  // 1 = low, 2 = mid, 3 = high
+
+
+                    }
+                    else
+                    {
+
+                        ReturnCurrent = IRCurrent;
+
+                    }
+
+
+                    if ((ReturnCurrent > .095) & (ReturnCurrent < .105))
+                    {
+                        led14.OffColor = Color.LimeGreen;
+
+
+                    }
+                    else
+                    {
+
+                        led14.OffColor = Color.Red;
+
+                    }
+
+                    this.Refresh();
+
+
+
+                    // set to MID coverage mode
+
+                    Txresponse = TxCommand("cov = 2");
+                    timer3.Enabled = false;
+
+
+                    Console.WriteLine("Response From Juno: {0}", Txresponse); // may have to capture this as soon as we have cr
+
+                    // our results sometimes gets corrupted  - need to fulsh the buffer?
+                    results = GetIRCurrent.Run();
+
+                    myCurrent = results.Token2.ToString();
+
+                    Thread.Sleep(250); // add delay
+
+                    IRCurrent = Convert.ToDouble(myCurrent);
+
+                    ReturnCurrent = 0;
+
+
+                    led23.OffColor = Color.Yellow;
+
+                    this.Refresh();
+
+
+                    //  if current is out of spec, run cal
+
+                    if ((IRCurrent < .11) | (IRCurrent > .12))
+                    {
+                        ReturnCurrent = IRSetCurrent(2);  // 1 = low, 2 = mid, 3 = high
+
+
+                    }
+                    else
+                    {
+
+                        ReturnCurrent = IRCurrent;
+
+                    }
+
+
+                    if ((ReturnCurrent > .11) & (ReturnCurrent < .12))
+                    {
+                        led23.OffColor = Color.LimeGreen;
+
+
+                    }
+                    else
+                    {
+
+                        led23.OffColor = Color.Red;
+
+                    }
+
+                    this.Refresh();
 
 
 
 
 
-                    // adjust to desired value
+
+                    // set to HIGH coverage mode
+
+                    Txresponse = TxCommand("cov = 3");
+                    timer3.Enabled = false;
+
+
+                    Console.WriteLine("Response From Juno: {0}", Txresponse); // may have to capture this as soon as we have cr
+
+
+                    results = GetIRCurrent.Run();
+                    Thread.Sleep(250); // add delay
+
+                    myCurrent = results.Token2.ToString();
+
+
+
+                    IRCurrent = Convert.ToDouble(myCurrent);
+
+                    ReturnCurrent = 0;
+
+
+                    led28.OffColor = Color.Yellow;
+
+                    this.Refresh();
+
+
+                    //  if current is out of spec, run cal
+
+                    if ((IRCurrent < .125) | (IRCurrent > .135))
+                    {
+                        ReturnCurrent = IRSetCurrent(3);  // 1 = low, 2 = mid, 3 = high
+
+
+                    }
+                    else
+                    {
+
+                        ReturnCurrent = IRCurrent;
+
+                    }
+
+
+                    if ((ReturnCurrent > .125) & (ReturnCurrent < .135))
+                    {
+                        led28.OffColor = Color.LimeGreen;
+
+
+                    }
+                    else
+                    {
+
+                        led28.OffColor = Color.Red;
+
+                    }
+
+                    this.Refresh();
 
 
 
@@ -917,7 +1070,7 @@ namespace ITM_ISM_Fixture
 
 
 
-                    if ((IRDutycyle > 27) | (IRDutycyle < 23))
+                    if ((IRDutycyle > 33) | (IRDutycyle < 27) | (Double.IsNaN(IRDutycyle)))
                         AdjustDuty();
 
 
@@ -932,7 +1085,7 @@ namespace ITM_ISM_Fixture
 
 
                     IRDutycyle = getdutycycle();
-                    if ((IRDutycyle < 27) | (IRDutycyle > 23))
+                    if ((IRDutycyle < 33) | (IRDutycyle > 27))
                     {
                         led10.OffColor = Color.LimeGreen;
 
@@ -950,6 +1103,205 @@ namespace ITM_ISM_Fixture
 
 
                     // measure Current
+
+                    // measure Current
+
+
+        
+
+
+
+                    //setupCurrent.Run();
+
+
+                    // set to low coverage mode
+
+                    Txresponse = TxCommand("cov = 1");
+                    timer3.Enabled = false;
+
+
+                    Console.WriteLine("Response From Juno: {0}", Txresponse); // may have to capture this as soon as we have cr
+
+
+                     results = GetIRCurrent.Run();
+                     Thread.Sleep(250); // add delay
+
+                     myCurrent = results.Token2.ToString();
+
+
+
+                    IRCurrent = Convert.ToDouble(myCurrent);
+
+                    ReturnCurrent = 0;
+
+
+                    led15.OffColor = Color.Yellow;
+
+                    this.Refresh();
+
+
+                    //  if current is out of spec, run cal
+
+                    if ((IRCurrent < .095) | (IRCurrent > .105))
+                    {
+                        ReturnCurrent = IRSetCurrent(1);  // 1 = low, 2 = mid, 3 = high
+
+
+                    }
+                    else
+                    {
+
+                        ReturnCurrent = IRCurrent;
+
+                    }
+
+
+                    if ((ReturnCurrent > .095) & (ReturnCurrent < .105))
+                    {
+                        led15.OffColor = Color.LimeGreen;
+
+
+                    }
+                    else
+                    {
+
+                        led15.OffColor = Color.Red;
+
+                    }
+
+                    this.Refresh();
+
+
+
+                    // set to MID coverage mode
+
+                    Txresponse = TxCommand("cov = 2");
+                    timer3.Enabled = false;
+
+
+                    Console.WriteLine("Response From Juno: {0}", Txresponse); // may have to capture this as soon as we have cr
+
+
+                    results = GetIRCurrent.Run();
+
+                    myCurrent = results.Token2.ToString();
+
+
+
+                    IRCurrent = Convert.ToDouble(myCurrent);
+
+                    ReturnCurrent = 0;
+
+
+                    led22.OffColor = Color.Yellow;
+
+                    this.Refresh();
+
+
+                    //  if current is out of spec, run cal
+
+                    if ((IRCurrent < .11) | (IRCurrent > .12))
+                    {
+                        ReturnCurrent = IRSetCurrent(2);  // 1 = low, 2 = mid, 3 = high
+
+
+                    }
+                    else
+                    {
+
+                        ReturnCurrent = IRCurrent;
+
+                    }
+
+
+                    if ((ReturnCurrent > .11) & (ReturnCurrent < .12))
+                    {
+                        led22.OffColor = Color.LimeGreen;
+
+
+                    }
+                    else
+                    {
+
+                        led22.OffColor = Color.Red;
+
+                    }
+
+                    this.Refresh();
+
+
+
+
+
+
+                    // set to HIGH coverage mode
+
+                    Txresponse = TxCommand("cov = 3");
+                    timer3.Enabled = false;
+
+
+                    Console.WriteLine("Response From Juno: {0}", Txresponse); // may have to capture this as soon as we have cr
+
+
+                    results = GetIRCurrent.Run();
+
+                    myCurrent = results.Token2.ToString();
+
+
+
+                    IRCurrent = Convert.ToDouble(myCurrent);
+
+                    ReturnCurrent = 0;
+
+
+                    led27.OffColor = Color.Yellow;
+
+                    this.Refresh();
+
+
+                    //  if current is out of spec, run cal
+
+                    if ((IRCurrent < .125) | (IRCurrent > .135))
+                    {
+                        ReturnCurrent = IRSetCurrent(3);  // 1 = low, 2 = mid, 3 = high
+
+
+                    }
+                    else
+                    {
+
+                        ReturnCurrent = IRCurrent;
+
+                    }
+
+
+                    if ((ReturnCurrent > .125) & (ReturnCurrent < .135))
+                    {
+                        led27.OffColor = Color.LimeGreen;
+
+
+                    }
+                    else
+                    {
+
+                        led27.OffColor = Color.Red;
+
+                    }
+
+                    this.Refresh();
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
                     // adjust to desired value
@@ -978,7 +1330,7 @@ namespace ITM_ISM_Fixture
 
 
 
-                    if ((IRDutycyle > 27) | (IRDutycyle < 23))
+                    if ((IRDutycyle > 33) | (IRDutycyle < 27) | (Double.IsNaN(IRDutycyle)))
                         AdjustDuty();
 
 
@@ -991,7 +1343,7 @@ namespace ITM_ISM_Fixture
 
 
                     IRDutycyle = getdutycycle();
-                    if ((IRDutycyle < 27) | (IRDutycyle > 23))
+                    if ((IRDutycyle < 33) | (IRDutycyle > 27))
                     {
                         led11.OffColor = Color.LimeGreen;
 
@@ -1009,7 +1361,194 @@ namespace ITM_ISM_Fixture
 
 
                     // measure Current
+                    // measure Current
 
+
+
+
+
+
+                    //setupCurrent.Run();
+
+
+                    // set to low coverage mode
+
+                    Txresponse = TxCommand("cov = 1");
+                    timer3.Enabled = false;
+
+
+                    Console.WriteLine("Response From Juno: {0}", Txresponse); // may have to capture this as soon as we have cr
+
+
+                    results = GetIRCurrent.Run();
+
+                    Thread.Sleep(250);
+
+                    myCurrent = results.Token2.ToString();
+
+
+
+                    IRCurrent = Convert.ToDouble(myCurrent);
+
+                    ReturnCurrent = 0;
+
+
+                    led16.OffColor = Color.Yellow;
+
+                    this.Refresh();
+
+
+                    //  if current is out of spec, run cal
+
+                    if ((IRCurrent < .095) | (IRCurrent > .105))
+                    {
+                        ReturnCurrent = IRSetCurrent(1);  // 1 = low, 2 = mid, 3 = high
+
+
+                    }
+                    else
+                    {
+
+                        ReturnCurrent = IRCurrent;
+
+                    }
+
+
+                    if ((ReturnCurrent > .095) & (ReturnCurrent < .105))
+                    {
+                        led16.OffColor = Color.LimeGreen;
+
+
+                    }
+                    else
+                    {
+
+                        led16.OffColor = Color.Red;
+
+                    }
+
+                    this.Refresh();
+
+
+
+                    // set to MID coverage mode
+
+                    Txresponse = TxCommand("cov = 2");
+                    timer3.Enabled = false;
+
+
+                    Console.WriteLine("Response From Juno: {0}", Txresponse); // may have to capture this as soon as we have cr
+
+
+                    results = GetIRCurrent.Run();
+
+                    Thread.Sleep(250);
+
+                    myCurrent = results.Token2.ToString();
+
+
+
+                    IRCurrent = Convert.ToDouble(myCurrent);
+
+                    ReturnCurrent = 0;
+
+
+                    led21.OffColor = Color.Yellow;
+
+                    this.Refresh();
+
+
+                    //  if current is out of spec, run cal
+
+                    if ((IRCurrent < .11) | (IRCurrent > .12))
+                    {
+                        ReturnCurrent = IRSetCurrent(2);  // 1 = low, 2 = mid, 3 = high
+
+
+                    }
+                    else
+                    {
+
+                        ReturnCurrent = IRCurrent;
+
+                    }
+
+
+                    if ((ReturnCurrent > .11) & (ReturnCurrent < .12))
+                    {
+                        led21.OffColor = Color.LimeGreen;
+
+
+                    }
+                    else
+                    {
+
+                        led21.OffColor = Color.Red;
+
+                    }
+
+                    this.Refresh();
+
+
+
+
+
+
+                    // set to HIGH coverage mode
+
+                    Txresponse = TxCommand("cov = 3");
+                    timer3.Enabled = false;
+
+
+                    Console.WriteLine("Response From Juno: {0}", Txresponse); // may have to capture this as soon as we have cr
+
+
+                    results = GetIRCurrent.Run();
+
+                    myCurrent = results.Token2.ToString();
+
+
+
+                    IRCurrent = Convert.ToDouble(myCurrent);
+
+                    ReturnCurrent = 0;
+
+
+                    led26.OffColor = Color.Yellow;
+
+                    this.Refresh();
+
+
+                    //  if current is out of spec, run cal
+
+                    if ((IRCurrent < .125) | (IRCurrent > .135))
+                    {
+                        ReturnCurrent = IRSetCurrent(3);  // 1 = low, 2 = mid, 3 = high
+
+
+                    }
+                    else
+                    {
+
+                        ReturnCurrent = IRCurrent;
+
+                    }
+
+
+                    if ((ReturnCurrent > .125) & (ReturnCurrent < .135))
+                    {
+                        led26.OffColor = Color.LimeGreen;
+
+
+                    }
+                    else
+                    {
+
+                        led26.OffColor = Color.Red;
+
+                    }
+
+                    this.Refresh();
 
                     // adjust to desired value
 
@@ -1037,7 +1576,7 @@ namespace ITM_ISM_Fixture
 
 
 
-                    if ((IRDutycyle > 27) | (IRDutycyle < 23))
+                    if ((IRDutycyle > 33) | (IRDutycyle < 27) | (Double.IsNaN(IRDutycyle)))
                         AdjustDuty();
 
 
@@ -1050,7 +1589,7 @@ namespace ITM_ISM_Fixture
 
 
                     IRDutycyle = getdutycycle();
-                    if ((IRDutycyle < 27) | (IRDutycyle > 23))
+                    if ((IRDutycyle < 33) | (IRDutycyle > 27))
                     {
                         led12.OffColor = Color.LimeGreen;
 
@@ -1067,6 +1606,198 @@ namespace ITM_ISM_Fixture
 
 
                     // measure Current
+
+
+
+
+                    // measure Current
+
+
+
+
+
+
+                    //setupCurrent.Run();
+
+
+                    // set to low coverage mode
+
+                    Txresponse = TxCommand("cov = 1");
+                    timer3.Enabled = false;
+
+
+                    Console.WriteLine("Response From Juno: {0}", Txresponse); // may have to capture this as soon as we have cr
+
+
+                    results = GetIRCurrent.Run();
+
+                    Thread.Sleep(250);
+
+                    myCurrent = results.Token2.ToString();
+
+
+
+                    IRCurrent = Convert.ToDouble(myCurrent);
+
+                    ReturnCurrent = 0;
+
+
+                    led17.OffColor = Color.Yellow;
+
+                    this.Refresh();
+
+
+                    //  if current is out of spec, run cal
+
+                    if ((IRCurrent < .095) | (IRCurrent > .105))
+                    {
+                        ReturnCurrent = IRSetCurrent(1);  // 1 = low, 2 = mid, 3 = high
+
+
+                    }
+                    else
+                    {
+
+                        ReturnCurrent = IRCurrent;
+
+                    }
+
+
+                    if ((ReturnCurrent > .095) & (ReturnCurrent < .105))
+                    {
+                        led17.OffColor = Color.LimeGreen;
+
+
+                    }
+                    else
+                    {
+
+                        led17.OffColor = Color.Red;
+
+                    }
+
+                    this.Refresh();
+
+
+
+                    // set to MID coverage mode
+
+                    Txresponse = TxCommand("cov = 2");
+                    timer3.Enabled = false;
+
+
+                    Console.WriteLine("Response From Juno: {0}", Txresponse); // may have to capture this as soon as we have cr
+
+
+                    results = GetIRCurrent.Run();
+
+                    Thread.Sleep(250);
+
+                    myCurrent = results.Token2.ToString();
+
+
+
+                    IRCurrent = Convert.ToDouble(myCurrent);
+
+                    ReturnCurrent = 0;
+
+
+                    led20.OffColor = Color.Yellow;
+
+                    this.Refresh();
+
+
+                    //  if current is out of spec, run cal
+
+                    if ((IRCurrent < .11) | (IRCurrent > .12))
+                    {
+                        ReturnCurrent = IRSetCurrent(2);  // 1 = low, 2 = mid, 3 = high
+
+
+                    }
+                    else
+                    {
+
+                        ReturnCurrent = IRCurrent;
+
+                    }
+
+
+                    if ((ReturnCurrent > .11) & (ReturnCurrent < .12))
+                    {
+                        led20.OffColor = Color.LimeGreen;
+
+
+                    }
+                    else
+                    {
+
+                        led20.OffColor = Color.Red;
+
+                    }
+
+                    this.Refresh();
+
+
+
+
+
+
+                    // set to HIGH coverage mode
+
+                    Txresponse = TxCommand("cov = 3");
+                    timer3.Enabled = false;
+
+
+                    Console.WriteLine("Response From Juno: {0}", Txresponse); // may have to capture this as soon as we have cr
+
+
+                    results = GetIRCurrent.Run();
+
+                    myCurrent = results.Token2.ToString();
+
+
+
+                    IRCurrent = Convert.ToDouble(myCurrent);
+
+                    ReturnCurrent = 0;
+
+
+                    led25.OffColor = Color.Yellow;
+
+                    this.Refresh();
+
+
+                    //  if current is out of spec, run cal
+
+                    if ((IRCurrent < .125) | (IRCurrent > .135))
+                    {
+                        ReturnCurrent = IRSetCurrent(3);  // 1 = low, 2 = mid, 3 = high
+
+
+                    }
+                    else
+                    {
+
+                        ReturnCurrent = IRCurrent;
+
+                    }
+
+
+                    if ((ReturnCurrent > .125) & (ReturnCurrent < .135))
+                    {
+                        led25.OffColor = Color.LimeGreen;
+
+
+                    }
+                    else
+                    {
+
+                        led25.OffColor = Color.Red;
+
+                    }
+
+                    this.Refresh();
 
 
                     // adjust to desired value
@@ -1097,7 +1828,7 @@ namespace ITM_ISM_Fixture
 
 
 
-                    if ((IRDutycyle > 27) | (IRDutycyle < 23))
+                    if ((IRDutycyle > 33) | (IRDutycyle < 27) |(Double.IsNaN(IRDutycyle)))
                         AdjustDuty();
 
 
@@ -1109,7 +1840,7 @@ namespace ITM_ISM_Fixture
                     }
 
                     IRDutycyle = getdutycycle();
-                    if ((IRDutycyle < 27) | (IRDutycyle > 23))
+                    if ((IRDutycyle < 33) | (IRDutycyle > 27))
                     {
                         led13.OffColor = Color.LimeGreen;
 
@@ -1118,6 +1849,199 @@ namespace ITM_ISM_Fixture
                     else
                     {
                         led13.OffColor = Color.Red;
+
+                    }
+
+                    this.Refresh();
+
+
+
+
+
+                    // measure Current
+
+
+
+
+
+
+                    //setupCurrent.Run();
+
+
+                    // set to low coverage mode
+
+                    Txresponse = TxCommand("cov = 1");
+                    timer3.Enabled = false;
+
+
+                    Console.WriteLine("Response From Juno: {0}", Txresponse); // may have to capture this as soon as we have cr
+
+
+                    results = GetIRCurrent.Run();
+
+                    Thread.Sleep(250);
+
+                    myCurrent = results.Token2.ToString();
+
+
+
+                    IRCurrent = Convert.ToDouble(myCurrent);
+
+                    ReturnCurrent = 0;
+
+
+                    led18.OffColor = Color.Yellow;
+
+                    this.Refresh();
+
+
+                    //  if current is out of spec, run cal
+
+                    if ((IRCurrent < .095) | (IRCurrent > .105))
+                    {
+                        ReturnCurrent = IRSetCurrent(1);  // 1 = low, 2 = mid, 3 = high
+
+
+                    }
+                    else
+                    {
+
+                        ReturnCurrent = IRCurrent;
+
+                    }
+
+
+                    if ((ReturnCurrent > .095) & (ReturnCurrent < .105))
+                    {
+                        led18.OffColor = Color.LimeGreen;
+
+
+                    }
+                    else
+                    {
+
+                        led18.OffColor = Color.Red;
+
+                    }
+
+                    this.Refresh();
+
+
+
+                    // set to MID coverage mode
+
+                    Txresponse = TxCommand("cov = 2");
+                    timer3.Enabled = false;
+
+
+                    Console.WriteLine("Response From Juno: {0}", Txresponse); // may have to capture this as soon as we have cr
+
+
+                    results = GetIRCurrent.Run();
+
+                    Thread.Sleep(250);
+
+                    myCurrent = results.Token2.ToString();
+
+
+
+                    IRCurrent = Convert.ToDouble(myCurrent);
+
+                    ReturnCurrent = 0;
+
+
+                    led19.OffColor = Color.Yellow;
+
+                    this.Refresh();
+
+
+                    //  if current is out of spec, run cal
+
+                    if ((IRCurrent < .11) | (IRCurrent > .12))
+                    {
+                        ReturnCurrent = IRSetCurrent(2);  // 1 = low, 2 = mid, 3 = high
+
+
+                    }
+                    else
+                    {
+
+                        ReturnCurrent = IRCurrent;
+
+                    }
+
+
+                    if ((ReturnCurrent > .11) & (ReturnCurrent < .12))
+                    {
+                        led19.OffColor = Color.LimeGreen;
+
+
+                    }
+                    else
+                    {
+
+                        led19.OffColor = Color.Red;
+
+                    }
+
+                    this.Refresh();
+
+
+
+
+
+
+                    // set to HIGH coverage mode
+
+                    Txresponse = TxCommand("cov = 3");
+                    timer3.Enabled = false;
+
+
+                    Console.WriteLine("Response From Juno: {0}", Txresponse); // may have to capture this as soon as we have cr
+
+
+                    results = GetIRCurrent.Run();
+
+                    myCurrent = results.Token2.ToString();
+
+
+
+                    IRCurrent = Convert.ToDouble(myCurrent);
+
+                    ReturnCurrent = 0;
+
+
+                    led24.OffColor = Color.Yellow;
+
+                    this.Refresh();
+
+
+                    //  if current is out of spec, run cal
+
+                    if ((IRCurrent < .125) | (IRCurrent > .135))
+                    {
+                        ReturnCurrent = IRSetCurrent(3);  // 1 = low, 2 = mid, 3 = high
+
+
+                    }
+                    else
+                    {
+
+                        ReturnCurrent = IRCurrent;
+
+                    }
+
+
+                    if ((ReturnCurrent > .125) & (ReturnCurrent < .135))
+                    {
+                        led24.OffColor = Color.LimeGreen;
+
+
+                    }
+                    else
+                    {
+
+                        led24.OffColor = Color.Red;
 
                     }
 
@@ -1164,6 +2088,252 @@ namespace ITM_ISM_Fixture
         }
 
 
+        private double IRSetCurrent(int coverage)
+        {
+            BK2831E_2_ReadCurrent GetIRCurrent = new BK2831E_2_ReadCurrent();
+            bool CurrentOK = false;
+
+            double ldpot = 3.6;
+            double mdpot = 3.6;
+            double hdpot = 3.62;
+            double stepsize = .01;
+            double ReturnCurrent = 0;
+
+            double SetPot = 0;
+            string txcommandstring;
+
+
+
+
+
+
+            // start at following values for each value
+
+
+            BK2831E_2_ReadCurrentResults results = GetIRCurrent.Run();
+
+
+            string myCurrent = results.Token2.ToString();
+
+
+
+            double IRCurrent = Convert.ToDouble(myCurrent);
+
+            
+
+
+            // set initial value
+            switch (coverage)
+            {
+                case 1:
+                    SetPot = ldpot;
+
+                    break;
+                case 2:
+
+                    SetPot = mdpot;
+                    break;
+                case 3:
+
+                    SetPot = hdpot;
+                    break;
+                default:
+
+                    SetPot = hdpot;
+                    break;
+
+            }
+
+
+
+
+
+            do
+            {
+
+                switch(coverage)
+                {
+                    case 1:
+
+                        txcommandstring = "ldpot = " + SetPot.ToString("N3");
+                    break;
+                    case 2:
+                        txcommandstring = "mdpot = " + SetPot.ToString("N3");
+                    break;
+                    case 3:
+                        txcommandstring = "hdpot = " + SetPot.ToString("N3");
+                        break;
+                    default:
+                        txcommandstring = "hdpot = " + SetPot.ToString("N3");
+
+                    break;
+
+                }
+
+
+
+                Txresponse = null;
+
+                
+
+                Txresponse = TxCommand(txcommandstring);
+
+
+
+                Console.WriteLine("Response From Juno: {0}", Txresponse); // may have to capture this as soon as we have cr
+
+
+                Thread.Sleep(250);  // allow a litle settleing time
+
+
+                results = GetIRCurrent.Run();
+
+                Thread.Sleep(100); // add delay
+                myCurrent = results.Token2.ToString();
+
+                IRCurrent = Convert.ToDouble(myCurrent);
+
+
+                MeterReading.Text = (IRCurrent*1000).ToString() + " mA";
+
+
+
+
+
+                switch (coverage)
+                {
+                    case 1:
+                        if ((IRCurrent > .095) & (IRCurrent < .105))
+                        {
+                            CurrentOK = true;
+
+
+                        }
+                        else
+                        {
+
+                            if (IRCurrent < .095) 
+                                return IRCurrent;  // error condition
+
+                            if (IRCurrent > .130)
+                            {
+
+                                SetPot = SetPot - 0.05;  // course
+                            }
+                            else
+                            {
+                                SetPot = SetPot - 0.01;  // fine
+                            }
+
+                        }
+
+                       
+                        break;
+                    case 2:
+                        if ((IRCurrent > .11) & (IRCurrent < .12))
+                        {
+                            CurrentOK = true;
+
+
+                        }
+                        else
+                        {
+
+                            if (IRCurrent < .11) 
+                                return IRCurrent;  // error condition
+
+                            if (IRCurrent > .140)
+                            {
+
+                                SetPot = SetPot - 0.05;  // course
+                            }
+                            else
+                            {
+                                SetPot = SetPot - 0.01;  // fine
+                            }
+
+                     
+
+                        }
+                        break;
+                    case 3:
+                        if ((IRCurrent > .125) & (IRCurrent < .135))
+                        {
+                            CurrentOK = true;
+
+
+                        }
+                        else
+                        {
+
+
+                            if (IRCurrent < .125) 
+                                return IRCurrent;  // error condition
+
+                            if (IRCurrent > .15)
+                            {
+
+                                SetPot = SetPot - 0.05;  // course
+                            }
+                            else
+                            {
+                                SetPot = SetPot - 0.01;  // fine
+                            }
+
+                       
+
+                        }
+                        break;
+                    default:
+                        if ((IRCurrent > .125) & (IRCurrent < .135))
+                        {
+                            CurrentOK = true;
+
+
+                        }
+                        else
+                        {
+
+                            if (IRCurrent > 1.4)
+                            {
+
+                                SetPot = SetPot - 0.05;  // course
+                            }
+                            else
+                            {
+                                SetPot = SetPot - 0.01;  // fine
+                            }
+
+                  
+
+                        }
+
+                        break;
+
+                }
+
+
+
+
+
+
+
+
+
+            } while (!CurrentOK);
+
+
+
+
+            MeterReading.Text = (IRCurrent * 1000).ToString() + " mA";
+
+
+
+            return IRCurrent;
+
+        }
+
+
         private void AdjustDuty()
         {
             // start at .25 IRPW and step by .005 until we get to 25%
@@ -1200,7 +2370,7 @@ namespace ITM_ISM_Fixture
 
 
 
-                if ((IRDutycycle < 27) & (IRDutycycle > 23))
+                if ((IRDutycycle < 33) & (IRDutycycle > 27))
                 {
 
                     dutyOK = true;
