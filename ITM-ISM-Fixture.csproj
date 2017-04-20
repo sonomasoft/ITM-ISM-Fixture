@@ -197,6 +197,22 @@
       <DependentUpon>MainForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Program.cs" />
+    <Compile Include="Program_Off.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Program_Off.mxb</DependentUpon>
+    </Compile>
+    <Compile Include="Program_Off.User.cs">
+      <DependentUpon>Program_Off.mxb</DependentUpon>
+    </Compile>
+    <Compile Include="Program_ON.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Program_ON.mxb</DependentUpon>
+    </Compile>
+    <Compile Include="Program_ON.User.cs">
+      <DependentUpon>Program_ON.mxb</DependentUpon>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="pingBK2831e.cs">
       <AutoGen>True</AutoGen>
@@ -347,6 +363,14 @@
     <None Include="IrLEDOn.mxb">
       <Generator>NationalInstruments.MeasurementStudio.Tools.DotNET.MxbCodeGenerator.2010</Generator>
       <LastGenOutput>IrLEDOn.cs</LastGenOutput>
+    </None>
+    <None Include="Program_Off.mxb">
+      <Generator>NationalInstruments.MeasurementStudio.Tools.DotNET.MxbCodeGenerator.2010</Generator>
+      <LastGenOutput>Program_Off.cs</LastGenOutput>
+    </None>
+    <None Include="Program_ON.mxb">
+      <Generator>NationalInstruments.MeasurementStudio.Tools.DotNET.MxbCodeGenerator.2010</Generator>
+      <LastGenOutput>Program_ON.cs</LastGenOutput>
     </None>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>

@@ -374,8 +374,7 @@ namespace ITM_ISM_Fixture
 
 
 
-            /*  remark out program step for now
-
+           
             if (instumentStatus == 0)
             {
                 led4.OffColor = Color.Yellow;
@@ -385,15 +384,36 @@ namespace ITM_ISM_Fixture
                 
           
 
+                // switch in DTR signal on relay 12
 
+                try
+                {
+                    using (Task digitalWriteTask = new Task())
+                    {
+                        digitalWriteTask.DOChannels.CreateChannel("NI-USB-6501/port1/line5", "",
+                            ChannelLineGrouping.OneChannelForAllLines);
+                        bool[] dataArray = new bool[1];
+                        dataArray[0] = false;
+                        DigitalSingleChannelWriter writer = new DigitalSingleChannelWriter(digitalWriteTask.Stream);
+                        writer.WriteSingleSampleMultiLine(true, dataArray);
+                    }
+                }
+                catch (DaqException ex)
+                {
+                    MessageBox.Show(ex.Message);
+                }
+                finally
+                {
 
+                }
 
+                /*
                 MessageBox.Show("Flip COM Switch to program",
                 "Error",
                 MessageBoxButtons.OK,
                 MessageBoxIcon.Exclamation,
                 MessageBoxDefaultButton.Button1);
-
+                */
                 ProgramInProgress = true;
 
                 progressBar1.Visible = true;
@@ -460,12 +480,13 @@ namespace ITM_ISM_Fixture
                 {
                     led4.OffColor = Color.LimeGreen;
                     this.Refresh();
-
+                    /*
                     MessageBox.Show("Programming Complete.",
                     "Error",
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Exclamation,
                     MessageBoxDefaultButton.Button1);
+                     * */
 
                 }
                 else
@@ -485,8 +506,29 @@ namespace ITM_ISM_Fixture
 
                 }
 
+            // switch off DTR signal on Relay 12 so we can connect to tx
 
-                
+
+                try
+                {
+                    using (Task digitalWriteTask = new Task())
+                    {
+                        digitalWriteTask.DOChannels.CreateChannel("NI-USB-6501/port1/line7", "",
+                            ChannelLineGrouping.OneChannelForAllLines);
+                        bool[] dataArray = new bool[1];
+                        dataArray[0] = true;
+                        DigitalSingleChannelWriter writer = new DigitalSingleChannelWriter(digitalWriteTask.Stream);
+                        writer.WriteSingleSampleMultiLine(true, dataArray);
+                    }
+                }
+                catch (DaqException ex)
+                {
+                    MessageBox.Show(ex.Message);
+                }
+                finally
+                {
+
+                }
                 
 
 
@@ -495,7 +537,7 @@ namespace ITM_ISM_Fixture
                 progressBar1.Visible = false;
 
            
-              */
+           
 
 
             // test Aux inputs
@@ -773,11 +815,7 @@ namespace ITM_ISM_Fixture
 
 
 
-                    Txresponse = TxCommand("mfgt= 1");
-                    timer3.Enabled = false;
 
-
-                    Console.WriteLine("Response From Juno: {0}", Txresponse); // may have to capture this as soon as we have cr
 
 
 
@@ -800,6 +838,15 @@ namespace ITM_ISM_Fixture
                     // SetChannel(1);  CHI = 0
 
                     Txresponse = TxCommand("CHI = 0");
+                    timer3.Enabled = false;
+
+
+                    Console.WriteLine("Response From Juno: {0}", Txresponse); // may have to capture this as soon as we have cr
+
+
+
+
+                    Txresponse = TxCommand("mfgt= 1");
                     timer3.Enabled = false;
 
 
@@ -861,7 +908,7 @@ namespace ITM_ISM_Fixture
 
 
 
-                    //setupCurrent.Run();
+                    setupCurrent.Run();
 
 
                     // set to low coverage mode
@@ -925,7 +972,7 @@ namespace ITM_ISM_Fixture
 
                     // set to MID coverage mode
 
-                    Txresponse = TxCommand("cov = 2");
+                    Txresponse = TxCommand("cov = 3");
                     timer3.Enabled = false;
 
 
@@ -952,7 +999,7 @@ namespace ITM_ISM_Fixture
 
                     if ((IRCurrent < .11) | (IRCurrent > .12))
                     {
-                        ReturnCurrent = IRSetCurrent(2);  // 1 = low, 2 = mid, 3 = high
+                        ReturnCurrent = IRSetCurrent(3);  // 1 = low, 3 = mid, 5 = high
 
 
                     }
@@ -986,7 +1033,7 @@ namespace ITM_ISM_Fixture
 
                     // set to HIGH coverage mode
 
-                    Txresponse = TxCommand("cov = 3");
+                    Txresponse = TxCommand("cov = 5");
                     timer3.Enabled = false;
 
 
@@ -1014,7 +1061,7 @@ namespace ITM_ISM_Fixture
 
                     if ((IRCurrent < .125) | (IRCurrent > .135))
                     {
-                        ReturnCurrent = IRSetCurrent(3);  // 1 = low, 2 = mid, 3 = high
+                        ReturnCurrent = IRSetCurrent(5);  // 1 = low, 2 = mid, 3 = high
 
 
                     }
@@ -1058,6 +1105,14 @@ namespace ITM_ISM_Fixture
                     led10.OffColor = Color.Yellow;
 
                     this.Refresh();
+
+                    // invoke each time we change channel
+
+                    Txresponse = TxCommand("mfgt= 1");
+                    timer3.Enabled = false;
+
+
+                    Console.WriteLine("Response From Juno: {0}", Txresponse); // may have to capture this as soon as we have cr
 
                     // measure duty cycle
                    // button2.PerformClick();
@@ -1175,7 +1230,7 @@ namespace ITM_ISM_Fixture
 
                     // set to MID coverage mode
 
-                    Txresponse = TxCommand("cov = 2");
+                    Txresponse = TxCommand("cov = 3");
                     timer3.Enabled = false;
 
 
@@ -1202,7 +1257,7 @@ namespace ITM_ISM_Fixture
 
                     if ((IRCurrent < .11) | (IRCurrent > .12))
                     {
-                        ReturnCurrent = IRSetCurrent(2);  // 1 = low, 2 = mid, 3 = high
+                        ReturnCurrent = IRSetCurrent(3);  // 1 = low, 2 = mid, 3 = high
 
 
                     }
@@ -1236,7 +1291,7 @@ namespace ITM_ISM_Fixture
 
                     // set to HIGH coverage mode
 
-                    Txresponse = TxCommand("cov = 3");
+                    Txresponse = TxCommand("cov = 5");
                     timer3.Enabled = false;
 
 
@@ -1263,7 +1318,7 @@ namespace ITM_ISM_Fixture
 
                     if ((IRCurrent < .125) | (IRCurrent > .135))
                     {
-                        ReturnCurrent = IRSetCurrent(3);  // 1 = low, 2 = mid, 3 = high
+                        ReturnCurrent = IRSetCurrent(5);  // 1 = low, 2 = mid, 3 = high
 
 
                     }
@@ -1318,6 +1373,16 @@ namespace ITM_ISM_Fixture
                     led11.OffColor = Color.Yellow;
 
                     this.Refresh();
+
+
+
+                    // invoke each time we change channel
+
+                    Txresponse = TxCommand("mfgt= 1");
+                    timer3.Enabled = false;
+
+
+                    Console.WriteLine("Response From Juno: {0}", Txresponse); // may have to capture this as soon as we have cr
 
                     // measure duty cycle
                    // button2.PerformClick();
@@ -1433,7 +1498,7 @@ namespace ITM_ISM_Fixture
 
                     // set to MID coverage mode
 
-                    Txresponse = TxCommand("cov = 2");
+                    Txresponse = TxCommand("cov = 3");
                     timer3.Enabled = false;
 
 
@@ -1462,7 +1527,7 @@ namespace ITM_ISM_Fixture
 
                     if ((IRCurrent < .11) | (IRCurrent > .12))
                     {
-                        ReturnCurrent = IRSetCurrent(2);  // 1 = low, 2 = mid, 3 = high
+                        ReturnCurrent = IRSetCurrent(3);  // 1 = low, 2 = mid, 3 = high
 
 
                     }
@@ -1496,7 +1561,7 @@ namespace ITM_ISM_Fixture
 
                     // set to HIGH coverage mode
 
-                    Txresponse = TxCommand("cov = 3");
+                    Txresponse = TxCommand("cov = 5");
                     timer3.Enabled = false;
 
 
@@ -1523,7 +1588,7 @@ namespace ITM_ISM_Fixture
 
                     if ((IRCurrent < .125) | (IRCurrent > .135))
                     {
-                        ReturnCurrent = IRSetCurrent(3);  // 1 = low, 2 = mid, 3 = high
+                        ReturnCurrent = IRSetCurrent(5);  // 1 = low, 2 = mid, 3 = high
 
 
                     }
@@ -1564,6 +1629,16 @@ namespace ITM_ISM_Fixture
                     led12.OffColor = Color.Yellow;
 
                     this.Refresh();
+
+
+
+                    // invoke each time we change channel
+
+                    Txresponse = TxCommand("mfgt= 1");
+                    timer3.Enabled = false;
+
+
+                    Console.WriteLine("Response From Juno: {0}", Txresponse); // may have to capture this as soon as we have cr
 
                     // measure duty cycle
                    // button2.PerformClick();
@@ -1682,7 +1757,7 @@ namespace ITM_ISM_Fixture
 
                     // set to MID coverage mode
 
-                    Txresponse = TxCommand("cov = 2");
+                    Txresponse = TxCommand("cov = 3");
                     timer3.Enabled = false;
 
 
@@ -1711,7 +1786,7 @@ namespace ITM_ISM_Fixture
 
                     if ((IRCurrent < .11) | (IRCurrent > .12))
                     {
-                        ReturnCurrent = IRSetCurrent(2);  // 1 = low, 2 = mid, 3 = high
+                        ReturnCurrent = IRSetCurrent(3);  // 1 = low, 2 = mid, 3 = high
 
 
                     }
@@ -1745,7 +1820,7 @@ namespace ITM_ISM_Fixture
 
                     // set to HIGH coverage mode
 
-                    Txresponse = TxCommand("cov = 3");
+                    Txresponse = TxCommand("cov = 5");
                     timer3.Enabled = false;
 
 
@@ -1772,7 +1847,7 @@ namespace ITM_ISM_Fixture
 
                     if ((IRCurrent < .125) | (IRCurrent > .135))
                     {
-                        ReturnCurrent = IRSetCurrent(3);  // 1 = low, 2 = mid, 3 = high
+                        ReturnCurrent = IRSetCurrent(5);  // 1 = low, 3 = mid, 5= high
 
 
                     }
@@ -1817,6 +1892,15 @@ namespace ITM_ISM_Fixture
                     led13.OffColor = Color.Yellow;
 
                     this.Refresh();
+
+
+                    // invoke each time we change channel
+
+                    Txresponse = TxCommand("mfgt= 1");
+                    timer3.Enabled = false;
+
+
+                    Console.WriteLine("Response From Juno: {0}", Txresponse); // may have to capture this as soon as we have cr
 
                     // measure duty cycle
                     //button2.PerformClick();
@@ -1930,7 +2014,7 @@ namespace ITM_ISM_Fixture
 
                     // set to MID coverage mode
 
-                    Txresponse = TxCommand("cov = 2");
+                    Txresponse = TxCommand("cov = 3");
                     timer3.Enabled = false;
 
 
@@ -1959,7 +2043,7 @@ namespace ITM_ISM_Fixture
 
                     if ((IRCurrent < .11) | (IRCurrent > .12))
                     {
-                        ReturnCurrent = IRSetCurrent(2);  // 1 = low, 2 = mid, 3 = high
+                        ReturnCurrent = IRSetCurrent(3);  // 1 = low, 2 = mid, 3 = high
 
 
                     }
@@ -1993,7 +2077,7 @@ namespace ITM_ISM_Fixture
 
                     // set to HIGH coverage mode
 
-                    Txresponse = TxCommand("cov = 3");
+                    Txresponse = TxCommand("cov = 5");
                     timer3.Enabled = false;
 
 
@@ -2020,7 +2104,7 @@ namespace ITM_ISM_Fixture
 
                     if ((IRCurrent < .125) | (IRCurrent > .135))
                     {
-                        ReturnCurrent = IRSetCurrent(3);  // 1 = low, 2 = mid, 3 = high
+                        ReturnCurrent = IRSetCurrent(5);  // 1 = low, 2 = mid, 3 = high
 
 
                     }
@@ -2047,11 +2131,532 @@ namespace ITM_ISM_Fixture
 
                     this.Refresh();
 
+
+
+//---
+
+                    Txresponse = TxCommand("CHI = 5");
+                    timer3.Enabled = false;
+
+
+                    Console.WriteLine("Response From Juno: {0}", Txresponse); // may have to capture this as soon as we have cr
+
+
+                    led33.OffColor = Color.Yellow;
+
+                    this.Refresh();
+
+
+
+                    // invoke each time we change channel
+
+                    Txresponse = TxCommand("mfgt= 1");
+                    timer3.Enabled = false;
+
+
+                    Console.WriteLine("Response From Juno: {0}", Txresponse); // may have to capture this as soon as we have cr
+
+                    // measure duty cycle
+                    //button2.PerformClick();
+
+                    timer2.Enabled = true;
+
+                    // Adjust to 25%
+                    IRDutycyle = getdutycycle();
+
+
+
+                    if ((IRDutycyle > 33) | (IRDutycyle < 27) | (Double.IsNaN(IRDutycyle)))
+                        AdjustDuty();
+
+
+                    while (timer2.Enabled == true)
+                    {
+
+                        Application.DoEvents();
+
+                    }
+
+                    IRDutycyle = getdutycycle();
+                    if ((IRDutycyle < 33) | (IRDutycyle > 27))
+                    {
+                        led33.OffColor = Color.LimeGreen;
+
+
+                    }
+                    else
+                    {
+                        led33.OffColor = Color.Red;
+
+                    }
+
+                    this.Refresh();
+
+
+
+
+
+                    // measure Current
+
+
+
+
+
+
+                    //setupCurrent.Run();
+
+
+                    // set to low coverage mode
+
+                    Txresponse = TxCommand("cov = 1");
+                    timer3.Enabled = false;
+
+
+                    Console.WriteLine("Response From Juno: {0}", Txresponse); // may have to capture this as soon as we have cr
+
+
+                    results = GetIRCurrent.Run();
+
+                    Thread.Sleep(250);
+
+                    myCurrent = results.Token2.ToString();
+
+
+
+                    IRCurrent = Convert.ToDouble(myCurrent);
+
+                    ReturnCurrent = 0;
+
+
+                    led32.OffColor = Color.Yellow;
+
+                    this.Refresh();
+
+
+                    //  if current is out of spec, run cal
+
+                    if ((IRCurrent < .095) | (IRCurrent > .105))
+                    {
+                        ReturnCurrent = IRSetCurrent(1);  // 1 = low, 2 = mid, 3 = high
+
+
+                    }
+                    else
+                    {
+
+                        ReturnCurrent = IRCurrent;
+
+                    }
+
+
+                    if ((ReturnCurrent > .095) & (ReturnCurrent < .105))
+                    {
+                        led32.OffColor = Color.LimeGreen;
+
+
+                    }
+                    else
+                    {
+
+                        led32.OffColor = Color.Red;
+
+                    }
+
+                    this.Refresh();
+
+
+
+                    // set to MID coverage mode
+
+                    Txresponse = TxCommand("cov = 3");
+                    timer3.Enabled = false;
+
+
+                    Console.WriteLine("Response From Juno: {0}", Txresponse); // may have to capture this as soon as we have cr
+
+
+                    results = GetIRCurrent.Run();
+
+                    Thread.Sleep(250);
+
+                    myCurrent = results.Token2.ToString();
+
+
+
+                    IRCurrent = Convert.ToDouble(myCurrent);
+
+                    ReturnCurrent = 0;
+
+
+                    led31.OffColor = Color.Yellow;
+
+                    this.Refresh();
+
+
+                    //  if current is out of spec, run cal
+
+                    if ((IRCurrent < .11) | (IRCurrent > .12))
+                    {
+                        ReturnCurrent = IRSetCurrent(3);  // 1 = low, 2 = mid, 3 = high
+
+
+                    }
+                    else
+                    {
+
+                        ReturnCurrent = IRCurrent;
+
+                    }
+
+
+                    if ((ReturnCurrent > .11) & (ReturnCurrent < .12))
+                    {
+                        led31.OffColor = Color.LimeGreen;
+
+
+                    }
+                    else
+                    {
+
+                        led31.OffColor = Color.Red;
+
+                    }
+
+                    this.Refresh();
+
+
+
+
+
+
+                    // set to HIGH coverage mode
+
+                    Txresponse = TxCommand("cov = 5");
+                    timer3.Enabled = false;
+
+
+                    Console.WriteLine("Response From Juno: {0}", Txresponse); // may have to capture this as soon as we have cr
+
+
+                    results = GetIRCurrent.Run();
+
+                    myCurrent = results.Token2.ToString();
+
+
+
+                    IRCurrent = Convert.ToDouble(myCurrent);
+
+                    ReturnCurrent = 0;
+
+
+                    led30.OffColor = Color.Yellow;
+
+                    this.Refresh();
+
+
+                    //  if current is out of spec, run cal
+
+                    if ((IRCurrent < .125) | (IRCurrent > .135))
+                    {
+                        ReturnCurrent = IRSetCurrent(5);  // 1 = low, 2 = mid, 3 = high
+
+
+                    }
+                    else
+                    {
+
+                        ReturnCurrent = IRCurrent;
+
+                    }
+
+
+                    if ((ReturnCurrent > .125) & (ReturnCurrent < .135))
+                    {
+                        led30.OffColor = Color.LimeGreen;
+
+
+                    }
+                    else
+                    {
+
+                        led30.OffColor = Color.Red;
+
+                    }
+
+                    this.Refresh();
+
+
+
+                    Txresponse = TxCommand("CHI = 6");
+                    timer3.Enabled = false;
+
+
+                    Console.WriteLine("Response From Juno: {0}", Txresponse); // may have to capture this as soon as we have cr
+
+
+                    led37.OffColor = Color.Yellow;
+
+                    this.Refresh();
+
+
+
+                    // invoke each time we change channel
+
+                    Txresponse = TxCommand("mfgt= 1");
+                    timer3.Enabled = false;
+
+
+                    Console.WriteLine("Response From Juno: {0}", Txresponse); // may have to capture this as soon as we have cr
+
+                    // measure duty cycle
+                    //button2.PerformClick();
+
+                    timer2.Enabled = true;
+
+                    // Adjust to 25%
+                    IRDutycyle = getdutycycle();
+
+
+
+                    if ((IRDutycyle > 33) | (IRDutycyle < 27) | (Double.IsNaN(IRDutycyle)))
+                        AdjustDuty();
+
+
+                    while (timer2.Enabled == true)
+                    {
+
+                        Application.DoEvents();
+
+                    }
+
+                    IRDutycyle = getdutycycle();
+                    if ((IRDutycyle < 33) | (IRDutycyle > 27))
+                    {
+                        led37.OffColor = Color.LimeGreen;
+
+
+                    }
+                    else
+                    {
+                        led37.OffColor = Color.Red;
+
+                    }
+
+                    this.Refresh();
+
+
+
+
+
+                    // measure Current
+
+
+
+
+
+
+                    //setupCurrent.Run();
+
+
+                    // set to low coverage mode
+
+                    Txresponse = TxCommand("cov = 1");
+                    timer3.Enabled = false;
+
+
+                    Console.WriteLine("Response From Juno: {0}", Txresponse); // may have to capture this as soon as we have cr
+
+
+                    results = GetIRCurrent.Run();
+
+                    Thread.Sleep(250);
+
+                    myCurrent = results.Token2.ToString();
+
+
+
+                    IRCurrent = Convert.ToDouble(myCurrent);
+
+                    ReturnCurrent = 0;
+
+
+                    led36.OffColor = Color.Yellow;
+
+                    this.Refresh();
+
+
+                    //  if current is out of spec, run cal
+
+                    if ((IRCurrent < .095) | (IRCurrent > .105))
+                    {
+                        ReturnCurrent = IRSetCurrent(1);  // 1 = low, 2 = mid, 3 = high
+
+
+                    }
+                    else
+                    {
+
+                        ReturnCurrent = IRCurrent;
+
+                    }
+
+
+                    if ((ReturnCurrent > .095) & (ReturnCurrent < .105))
+                    {
+                        led36.OffColor = Color.LimeGreen;
+
+
+                    }
+                    else
+                    {
+
+                        led36.OffColor = Color.Red;
+
+                    }
+
+                    this.Refresh();
+
+
+
+                    // set to MID coverage mode
+
+                    Txresponse = TxCommand("cov = 3");
+                    timer3.Enabled = false;
+
+
+                    Console.WriteLine("Response From Juno: {0}", Txresponse); // may have to capture this as soon as we have cr
+
+
+                    results = GetIRCurrent.Run();
+
+                    Thread.Sleep(250);
+
+                    myCurrent = results.Token2.ToString();
+
+
+
+                    IRCurrent = Convert.ToDouble(myCurrent);
+
+                    ReturnCurrent = 0;
+
+
+                    led35.OffColor = Color.Yellow;
+
+                    this.Refresh();
+
+
+                    //  if current is out of spec, run cal
+
+                    if ((IRCurrent < .11) | (IRCurrent > .12))
+                    {
+                        ReturnCurrent = IRSetCurrent(3);  // 1 = low, 2 = mid, 3 = high
+
+
+                    }
+                    else
+                    {
+
+                        ReturnCurrent = IRCurrent;
+
+                    }
+
+
+                    if ((ReturnCurrent > .11) & (ReturnCurrent < .12))
+                    {
+                        led35.OffColor = Color.LimeGreen;
+
+
+                    }
+                    else
+                    {
+
+                        led35.OffColor = Color.Red;
+
+                    }
+
+                    this.Refresh();
+
+
+
+
+
+
+                    // set to HIGH coverage mode
+
+                    Txresponse = TxCommand("cov = 5");
+                    timer3.Enabled = false;
+
+
+                    Console.WriteLine("Response From Juno: {0}", Txresponse); // may have to capture this as soon as we have cr
+
+
+                    results = GetIRCurrent.Run();
+
+                    myCurrent = results.Token2.ToString();
+
+
+
+                    IRCurrent = Convert.ToDouble(myCurrent);
+
+                    ReturnCurrent = 0;
+
+
+                    led34.OffColor = Color.Yellow;
+
+                    this.Refresh();
+
+
+                    //  if current is out of spec, run cal
+
+                    if ((IRCurrent < .125) | (IRCurrent > .135))
+                    {
+                        ReturnCurrent = IRSetCurrent(5);  // 1 = low, 2 = mid, 3 = high
+
+
+                    }
+                    else
+                    {
+
+                        ReturnCurrent = IRCurrent;
+
+                    }
+
+
+                    if ((ReturnCurrent > .125) & (ReturnCurrent < .135))
+                    {
+                        led34.OffColor = Color.LimeGreen;
+
+
+                    }
+                    else
+                    {
+
+                        led34.OffColor = Color.Red;
+
+                    }
+
+                    this.Refresh();
+
+
                     // Save Settings!!
 
 
 
+                    Txresponse = TxCommand("setd");
+                    timer3.Enabled = false;
 
+
+                    Console.WriteLine("Response From Tx: {0}", Txresponse); // may have to capture this as soon as we have cr
+
+
+
+
+
+                    Txresponse = TxCommand("saves");
+                    timer3.Enabled = false;
+
+
+                    Console.WriteLine("Response From Tx: {0}", Txresponse); // may have to capture this as soon as we have cr
 
 
 
@@ -2129,11 +2734,11 @@ namespace ITM_ISM_Fixture
                     SetPot = ldpot;
 
                     break;
-                case 2:
+                case 3:
 
                     SetPot = mdpot;
                     break;
-                case 3:
+                case 5:
 
                     SetPot = hdpot;
                     break;
@@ -2157,10 +2762,10 @@ namespace ITM_ISM_Fixture
 
                         txcommandstring = "ldpot = " + SetPot.ToString("N3");
                     break;
-                    case 2:
+                    case 3:
                         txcommandstring = "mdpot = " + SetPot.ToString("N3");
                     break;
-                    case 3:
+                    case 5:
                         txcommandstring = "hdpot = " + SetPot.ToString("N3");
                         break;
                     default:
@@ -2229,7 +2834,7 @@ namespace ITM_ISM_Fixture
 
                        
                         break;
-                    case 2:
+                    case 3:
                         if ((IRCurrent > .11) & (IRCurrent < .12))
                         {
                             CurrentOK = true;
@@ -2256,7 +2861,7 @@ namespace ITM_ISM_Fixture
 
                         }
                         break;
-                    case 3:
+                    case 5:
                         if ((IRCurrent > .125) & (IRCurrent < .135))
                         {
                             CurrentOK = true;
@@ -2884,7 +3489,7 @@ namespace ITM_ISM_Fixture
             powerupCurrent = Math.Abs(Ccurrent);
 
 
-            if ((powerupCurrent > 20) & (powerupCurrent < 50))  // takes a bit to settle back on boot
+            if ((powerupCurrent < 50))  // takes a bit to settle back on boot
             {
                 PowerUpCurrentResult = true;
                 led2.OffColor = Color.LimeGreen;

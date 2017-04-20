@@ -273,6 +273,16 @@
             this.timer3 = new System.Windows.Forms.Timer(this.components);
             this.DUTport = new System.IO.Ports.SerialPort(this.components);
             this.timer4 = new System.Windows.Forms.Timer(this.components);
+            this.led30 = new NationalInstruments.UI.WindowsForms.Led();
+            this.led31 = new NationalInstruments.UI.WindowsForms.Led();
+            this.led32 = new NationalInstruments.UI.WindowsForms.Led();
+            this.led33 = new NationalInstruments.UI.WindowsForms.Led();
+            this.label21 = new System.Windows.Forms.Label();
+            this.led34 = new NationalInstruments.UI.WindowsForms.Led();
+            this.led35 = new NationalInstruments.UI.WindowsForms.Led();
+            this.led36 = new NationalInstruments.UI.WindowsForms.Led();
+            this.led37 = new NationalInstruments.UI.WindowsForms.Led();
+            this.label22 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.led1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.led2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.led3)).BeginInit();
@@ -309,6 +319,14 @@
             ((System.ComponentModel.ISupportInitialize)(this.writePort_1Component1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.chargeOnComponent1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.led29)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.led30)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.led31)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.led32)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.led33)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.led34)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.led35)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.led36)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.led37)).BeginInit();
             this.SuspendLayout();
             // 
             // label1
@@ -1196,11 +1214,105 @@
             // 
             this.timer4.Tick += new System.EventHandler(this.timer4_Tick);
             // 
+            // led30
+            // 
+            this.led30.LedStyle = NationalInstruments.UI.LedStyle.Round3D;
+            this.led30.Location = new System.Drawing.Point(702, 647);
+            this.led30.Name = "led30";
+            this.led30.Size = new System.Drawing.Size(43, 37);
+            this.led30.TabIndex = 59;
+            // 
+            // led31
+            // 
+            this.led31.LedStyle = NationalInstruments.UI.LedStyle.Round3D;
+            this.led31.Location = new System.Drawing.Point(634, 647);
+            this.led31.Name = "led31";
+            this.led31.Size = new System.Drawing.Size(43, 37);
+            this.led31.TabIndex = 58;
+            // 
+            // led32
+            // 
+            this.led32.LedStyle = NationalInstruments.UI.LedStyle.Round3D;
+            this.led32.Location = new System.Drawing.Point(564, 647);
+            this.led32.Name = "led32";
+            this.led32.Size = new System.Drawing.Size(43, 37);
+            this.led32.TabIndex = 57;
+            // 
+            // led33
+            // 
+            this.led33.LedStyle = NationalInstruments.UI.LedStyle.Round3D;
+            this.led33.Location = new System.Drawing.Point(425, 647);
+            this.led33.Name = "led33";
+            this.led33.Size = new System.Drawing.Size(43, 37);
+            this.led33.TabIndex = 56;
+            // 
+            // label21
+            // 
+            this.label21.AutoSize = true;
+            this.label21.Font = new System.Drawing.Font("Microsoft Sans Serif", 13.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label21.Location = new System.Drawing.Point(29, 647);
+            this.label21.Name = "label21";
+            this.label21.Size = new System.Drawing.Size(118, 29);
+            this.label21.TabIndex = 55;
+            this.label21.Text = "LEGICY 1";
+            // 
+            // led34
+            // 
+            this.led34.LedStyle = NationalInstruments.UI.LedStyle.Round3D;
+            this.led34.Location = new System.Drawing.Point(702, 689);
+            this.led34.Name = "led34";
+            this.led34.Size = new System.Drawing.Size(43, 37);
+            this.led34.TabIndex = 64;
+            // 
+            // led35
+            // 
+            this.led35.LedStyle = NationalInstruments.UI.LedStyle.Round3D;
+            this.led35.Location = new System.Drawing.Point(634, 689);
+            this.led35.Name = "led35";
+            this.led35.Size = new System.Drawing.Size(43, 37);
+            this.led35.TabIndex = 63;
+            // 
+            // led36
+            // 
+            this.led36.LedStyle = NationalInstruments.UI.LedStyle.Round3D;
+            this.led36.Location = new System.Drawing.Point(564, 689);
+            this.led36.Name = "led36";
+            this.led36.Size = new System.Drawing.Size(43, 37);
+            this.led36.TabIndex = 62;
+            // 
+            // led37
+            // 
+            this.led37.LedStyle = NationalInstruments.UI.LedStyle.Round3D;
+            this.led37.Location = new System.Drawing.Point(425, 689);
+            this.led37.Name = "led37";
+            this.led37.Size = new System.Drawing.Size(43, 37);
+            this.led37.TabIndex = 61;
+            // 
+            // label22
+            // 
+            this.label22.AutoSize = true;
+            this.label22.Font = new System.Drawing.Font("Microsoft Sans Serif", 13.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label22.Location = new System.Drawing.Point(29, 689);
+            this.label22.Name = "label22";
+            this.label22.Size = new System.Drawing.Size(118, 29);
+            this.label22.TabIndex = 60;
+            this.label22.Text = "LEGICY 2";
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1271, 854);
+            this.Controls.Add(this.led34);
+            this.Controls.Add(this.led35);
+            this.Controls.Add(this.led36);
+            this.Controls.Add(this.led37);
+            this.Controls.Add(this.label22);
+            this.Controls.Add(this.led30);
+            this.Controls.Add(this.led31);
+            this.Controls.Add(this.led32);
+            this.Controls.Add(this.led33);
+            this.Controls.Add(this.label21);
             this.Controls.Add(this.label20);
             this.Controls.Add(this.led29);
             this.Controls.Add(this.button3);
@@ -1296,6 +1408,14 @@
             ((System.ComponentModel.ISupportInitialize)(this.writePort_1Component1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.chargeOnComponent1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.led29)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.led30)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.led31)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.led32)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.led33)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.led34)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.led35)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.led36)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.led37)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -1371,6 +1491,16 @@
         private System.Windows.Forms.Timer timer3;
         private System.IO.Ports.SerialPort DUTport;
         private System.Windows.Forms.Timer timer4;
+        private NationalInstruments.UI.WindowsForms.Led led30;
+        private NationalInstruments.UI.WindowsForms.Led led31;
+        private NationalInstruments.UI.WindowsForms.Led led32;
+        private NationalInstruments.UI.WindowsForms.Led led33;
+        private System.Windows.Forms.Label label21;
+        private NationalInstruments.UI.WindowsForms.Led led34;
+        private NationalInstruments.UI.WindowsForms.Led led35;
+        private NationalInstruments.UI.WindowsForms.Led led36;
+        private NationalInstruments.UI.WindowsForms.Led led37;
+        private System.Windows.Forms.Label label22;
     }
 }
 
