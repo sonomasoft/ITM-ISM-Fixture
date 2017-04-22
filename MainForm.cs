@@ -102,11 +102,29 @@ namespace ITM_ISM_Fixture
         public bool ProgramInProgress = false;
 
         public bool ProgramResult = false;
+
+        public bool IRChannel_A_Result = false;
+        public bool IRChannel_B_Result = false;
+        public bool IRChannel_C_Result = false;
+        public bool IRChannel_D_Result = false;
+        public bool IRChannel_E_Result = false;
+        public bool IRChannel_L1_Result = false;
+        public bool IRChannel_L2_Result = false;
+
+
+
         public string flashstring = "Data";
 
         public string IxM_port = null;
 
         public string Txresponse = null;
+
+
+        public string Model = null;
+
+        
+
+
 
         public string comResponseString = null;
         public bool comResponse = false;
@@ -140,6 +158,23 @@ namespace ITM_ISM_Fixture
 
 
         public double ChargeCurrent = 0;
+
+        public double[] IRPW = new double[] {0,0,0,0,0,0,0};
+
+        public double[] IRDutyCycle = new double[] {0,0,0,0,0,0,0};
+
+        public double[] ldpot = new double[] { 0, 0, 0, 0, 0, 0, 0 };
+
+        public double[] ldcurrent = new double[] { 0, 0, 0, 0, 0, 0, 0 };
+
+        public double[] mdpot = new double[] { 0, 0, 0, 0, 0, 0, 0 };
+
+        public double[] mdcurrent = new double[] { 0, 0, 0, 0, 0, 0, 0 };
+
+        public double[] hdpot = new double[] { 0, 0, 0, 0, 0, 0, 0 };
+
+        public double[] hdcurrent = new double[] { 0, 0, 0, 0, 0, 0, 0 };
+
 
 
         static List<USBDeviceInfo> GetUSBDevices()
@@ -765,11 +800,15 @@ namespace ITM_ISM_Fixture
                         led5.OffColor = Color.LimeGreen;
 
 
+                        BootResult = true;
+
+
+
                     }
                     else
                     {
                         led5.OffColor = Color.Red;
-
+                        BootResult = false;
 
                     }
 
@@ -843,7 +882,7 @@ namespace ITM_ISM_Fixture
 
                     Console.WriteLine("Response From Juno: {0}", Txresponse); // may have to capture this as soon as we have cr
 
-
+                    IRChannel_A_Result = true;
 
 
                     Txresponse = TxCommand("mfgt= 1");
@@ -868,7 +907,30 @@ namespace ITM_ISM_Fixture
 
 
                     if ((IRDutycyle > 33) | (IRDutycyle < 27) | (Double.IsNaN(IRDutycyle)))
-                        AdjustDuty();
+                    {
+                        AdjustDuty(0);
+
+                    }
+                    else
+                    {
+                        // store data
+                        IRDutyCycle[0] = IRDutycyle;
+
+                        Txresponse = null;
+
+                        Txresponse = TxCommand("irpw");
+                        timer3.Enabled = false;
+
+
+                        Console.WriteLine("Response From Juno: {0}", Txresponse); // may have to capture this as soon as we have cr
+
+                        string[] tokens;
+
+                        tokens = Txresponse.Split('=');
+                        IRPW[0] = Convert.ToDouble(tokens[3]);
+
+
+                    }
 
 
                     while (timer2.Enabled == true)
@@ -892,8 +954,12 @@ namespace ITM_ISM_Fixture
                     else
                     {
                         led9.OffColor = Color.Red;
+                        IRChannel_A_Result = false;
 
                     }
+
+
+
 
                     this.Refresh();
                    
@@ -941,7 +1007,7 @@ namespace ITM_ISM_Fixture
 
                     if ((IRCurrent < .095) | (IRCurrent > .105))
                     {
-                        ReturnCurrent=IRSetCurrent(1);  // 1 = low, 2 = mid, 3 = high
+                        ReturnCurrent=IRSetCurrent(1,0);  // 1 = low, 2 = mid, 3 = high
 
 
                     }
@@ -949,6 +1015,21 @@ namespace ITM_ISM_Fixture
                     {
 
                         ReturnCurrent = IRCurrent;
+                        // record current and ldpot
+                        ldcurrent[0] = IRCurrent;
+
+
+                        Txresponse = TxCommand("ldpot");
+                        timer3.Enabled = false;
+
+
+                        Console.WriteLine("Response From Juno: {0}", Txresponse); // may have to capture this as soon as we have cr
+
+                        string[] tokens;
+
+                        tokens = Txresponse.Split('=');
+                        ldpot[0] = Convert.ToDouble(tokens[1]);
+
 
                     }
 
@@ -963,10 +1044,13 @@ namespace ITM_ISM_Fixture
                     {
 
                         led14.OffColor = Color.Red;
-
+                        IRChannel_A_Result = false;
                     }
 
                     this.Refresh();
+
+                    // store data
+
 
 
 
@@ -999,7 +1083,7 @@ namespace ITM_ISM_Fixture
 
                     if ((IRCurrent < .11) | (IRCurrent > .12))
                     {
-                        ReturnCurrent = IRSetCurrent(3);  // 1 = low, 3 = mid, 5 = high
+                        ReturnCurrent = IRSetCurrent(3,0);  // 1 = low, 3 = mid, 5 = high
 
 
                     }
@@ -1007,6 +1091,20 @@ namespace ITM_ISM_Fixture
                     {
 
                         ReturnCurrent = IRCurrent;
+                        // record current and ldpot
+                        mdcurrent[0] = IRCurrent;
+
+
+                        Txresponse = TxCommand("mdpot");
+                        timer3.Enabled = false;
+
+
+                        Console.WriteLine("Response From Juno: {0}", Txresponse); // may have to capture this as soon as we have cr
+
+                        string[] tokens;
+
+                        tokens = Txresponse.Split('=');
+                        mdpot[0] = Convert.ToDouble(tokens[1]);
 
                     }
 
@@ -1021,6 +1119,7 @@ namespace ITM_ISM_Fixture
                     {
 
                         led23.OffColor = Color.Red;
+                        IRChannel_A_Result = false;
 
                     }
 
@@ -1061,7 +1160,7 @@ namespace ITM_ISM_Fixture
 
                     if ((IRCurrent < .125) | (IRCurrent > .135))
                     {
-                        ReturnCurrent = IRSetCurrent(5);  // 1 = low, 2 = mid, 3 = high
+                        ReturnCurrent = IRSetCurrent(5,0);  // 1 = low, 2 = mid, 3 = high
 
 
                     }
@@ -1069,6 +1168,20 @@ namespace ITM_ISM_Fixture
                     {
 
                         ReturnCurrent = IRCurrent;
+                        // record current and ldpot
+                        hdcurrent[0] = IRCurrent;
+
+
+                        Txresponse = TxCommand("hdpot");
+                        timer3.Enabled = false;
+
+
+                        Console.WriteLine("Response From Juno: {0}", Txresponse); // may have to capture this as soon as we have cr
+
+                        string[] tokens;
+
+                        tokens = Txresponse.Split('=');
+                        hdpot[0] = Convert.ToDouble(tokens[1]);
 
                     }
 
@@ -1083,9 +1196,9 @@ namespace ITM_ISM_Fixture
                     {
 
                         led28.OffColor = Color.Red;
+                        IRChannel_A_Result = false;
 
                     }
-
                     this.Refresh();
 
 
@@ -1105,6 +1218,7 @@ namespace ITM_ISM_Fixture
                     led10.OffColor = Color.Yellow;
 
                     this.Refresh();
+                    IRChannel_B_Result = true;
 
                     // invoke each time we change channel
 
@@ -1126,7 +1240,28 @@ namespace ITM_ISM_Fixture
 
 
                     if ((IRDutycyle > 33) | (IRDutycyle < 27) | (Double.IsNaN(IRDutycyle)))
-                        AdjustDuty();
+                    {
+                        AdjustDuty(1);
+                    }
+                    else
+                    {
+                        // store data
+                        IRDutyCycle[1] = IRDutycyle;
+
+                        Txresponse = null;
+                        Txresponse = TxCommand("irpw");
+                        timer3.Enabled = false;
+
+
+                        Console.WriteLine("Response From Juno: {0}", Txresponse); // may have to capture this as soon as we have cr
+
+                        string[] tokens;
+
+                        tokens = Txresponse.Split('=');
+                        IRPW[1] = Convert.ToDouble(tokens[1]);
+
+
+                    }
 
 
                     while (timer2.Enabled == true)
@@ -1149,6 +1284,7 @@ namespace ITM_ISM_Fixture
                     else
                     {
                         led10.OffColor = Color.Red;
+                        IRChannel_B_Result = false;
 
                     }
 
@@ -1199,7 +1335,7 @@ namespace ITM_ISM_Fixture
 
                     if ((IRCurrent < .095) | (IRCurrent > .105))
                     {
-                        ReturnCurrent = IRSetCurrent(1);  // 1 = low, 2 = mid, 3 = high
+                        ReturnCurrent = IRSetCurrent(1,1);  // 1 = low, 2 = mid, 3 = high
 
 
                     }
@@ -1207,6 +1343,20 @@ namespace ITM_ISM_Fixture
                     {
 
                         ReturnCurrent = IRCurrent;
+                        // record current and ldpot
+                        ldcurrent[1] = IRCurrent;
+
+
+                        Txresponse = TxCommand("ldpot");
+                        timer3.Enabled = false;
+
+
+                        Console.WriteLine("Response From Juno: {0}", Txresponse); // may have to capture this as soon as we have cr
+
+                        string[] tokens;
+
+                        tokens = Txresponse.Split('=');
+                        ldpot[1] = Convert.ToDouble(tokens[1]);
 
                     }
 
@@ -1221,6 +1371,7 @@ namespace ITM_ISM_Fixture
                     {
 
                         led15.OffColor = Color.Red;
+                        IRChannel_B_Result = false;
 
                     }
 
@@ -1257,7 +1408,7 @@ namespace ITM_ISM_Fixture
 
                     if ((IRCurrent < .11) | (IRCurrent > .12))
                     {
-                        ReturnCurrent = IRSetCurrent(3);  // 1 = low, 2 = mid, 3 = high
+                        ReturnCurrent = IRSetCurrent(3,1);  // 1 = low, 2 = mid, 3 = high
 
 
                     }
@@ -1265,6 +1416,20 @@ namespace ITM_ISM_Fixture
                     {
 
                         ReturnCurrent = IRCurrent;
+                        // record current and ldpot
+                        mdcurrent[1] = IRCurrent;
+
+
+                        Txresponse = TxCommand("mdpot");
+                        timer3.Enabled = false;
+
+
+                        Console.WriteLine("Response From Juno: {0}", Txresponse); // may have to capture this as soon as we have cr
+
+                        string[] tokens;
+
+                        tokens = Txresponse.Split('=');
+                        mdpot[1] = Convert.ToDouble(tokens[1]);
 
                     }
 
@@ -1279,6 +1444,7 @@ namespace ITM_ISM_Fixture
                     {
 
                         led22.OffColor = Color.Red;
+                        IRChannel_B_Result = false;
 
                     }
 
@@ -1318,7 +1484,7 @@ namespace ITM_ISM_Fixture
 
                     if ((IRCurrent < .125) | (IRCurrent > .135))
                     {
-                        ReturnCurrent = IRSetCurrent(5);  // 1 = low, 2 = mid, 3 = high
+                        ReturnCurrent = IRSetCurrent(5,1);  // 1 = low, 2 = mid, 3 = high
 
 
                     }
@@ -1326,6 +1492,20 @@ namespace ITM_ISM_Fixture
                     {
 
                         ReturnCurrent = IRCurrent;
+                        // record current and ldpot
+                        hdcurrent[1] = IRCurrent;
+
+
+                        Txresponse = TxCommand("hdpot");
+                        timer3.Enabled = false;
+
+
+                        Console.WriteLine("Response From Juno: {0}", Txresponse); // may have to capture this as soon as we have cr
+
+                        string[] tokens;
+
+                        tokens = Txresponse.Split('=');
+                        hdpot[1] = Convert.ToDouble(tokens[1]);
 
                     }
 
@@ -1340,6 +1520,7 @@ namespace ITM_ISM_Fixture
                     {
 
                         led27.OffColor = Color.Red;
+                        IRChannel_B_Result = false;
 
                     }
 
@@ -1373,6 +1554,7 @@ namespace ITM_ISM_Fixture
                     led11.OffColor = Color.Yellow;
 
                     this.Refresh();
+                    IRChannel_C_Result = true;
 
 
 
@@ -1396,7 +1578,27 @@ namespace ITM_ISM_Fixture
 
 
                     if ((IRDutycyle > 33) | (IRDutycyle < 27) | (Double.IsNaN(IRDutycyle)))
-                        AdjustDuty();
+                    {
+                        AdjustDuty(2);
+                    }
+                    else
+                    {
+                        // store data
+                        IRDutyCycle[2] = IRDutycyle;
+
+                        Txresponse = null;
+                        Txresponse = TxCommand("irpw");
+                        timer3.Enabled = false;
+
+
+                        Console.WriteLine("Response From Juno: {0}", Txresponse); // may have to capture this as soon as we have cr
+
+                        string[] tokens;
+
+                        tokens = Txresponse.Split('=');
+                        IRPW[2] = Convert.ToDouble(tokens[1]);
+
+                    }
 
 
                     while (timer2.Enabled == true)
@@ -1417,6 +1619,7 @@ namespace ITM_ISM_Fixture
                     else
                     {
                         led11.OffColor = Color.Red;
+                        IRChannel_C_Result = false;
 
                     }
 
@@ -1467,7 +1670,7 @@ namespace ITM_ISM_Fixture
 
                     if ((IRCurrent < .095) | (IRCurrent > .105))
                     {
-                        ReturnCurrent = IRSetCurrent(1);  // 1 = low, 2 = mid, 3 = high
+                        ReturnCurrent = IRSetCurrent(1,2);  // 1 = low, 3 = mid, 5 = high
 
 
                     }
@@ -1475,6 +1678,20 @@ namespace ITM_ISM_Fixture
                     {
 
                         ReturnCurrent = IRCurrent;
+                        // record current and ldpot
+                        ldcurrent[2] = IRCurrent;
+
+
+                        Txresponse = TxCommand("ldpot");
+                        timer3.Enabled = false;
+
+
+                        Console.WriteLine("Response From Juno: {0}", Txresponse); // may have to capture this as soon as we have cr
+
+                        string[] tokens;
+
+                        tokens = Txresponse.Split('=');
+                        ldpot[2] = Convert.ToDouble(tokens[1]);
 
                     }
 
@@ -1489,6 +1706,7 @@ namespace ITM_ISM_Fixture
                     {
 
                         led16.OffColor = Color.Red;
+                        IRChannel_C_Result = false;
 
                     }
 
@@ -1527,7 +1745,7 @@ namespace ITM_ISM_Fixture
 
                     if ((IRCurrent < .11) | (IRCurrent > .12))
                     {
-                        ReturnCurrent = IRSetCurrent(3);  // 1 = low, 2 = mid, 3 = high
+                        ReturnCurrent = IRSetCurrent(3,2);  // 1 = low, 3 = mid, 5 = high
 
 
                     }
@@ -1535,6 +1753,20 @@ namespace ITM_ISM_Fixture
                     {
 
                         ReturnCurrent = IRCurrent;
+                        // record current and ldpot
+                        mdcurrent[2] = IRCurrent;
+
+
+                        Txresponse = TxCommand("mdpot");
+                        timer3.Enabled = false;
+
+
+                        Console.WriteLine("Response From Juno: {0}", Txresponse); // may have to capture this as soon as we have cr
+
+                        string[] tokens;
+
+                        tokens = Txresponse.Split('=');
+                        mdpot[2] = Convert.ToDouble(tokens[1]);
 
                     }
 
@@ -1549,6 +1781,7 @@ namespace ITM_ISM_Fixture
                     {
 
                         led21.OffColor = Color.Red;
+                        IRChannel_C_Result = false;
 
                     }
 
@@ -1588,7 +1821,7 @@ namespace ITM_ISM_Fixture
 
                     if ((IRCurrent < .125) | (IRCurrent > .135))
                     {
-                        ReturnCurrent = IRSetCurrent(5);  // 1 = low, 2 = mid, 3 = high
+                        ReturnCurrent = IRSetCurrent(5,2);  // 1 = low, 3 = mid, 5 = high
 
 
                     }
@@ -1596,6 +1829,20 @@ namespace ITM_ISM_Fixture
                     {
 
                         ReturnCurrent = IRCurrent;
+                        // record current and ldpot
+                        hdcurrent[2] = IRCurrent;
+
+
+                        Txresponse = TxCommand("hdpot");
+                        timer3.Enabled = false;
+
+
+                        Console.WriteLine("Response From Juno: {0}", Txresponse); // may have to capture this as soon as we have cr
+
+                        string[] tokens;
+
+                        tokens = Txresponse.Split('=');
+                        hdpot[2] = Convert.ToDouble(tokens[1]);
 
                     }
 
@@ -1610,6 +1857,7 @@ namespace ITM_ISM_Fixture
                     {
 
                         led26.OffColor = Color.Red;
+                        IRChannel_C_Result = false;
 
                     }
 
@@ -1629,6 +1877,7 @@ namespace ITM_ISM_Fixture
                     led12.OffColor = Color.Yellow;
 
                     this.Refresh();
+                    IRChannel_D_Result = true;
 
 
 
@@ -1652,7 +1901,28 @@ namespace ITM_ISM_Fixture
 
 
                     if ((IRDutycyle > 33) | (IRDutycyle < 27) | (Double.IsNaN(IRDutycyle)))
-                        AdjustDuty();
+                    {
+                        AdjustDuty(3);
+                    }
+                    else
+                    {
+                        // store data
+                        IRDutyCycle[3] = IRDutycyle;
+
+                        Txresponse = null;
+                        Txresponse = TxCommand("irpw");
+                        timer3.Enabled = false;
+
+
+                        Console.WriteLine("Response From Juno: {0}", Txresponse); // may have to capture this as soon as we have cr
+
+                        string[] tokens;
+
+                        tokens = Txresponse.Split('=');
+                        IRPW[3] = Convert.ToDouble(tokens[1]);
+
+
+                    }
 
 
                     while (timer2.Enabled == true)
@@ -1673,6 +1943,7 @@ namespace ITM_ISM_Fixture
                     else
                     {
                         led12.OffColor = Color.Red;
+                        IRChannel_D_Result = false;
 
                     }
 
@@ -1726,7 +1997,7 @@ namespace ITM_ISM_Fixture
 
                     if ((IRCurrent < .095) | (IRCurrent > .105))
                     {
-                        ReturnCurrent = IRSetCurrent(1);  // 1 = low, 2 = mid, 3 = high
+                        ReturnCurrent = IRSetCurrent(1,3);  // 1 = low, 2 = mid, 3 = high
 
 
                     }
@@ -1734,6 +2005,20 @@ namespace ITM_ISM_Fixture
                     {
 
                         ReturnCurrent = IRCurrent;
+                        // record current and ldpot
+                        ldcurrent[3] = IRCurrent;
+
+
+                        Txresponse = TxCommand("ldpot");
+                        timer3.Enabled = false;
+
+
+                        Console.WriteLine("Response From Juno: {0}", Txresponse); // may have to capture this as soon as we have cr
+
+                        string[] tokens;
+
+                        tokens = Txresponse.Split('=');
+                        ldpot[3] = Convert.ToDouble(tokens[1]);
 
                     }
 
@@ -1748,6 +2033,7 @@ namespace ITM_ISM_Fixture
                     {
 
                         led17.OffColor = Color.Red;
+                        IRChannel_D_Result = false;
 
                     }
 
@@ -1786,7 +2072,7 @@ namespace ITM_ISM_Fixture
 
                     if ((IRCurrent < .11) | (IRCurrent > .12))
                     {
-                        ReturnCurrent = IRSetCurrent(3);  // 1 = low, 2 = mid, 3 = high
+                        ReturnCurrent = IRSetCurrent(3,3);  // 1 = low, 3 = mid, 5 = high
 
 
                     }
@@ -1794,6 +2080,20 @@ namespace ITM_ISM_Fixture
                     {
 
                         ReturnCurrent = IRCurrent;
+                        // record current and ldpot
+                        mdcurrent[3] = IRCurrent;
+
+
+                        Txresponse = TxCommand("mdpot");
+                        timer3.Enabled = false;
+
+
+                        Console.WriteLine("Response From Juno: {0}", Txresponse); // may have to capture this as soon as we have cr
+
+                        string[] tokens;
+
+                        tokens = Txresponse.Split('=');
+                        mdpot[3] = Convert.ToDouble(tokens[1]);
 
                     }
 
@@ -1808,6 +2108,7 @@ namespace ITM_ISM_Fixture
                     {
 
                         led20.OffColor = Color.Red;
+                        IRChannel_D_Result = false;
 
                     }
 
@@ -1847,7 +2148,7 @@ namespace ITM_ISM_Fixture
 
                     if ((IRCurrent < .125) | (IRCurrent > .135))
                     {
-                        ReturnCurrent = IRSetCurrent(5);  // 1 = low, 3 = mid, 5= high
+                        ReturnCurrent = IRSetCurrent(5,3);  // 1 = low, 3 = mid, 5= high
 
 
                     }
@@ -1855,6 +2156,20 @@ namespace ITM_ISM_Fixture
                     {
 
                         ReturnCurrent = IRCurrent;
+                        // record current and ldpot
+                        hdcurrent[3] = IRCurrent;
+
+
+                        Txresponse = TxCommand("hdpot");
+                        timer3.Enabled = false;
+
+
+                        Console.WriteLine("Response From Juno: {0}", Txresponse); // may have to capture this as soon as we have cr
+
+                        string[] tokens;
+
+                        tokens = Txresponse.Split('=');
+                        hdpot[3] = Convert.ToDouble(tokens[1]);
 
                     }
 
@@ -1869,6 +2184,7 @@ namespace ITM_ISM_Fixture
                     {
 
                         led25.OffColor = Color.Red;
+                        IRChannel_D_Result = false;
 
                     }
 
@@ -1893,6 +2209,9 @@ namespace ITM_ISM_Fixture
 
                     this.Refresh();
 
+                    IRChannel_E_Result = true;
+
+
 
                     // invoke each time we change channel
 
@@ -1912,8 +2231,29 @@ namespace ITM_ISM_Fixture
 
 
 
-                    if ((IRDutycyle > 33) | (IRDutycyle < 27) |(Double.IsNaN(IRDutycyle)))
-                        AdjustDuty();
+                    if ((IRDutycyle > 33) | (IRDutycyle < 27) | (Double.IsNaN(IRDutycyle)))
+                    {
+                        AdjustDuty(4);
+                    }
+                    else
+                    {
+                        // store data
+                        IRDutyCycle[4] = IRDutycyle;
+
+                        Txresponse = null;
+                        Txresponse = TxCommand("irpw");
+                        timer3.Enabled = false;
+
+
+                        Console.WriteLine("Response From Juno: {0}", Txresponse); // may have to capture this as soon as we have cr
+
+                        string[] tokens;
+
+                        tokens = Txresponse.Split('=');
+                        IRPW[4] = Convert.ToDouble(tokens[1]);
+
+
+                    }
 
 
                     while (timer2.Enabled == true)
@@ -1933,6 +2273,7 @@ namespace ITM_ISM_Fixture
                     else
                     {
                         led13.OffColor = Color.Red;
+                        IRChannel_E_Result = false;
 
                     }
 
@@ -1983,7 +2324,7 @@ namespace ITM_ISM_Fixture
 
                     if ((IRCurrent < .095) | (IRCurrent > .105))
                     {
-                        ReturnCurrent = IRSetCurrent(1);  // 1 = low, 2 = mid, 3 = high
+                        ReturnCurrent = IRSetCurrent(1,4);  // 1 = low, 3 = mid, 5 = high
 
 
                     }
@@ -1991,6 +2332,20 @@ namespace ITM_ISM_Fixture
                     {
 
                         ReturnCurrent = IRCurrent;
+                        // record current and ldpot
+                        ldcurrent[4] = IRCurrent;
+
+
+                        Txresponse = TxCommand("ldpot");
+                        timer3.Enabled = false;
+
+
+                        Console.WriteLine("Response From Juno: {0}", Txresponse); // may have to capture this as soon as we have cr
+
+                        string[] tokens;
+
+                        tokens = Txresponse.Split('=');
+                        ldpot[4] = Convert.ToDouble(tokens[1]);
 
                     }
 
@@ -2005,6 +2360,7 @@ namespace ITM_ISM_Fixture
                     {
 
                         led18.OffColor = Color.Red;
+                        IRChannel_E_Result = false;
 
                     }
 
@@ -2043,7 +2399,7 @@ namespace ITM_ISM_Fixture
 
                     if ((IRCurrent < .11) | (IRCurrent > .12))
                     {
-                        ReturnCurrent = IRSetCurrent(3);  // 1 = low, 2 = mid, 3 = high
+                        ReturnCurrent = IRSetCurrent(3,4);  // 1 = low, 4 = mid, 5 = high
 
 
                     }
@@ -2051,6 +2407,20 @@ namespace ITM_ISM_Fixture
                     {
 
                         ReturnCurrent = IRCurrent;
+                        // record current and ldpot
+                        mdcurrent[4] = IRCurrent;
+
+
+                        Txresponse = TxCommand("mdpot");
+                        timer3.Enabled = false;
+
+
+                        Console.WriteLine("Response From Juno: {0}", Txresponse); // may have to capture this as soon as we have cr
+
+                        string[] tokens;
+
+                        tokens = Txresponse.Split('=');
+                        mdpot[4] = Convert.ToDouble(tokens[1]);
 
                     }
 
@@ -2065,6 +2435,7 @@ namespace ITM_ISM_Fixture
                     {
 
                         led19.OffColor = Color.Red;
+                        IRChannel_E_Result = false;
 
                     }
 
@@ -2104,7 +2475,7 @@ namespace ITM_ISM_Fixture
 
                     if ((IRCurrent < .125) | (IRCurrent > .135))
                     {
-                        ReturnCurrent = IRSetCurrent(5);  // 1 = low, 2 = mid, 3 = high
+                        ReturnCurrent = IRSetCurrent(5,4);  // 1 = low, 3 = mid, 5 = high
 
 
                     }
@@ -2112,6 +2483,20 @@ namespace ITM_ISM_Fixture
                     {
 
                         ReturnCurrent = IRCurrent;
+                        // record current and ldpot
+                        hdcurrent[4] = IRCurrent;
+
+
+                        Txresponse = TxCommand("hdpot");
+                        timer3.Enabled = false;
+
+
+                        Console.WriteLine("Response From Juno: {0}", Txresponse); // may have to capture this as soon as we have cr
+
+                        string[] tokens;
+
+                        tokens = Txresponse.Split('=');
+                        hdpot[4] = Convert.ToDouble(tokens[1]);
 
                     }
 
@@ -2126,6 +2511,7 @@ namespace ITM_ISM_Fixture
                     {
 
                         led24.OffColor = Color.Red;
+                        IRChannel_E_Result = false;
 
                     }
 
@@ -2145,6 +2531,8 @@ namespace ITM_ISM_Fixture
                     led33.OffColor = Color.Yellow;
 
                     this.Refresh();
+
+                    IRChannel_L1_Result = true;
 
 
 
@@ -2167,7 +2555,28 @@ namespace ITM_ISM_Fixture
 
 
                     if ((IRDutycyle > 33) | (IRDutycyle < 27) | (Double.IsNaN(IRDutycyle)))
-                        AdjustDuty();
+                    {
+                        AdjustDuty(5);
+                    }
+                    else
+                    {
+
+                        // store data
+                        IRDutyCycle[5] = IRDutycyle;
+
+                        Txresponse = null;
+                        Txresponse = TxCommand("irpw");
+                        timer3.Enabled = false;
+
+
+                        Console.WriteLine("Response From Juno: {0}", Txresponse); // may have to capture this as soon as we have cr
+
+                        string[] tokens;
+
+                        tokens = Txresponse.Split('=');
+                        IRPW[5] = Convert.ToDouble(tokens[1]);
+
+                    }
 
 
                     while (timer2.Enabled == true)
@@ -2187,6 +2596,7 @@ namespace ITM_ISM_Fixture
                     else
                     {
                         led33.OffColor = Color.Red;
+                        IRChannel_L1_Result = false;
 
                     }
 
@@ -2237,7 +2647,7 @@ namespace ITM_ISM_Fixture
 
                     if ((IRCurrent < .095) | (IRCurrent > .105))
                     {
-                        ReturnCurrent = IRSetCurrent(1);  // 1 = low, 2 = mid, 3 = high
+                        ReturnCurrent = IRSetCurrent(1,5);  // 1 = low, 3 = mid, 5 = high
 
 
                     }
@@ -2245,6 +2655,20 @@ namespace ITM_ISM_Fixture
                     {
 
                         ReturnCurrent = IRCurrent;
+                        // record current and ldpot
+                        ldcurrent[5] = IRCurrent;
+
+
+                        Txresponse = TxCommand("ldpot");
+                        timer3.Enabled = false;
+
+
+                        Console.WriteLine("Response From Juno: {0}", Txresponse); // may have to capture this as soon as we have cr
+
+                        string[] tokens;
+
+                        tokens = Txresponse.Split('=');
+                        ldpot[5] = Convert.ToDouble(tokens[1]);
 
                     }
 
@@ -2259,6 +2683,7 @@ namespace ITM_ISM_Fixture
                     {
 
                         led32.OffColor = Color.Red;
+                        IRChannel_L1_Result = false;
 
                     }
 
@@ -2297,7 +2722,7 @@ namespace ITM_ISM_Fixture
 
                     if ((IRCurrent < .11) | (IRCurrent > .12))
                     {
-                        ReturnCurrent = IRSetCurrent(3);  // 1 = low, 2 = mid, 3 = high
+                        ReturnCurrent = IRSetCurrent(3,5);  // 1 = low, 3 = mid, 5 = high
 
 
                     }
@@ -2305,6 +2730,20 @@ namespace ITM_ISM_Fixture
                     {
 
                         ReturnCurrent = IRCurrent;
+                        // record current and ldpot
+                        mdcurrent[5] = IRCurrent;
+
+
+                        Txresponse = TxCommand("mdpot");
+                        timer3.Enabled = false;
+
+
+                        Console.WriteLine("Response From Juno: {0}", Txresponse); // may have to capture this as soon as we have cr
+
+                        string[] tokens;
+
+                        tokens = Txresponse.Split('=');
+                        mdpot[5] = Convert.ToDouble(tokens[1]);
 
                     }
 
@@ -2319,6 +2758,7 @@ namespace ITM_ISM_Fixture
                     {
 
                         led31.OffColor = Color.Red;
+                        IRChannel_L1_Result = false;
 
                     }
 
@@ -2358,7 +2798,7 @@ namespace ITM_ISM_Fixture
 
                     if ((IRCurrent < .125) | (IRCurrent > .135))
                     {
-                        ReturnCurrent = IRSetCurrent(5);  // 1 = low, 2 = mid, 3 = high
+                        ReturnCurrent = IRSetCurrent(5,5);  // 1 = low, 3 = mid, 5 = high
 
 
                     }
@@ -2366,6 +2806,20 @@ namespace ITM_ISM_Fixture
                     {
 
                         ReturnCurrent = IRCurrent;
+                        // record current and ldpot
+                        hdcurrent[5] = IRCurrent;
+
+
+                        Txresponse = TxCommand("hdpot");
+                        timer3.Enabled = false;
+
+
+                        Console.WriteLine("Response From Juno: {0}", Txresponse); // may have to capture this as soon as we have cr
+
+                        string[] tokens;
+
+                        tokens = Txresponse.Split('=');
+                        hdpot[5] = Convert.ToDouble(tokens[1]);
 
                     }
 
@@ -2380,6 +2834,7 @@ namespace ITM_ISM_Fixture
                     {
 
                         led30.OffColor = Color.Red;
+                        IRChannel_L1_Result = false;
 
                     }
 
@@ -2389,6 +2844,10 @@ namespace ITM_ISM_Fixture
 
                     Txresponse = TxCommand("CHI = 6");
                     timer3.Enabled = false;
+
+
+                    IRChannel_L2_Result = true;
+
 
 
                     Console.WriteLine("Response From Juno: {0}", Txresponse); // may have to capture this as soon as we have cr
@@ -2419,7 +2878,27 @@ namespace ITM_ISM_Fixture
 
 
                     if ((IRDutycyle > 33) | (IRDutycyle < 27) | (Double.IsNaN(IRDutycyle)))
-                        AdjustDuty();
+                    {
+                        AdjustDuty(6);
+                    }
+                    else
+                    {
+                        // store data
+                        IRDutyCycle[6] = IRDutycyle;
+
+                        Txresponse = null;
+                        Txresponse = TxCommand("irpw");
+                        timer3.Enabled = false;
+
+
+                        Console.WriteLine("Response From Juno: {0}", Txresponse); // may have to capture this as soon as we have cr
+
+                        string[] tokens;
+
+                        tokens = Txresponse.Split('=');
+                        IRPW[6] = Convert.ToDouble(tokens[1]);
+
+                    }
 
 
                     while (timer2.Enabled == true)
@@ -2439,6 +2918,7 @@ namespace ITM_ISM_Fixture
                     else
                     {
                         led37.OffColor = Color.Red;
+                        IRChannel_L2_Result = false;
 
                     }
 
@@ -2489,7 +2969,7 @@ namespace ITM_ISM_Fixture
 
                     if ((IRCurrent < .095) | (IRCurrent > .105))
                     {
-                        ReturnCurrent = IRSetCurrent(1);  // 1 = low, 2 = mid, 3 = high
+                        ReturnCurrent = IRSetCurrent(1,6);  // 1 = low, 3 = mid, 5 = high
 
 
                     }
@@ -2497,6 +2977,20 @@ namespace ITM_ISM_Fixture
                     {
 
                         ReturnCurrent = IRCurrent;
+                        // record current and ldpot
+                        ldcurrent[6] = IRCurrent;
+
+
+                        Txresponse = TxCommand("ldpot");
+                        timer3.Enabled = false;
+
+
+                        Console.WriteLine("Response From Juno: {0}", Txresponse); // may have to capture this as soon as we have cr
+
+                        string[] tokens;
+
+                        tokens = Txresponse.Split('=');
+                        ldpot[6] = Convert.ToDouble(tokens[1]);
 
                     }
 
@@ -2511,6 +3005,7 @@ namespace ITM_ISM_Fixture
                     {
 
                         led36.OffColor = Color.Red;
+                        IRChannel_L2_Result = false;
 
                     }
 
@@ -2549,7 +3044,7 @@ namespace ITM_ISM_Fixture
 
                     if ((IRCurrent < .11) | (IRCurrent > .12))
                     {
-                        ReturnCurrent = IRSetCurrent(3);  // 1 = low, 2 = mid, 3 = high
+                        ReturnCurrent = IRSetCurrent(3,6);  // 1 = low, 3 = mid, 5 = high
 
 
                     }
@@ -2557,6 +3052,20 @@ namespace ITM_ISM_Fixture
                     {
 
                         ReturnCurrent = IRCurrent;
+                        // record current and ldpot
+                        mdcurrent[6] = IRCurrent;
+
+
+                        Txresponse = TxCommand("mdpot");
+                        timer3.Enabled = false;
+
+
+                        Console.WriteLine("Response From Juno: {0}", Txresponse); // may have to capture this as soon as we have cr
+
+                        string[] tokens;
+
+                        tokens = Txresponse.Split('=');
+                        mdpot[6] = Convert.ToDouble(tokens[1]);
 
                     }
 
@@ -2571,6 +3080,7 @@ namespace ITM_ISM_Fixture
                     {
 
                         led35.OffColor = Color.Red;
+                        IRChannel_L2_Result = false;
 
                     }
 
@@ -2610,7 +3120,7 @@ namespace ITM_ISM_Fixture
 
                     if ((IRCurrent < .125) | (IRCurrent > .135))
                     {
-                        ReturnCurrent = IRSetCurrent(5);  // 1 = low, 2 = mid, 3 = high
+                        ReturnCurrent = IRSetCurrent(5,6);  // 1 = low, 3 = mid, 5 = high
 
 
                     }
@@ -2618,6 +3128,20 @@ namespace ITM_ISM_Fixture
                     {
 
                         ReturnCurrent = IRCurrent;
+                        // record current and ldpot
+                        hdcurrent[6] = IRCurrent;
+
+
+                        Txresponse = TxCommand("hdpot");
+                        timer3.Enabled = false;
+
+
+                        Console.WriteLine("Response From Juno: {0}", Txresponse); // may have to capture this as soon as we have cr
+
+                        string[] tokens;
+
+                        tokens = Txresponse.Split('=');
+                        hdpot[6] = Convert.ToDouble(tokens[1]);
 
                     }
 
@@ -2632,6 +3156,7 @@ namespace ITM_ISM_Fixture
                     {
 
                         led34.OffColor = Color.Red;
+                        IRChannel_L2_Result = false;
 
                     }
 
@@ -2660,10 +3185,24 @@ namespace ITM_ISM_Fixture
 
 
 
+                    Txresponse = TxCommand("summ");
+                    timer3.Enabled = false;
 
 
+                    Console.WriteLine("Response From Tx: {0}", Txresponse); // may have to capture this as soon as we have cr
 
 
+                    // figure out Model
+
+                    if (Txresponse.Contains("Teacher"))
+                    {
+                        Model = "ITM";
+                    }
+                    else
+                    {
+                        Model = "ISM";
+
+                    }
 
 
 
@@ -2676,6 +3215,9 @@ namespace ITM_ISM_Fixture
                     // look at output signal
 
 
+                    // save data
+
+                    WriteCSVFile();
 
 
 
@@ -2693,14 +3235,75 @@ namespace ITM_ISM_Fixture
         }
 
 
-        private double IRSetCurrent(int coverage)
+
+
+        public void WriteCSVFile()
+        {
+            string filename = "c:\\data\\IXMData" + DateTime.Now.ToString("yyyyMMdd") + ".csv";
+
+            // check for existance of todays file.  If it doesn't exist put a header on top for data
+
+            string timestring = DateTime.Now.ToString("h:mm:ss tt");
+            if (!File.Exists(filename))
+            {
+                using (StreamWriter sw = File.AppendText(filename))
+                {
+
+                    sw.WriteLine("Serial Number,Model,Time, Power Up Current, " +
+                                  "Voltage Result, TP102, TP116, TP115, TP130, " +
+                                  "Program Result," +
+                                  "Aux-In Result, TPxxx,TPXXX," +
+                                  "Mic-In Result, TPxxx," +
+                                  "Boot Result, " +
+                                  "Charge Result, Charge Current,"+
+                                  "IRChannel_A_Result, IRPW-A, Chan A Duty, ldpot-A, ld-A Current, mdpot-A, md-A Current, hdpot-A, hd-A Current," +
+                                  "IRChannel_B_Result, IRPW-B, Chan B Duty, ldpot-B, ld-B Current, mdpot-B, md-B Current, hdpot-B, hd-B Current," +
+                                  "IRChannel_C_Result, IRPW-C, Chan C Duty, ldpot-C, ld-C Current, mdpot-C, md-C Current, hdpot-C, hd-C Current," +
+                                  "IRChannel_D_Result, IRPW-D, Chan D Duty, ldpot-D, ld-D Current, mdpot-D, md-D Current, hdpot-D, hd-D Current," +
+                                  "IRChannel_E_Result, IRPW-E, Chan E Duty, ldpot-E, ld-E Current, mdpot-E, md-E Current, hdpot-E, hd-E Current," +
+                                  "IRChannel_L1_Result, IRPW-L1, Chan L1 Duty, ldpot-L1, ld-L1 Current, mdpot-L1, md-L1 Current, hdpot-L1, hd-L1 Current," +
+                                  "IRChannel_L2_Result, IRPW-L2, Chan L2 Duty, ldpot-L2, ld-L2 Current, mdpot-L2, md-L2 Current, hdpot-L2, hd-L2 Current,"
+                                   );
+                }
+
+            }
+
+
+
+            using (StreamWriter sw = File.AppendText(filename))
+            { 
+                sw.WriteLine("ToDo Serial Number" + "," + Model + "," + timestring + 
+                "," + Convert.ToString(powerupCurrent) +
+                "," + Convert.ToString(VoltageResult) + "," + Convert.ToString(VoltageMeasurements[0]) + "," + Convert.ToString(VoltageMeasurements[1]) +  "," + Convert.ToString(VoltageMeasurements[2]) +  "," + Convert.ToString(VoltageMeasurements[3]) +
+                "," + Convert.ToString(ProgramResult) +
+                "," + Convert.ToString(AuxResult) + "," + Convert.ToString(AudioInMeasurements[0]) + "," + Convert.ToString(AudioInMeasurements[1]) +
+                "," + Convert.ToString(MicResult) + "," + Convert.ToString(AudioInMeasurements[2]) + 
+                "," + Convert.ToString(BootResult) +
+                "," + Convert.ToString(ChargeCurrentResult) + "," + Convert.ToString(ChargeCurrent) +
+                "," + Convert.ToString(IRChannel_A_Result) + "," + Convert.ToString(IRPW[0]) + "," + Convert.ToString(IRDutyCycle[0]) + "," + Convert.ToString(ldpot[0]) + "," + Convert.ToString(ldcurrent[0]) + "," + Convert.ToString(mdpot[0]) + "," + Convert.ToString(mdcurrent[0]) + "," + Convert.ToString(hdpot[0]) + "," + Convert.ToString(hdcurrent[0]) +
+                "," + Convert.ToString(IRChannel_B_Result) + "," + Convert.ToString(IRPW[1]) + "," + Convert.ToString(IRDutyCycle[1]) + "," + Convert.ToString(ldpot[1]) + "," + Convert.ToString(ldcurrent[1]) + "," + Convert.ToString(mdpot[1]) + "," + Convert.ToString(mdcurrent[1]) + "," + Convert.ToString(hdpot[1]) + "," + Convert.ToString(hdcurrent[1]) +
+                "," + Convert.ToString(IRChannel_C_Result) + "," + Convert.ToString(IRPW[2]) + "," + Convert.ToString(IRDutyCycle[2]) + "," + Convert.ToString(ldpot[2]) + "," + Convert.ToString(ldcurrent[2]) + "," + Convert.ToString(mdpot[2]) + "," + Convert.ToString(mdcurrent[2]) + "," + Convert.ToString(hdpot[2]) + "," + Convert.ToString(hdcurrent[2]) +
+                "," + Convert.ToString(IRChannel_D_Result) + "," + Convert.ToString(IRPW[3]) + "," + Convert.ToString(IRDutyCycle[3]) + "," + Convert.ToString(ldpot[3]) + "," + Convert.ToString(ldcurrent[3]) + "," + Convert.ToString(mdpot[3]) + "," + Convert.ToString(mdcurrent[3]) + "," + Convert.ToString(hdpot[3]) + "," + Convert.ToString(hdcurrent[3]) +
+                "," + Convert.ToString(IRChannel_E_Result) + "," + Convert.ToString(IRPW[4]) + "," + Convert.ToString(IRDutyCycle[4]) + "," + Convert.ToString(ldpot[4]) + "," + Convert.ToString(ldcurrent[4]) + "," + Convert.ToString(mdpot[4]) + "," + Convert.ToString(mdcurrent[4]) + "," + Convert.ToString(hdpot[4]) + "," + Convert.ToString(hdcurrent[4]) +
+                "," + Convert.ToString(IRChannel_L1_Result) + "," + Convert.ToString(IRPW[5]) + "," + Convert.ToString(IRDutyCycle[5]) + "," + Convert.ToString(ldpot[5]) + "," + Convert.ToString(ldcurrent[5]) + "," + Convert.ToString(mdpot[5]) + "," + Convert.ToString(mdcurrent[5]) + "," + Convert.ToString(hdpot[5]) + "," + Convert.ToString(hdcurrent[5]) +
+                "," + Convert.ToString(IRChannel_L2_Result) + "," + Convert.ToString(IRPW[6]) + "," + Convert.ToString(IRDutyCycle[6]) + "," + Convert.ToString(ldpot[6]) + "," + Convert.ToString(ldcurrent[6]) + "," + Convert.ToString(mdpot[6]) + "," + Convert.ToString(mdcurrent[6]) + "," + Convert.ToString(hdpot[6]) + "," + Convert.ToString(hdcurrent[6]) 
+                
+                );  
+
+
+
+            }
+        }
+
+
+        private double IRSetCurrent(int coverage,int channel)
         {
             BK2831E_2_ReadCurrent GetIRCurrent = new BK2831E_2_ReadCurrent();
             bool CurrentOK = false;
 
-            double ldpot = 3.6;
-            double mdpot = 3.6;
-            double hdpot = 3.62;
+            double LDpot = 3.6;
+            double MDpot = 3.6;
+            double HDpot = 3.62;
             double stepsize = .01;
             double ReturnCurrent = 0;
 
@@ -2731,20 +3334,20 @@ namespace ITM_ISM_Fixture
             switch (coverage)
             {
                 case 1:
-                    SetPot = ldpot;
+                    SetPot = LDpot;
 
                     break;
                 case 3:
 
-                    SetPot = mdpot;
+                    SetPot = MDpot;
                     break;
                 case 5:
 
-                    SetPot = hdpot;
+                    SetPot = HDpot;
                     break;
                 default:
 
-                    SetPot = hdpot;
+                    SetPot = HDpot;
                     break;
 
             }
@@ -2812,6 +3415,11 @@ namespace ITM_ISM_Fixture
                         {
                             CurrentOK = true;
 
+                            
+                            ldpot[channel] = SetPot;
+                            ldcurrent[channel] = IRCurrent;
+
+
 
                         }
                         else
@@ -2838,6 +3446,8 @@ namespace ITM_ISM_Fixture
                         if ((IRCurrent > .11) & (IRCurrent < .12))
                         {
                             CurrentOK = true;
+                            mdpot[channel] = SetPot;
+                            mdcurrent[channel] = IRCurrent;
 
 
                         }
@@ -2865,6 +3475,8 @@ namespace ITM_ISM_Fixture
                         if ((IRCurrent > .125) & (IRCurrent < .135))
                         {
                             CurrentOK = true;
+                            hdpot[channel] = SetPot;
+                            hdcurrent[channel] = IRCurrent;
 
 
                         }
@@ -2939,7 +3551,7 @@ namespace ITM_ISM_Fixture
         }
 
 
-        private void AdjustDuty()
+        public void AdjustDuty(int channel)
         {
             // start at .25 IRPW and step by .005 until we get to 25%
 
@@ -2973,6 +3585,12 @@ namespace ITM_ISM_Fixture
                 this.Refresh();
 
 
+                IRPW[channel] = setduty;
+
+
+
+
+         
 
 
                 if ((IRDutycycle < 33) & (IRDutycycle > 27))

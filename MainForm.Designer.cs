@@ -1252,9 +1252,9 @@
             this.label21.Font = new System.Drawing.Font("Microsoft Sans Serif", 13.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label21.Location = new System.Drawing.Point(29, 647);
             this.label21.Name = "label21";
-            this.label21.Size = new System.Drawing.Size(118, 29);
+            this.label21.Size = new System.Drawing.Size(127, 29);
             this.label21.TabIndex = 55;
-            this.label21.Text = "LEGICY 1";
+            this.label21.Text = "LEGACY 1";
             // 
             // led34
             // 
@@ -1294,9 +1294,9 @@
             this.label22.Font = new System.Drawing.Font("Microsoft Sans Serif", 13.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label22.Location = new System.Drawing.Point(29, 689);
             this.label22.Name = "label22";
-            this.label22.Size = new System.Drawing.Size(118, 29);
+            this.label22.Size = new System.Drawing.Size(127, 29);
             this.label22.TabIndex = 60;
-            this.label22.Text = "LEGICY 2";
+            this.label22.Text = "LEGACY 2";
             // 
             // MainForm
             // 
