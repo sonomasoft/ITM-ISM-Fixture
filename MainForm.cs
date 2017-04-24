@@ -228,6 +228,58 @@ namespace ITM_ISM_Fixture
         private void button1_Click(object sender, EventArgs e)
         {
             // begin test sequence
+            progressSleep = 1500;
+
+            // clear all LED's
+            led1.OffColor = Color.Black;
+            led2.OffColor = Color.Black;
+            led3.OffColor = Color.Black;
+            led4.OffColor = Color.Black;
+            led5.OffColor = Color.Black;
+            led6.OffColor = Color.Black;
+            led8.OffColor = Color.Black;
+            led9.OffColor = Color.Black;
+            led10.OffColor = Color.Black;
+            led11.OffColor = Color.Black;
+            led12.OffColor = Color.Black;
+            led13.OffColor = Color.Black;
+            led14.OffColor = Color.Black;
+            led15.OffColor = Color.Black;
+            led16.OffColor = Color.Black;
+            led17.OffColor = Color.Black;
+            led18.OffColor = Color.Black;
+            led19.OffColor = Color.Black;
+            led20.OffColor = Color.Black;
+            led21.OffColor = Color.Black;
+            led22.OffColor = Color.Black;
+            led23.OffColor = Color.Black;
+            led24.OffColor = Color.Black;
+            led25.OffColor = Color.Black;
+
+            led26.OffColor = Color.Black;
+            led27.OffColor = Color.Black;
+            led28.OffColor = Color.Black;
+            led29.OffColor = Color.Black;
+            led30.OffColor = Color.Black;
+            led31.OffColor = Color.Black;
+            led32.OffColor = Color.Black;
+            led33.OffColor = Color.Black;
+            led34.OffColor = Color.Black;
+            led35.OffColor = Color.Black;
+            led36.OffColor = Color.Black;
+            led37.OffColor = Color.Black;
+          
+
+
+
+            this.Refresh();
+
+
+
+
+
+
+
 
             // forces exception
          // VoltageMeasurements[10] = 0;
@@ -359,6 +411,7 @@ namespace ITM_ISM_Fixture
                 */
 
                 switchChannel0(2);
+            
                 Test_TP115();
                 this.Refresh();
 
@@ -370,8 +423,13 @@ namespace ITM_ISM_Fixture
                 MessageBoxDefaultButton.Button1);
                 */
 
+
+                Thread.Sleep(1000);  // add delay for settling.
+
                 switchChannel0(3);
                 Test_TP130();
+                Test_TP130();
+
                 this.Refresh();
 
 
@@ -405,11 +463,162 @@ namespace ITM_ISM_Fixture
                 // program the board
            // ExecuteCommand("flashme.bat");
 
+            // move aux and mic to here
+            // test Aux inputs
+
+
+            if (instumentStatus == 0)
+            {
+
+
+                led6.OffColor = Color.Yellow;   /// seems to be crashing here!!!!!!
+                this.Refresh();
+
+
+                /*
+                MessageBox.Show("Switch Out to Tp402 and In/Out to Aux R.",
+                "Error",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Exclamation,
+                MessageBoxDefaultButton.Button1);
+                 * */
+
+                switchChannel0(5);
+                switchChannel1(0);  // inject signal
+
+
+
+                short status;
+
+
+                // turn on Generator
+                status = Imports.SetSiggenBuiltIn(handle, 0, 500000, Imports.SiggenWaveType.Sine, 1000, 1000, 0, 0, Imports.SiggenSweepType.Up, false, 1, 1, Imports.SiggenTrigType.Rising, Imports.SiggenTrigSource.None, 0);
+                // allow some settling time
+
+                // Thread.Sleep(1000);
+
+
+                GetChanB();
+                Thread.Sleep(1500);
+                GetChanB();  // have to do twice due to offset in buffer.. I don't know why yet.
+
+
+                // get value for aux from label
+
+                string rmsValue = Regex.Match(label19.Text, @"\d+").Value;
+
+
+                AudioInMeasurements[0] = Convert.ToDouble(rmsValue);
+
+
+
+                /*
+                MessageBox.Show("Switch Out to Tp402 and In/Out to Aux L.",
+                "Error",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Exclamation,
+                MessageBoxDefaultButton.Button1);
+                */
+                this.Refresh();
+                // switchChannel0(5);
+                switchChannel1(1);
+                GetChanB();
+
+                // get value for aux from label
+                rmsValue = Regex.Match(label19.Text, @"\d+").Value;
+
+                AudioInMeasurements[1] = Convert.ToDouble(rmsValue);
+                this.Refresh();
+
+
+                // validate measurements
+
+                if ((AudioInMeasurements[0] > 90) & (AudioInMeasurements[0] < 120) & (AudioInMeasurements[1] > 90) & (AudioInMeasurements[1] < 120))
+                {
+
+                    AuxResult = true;
+
+                    led6.OffColor = Color.LimeGreen;
+
+
+                }
+                else
+                {
+
+
+                    AuxResult = false;
+
+                    led6.OffColor = Color.Red;
+
+                }
+
+
+                this.Refresh();
+
+            }
+
+
+            // test mic input
+
+
+            if (instumentStatus == 0)
+            {
+
+
+                led8.OffColor = Color.Yellow;   /// seems to be crashing here!!!!!!
+                this.Refresh();
+
+                MessageBox.Show("Switch Out to Tp402 and In/Out to Mic.",
+                "Error",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Exclamation,
+                MessageBoxDefaultButton.Button1);
+
+
+                short status;
+
+
+                status = Imports.SetSiggenBuiltIn(handle, 0, 25000, Imports.SiggenWaveType.Sine, 1000, 1000, 0, 0, Imports.SiggenSweepType.Up, false, 1, 1, Imports.SiggenTrigType.Rising, Imports.SiggenTrigSource.None, 0);
+                // allow some settling time
+
+                Thread.Sleep(1000);
+
+
+                GetChanB();
+                Thread.Sleep(500);
+                // GetChanB();  // have to do twice due to offset in buffer.. I don't know why yet.
+
+
+                // get value for aux from label
+
+                string rmsValue = Regex.Match(label19.Text, @"\d+").Value;
+
+
+                AudioInMeasurements[2] = Convert.ToDouble(rmsValue);
+
+                if ((AudioInMeasurements[2] > 625) & (AudioInMeasurements[2] < 675))
+                {
+                    MicResult = true;
+                    led8.OffColor = Color.LimeGreen;
+
+                }
+                else
+                {
+                    MicResult = false;
+                    led8.OffColor = Color.Red;
+
+
+                }
+
+
+
+            }
 
 
 
 
-           
+
+          // if(false)  // skip program
             if (instumentStatus == 0)
             {
                 led4.OffColor = Color.Yellow;
@@ -541,6 +750,11 @@ namespace ITM_ISM_Fixture
 
                 }
 
+            // kill the bgw
+                bgw.Dispose();
+
+
+
             // switch off DTR signal on Relay 12 so we can connect to tx
 
 
@@ -548,7 +762,7 @@ namespace ITM_ISM_Fixture
                 {
                     using (Task digitalWriteTask = new Task())
                     {
-                        digitalWriteTask.DOChannels.CreateChannel("NI-USB-6501/port1/line7", "",
+                        digitalWriteTask.DOChannels.CreateChannel("NI-USB-6501/port1/line5", "",
                             ChannelLineGrouping.OneChannelForAllLines);
                         bool[] dataArray = new bool[1];
                         dataArray[0] = true;
@@ -571,159 +785,11 @@ namespace ITM_ISM_Fixture
 
                 progressBar1.Visible = false;
 
-           
-           
 
 
-            // test Aux inputs
+      
 
-            
-                if (instumentStatus == 0)
-                {
 
-
-                    led7.OffColor = Color.Yellow;   /// seems to be crashing here!!!!!!
-                    this.Refresh();
-
-
-                    /*
-                    MessageBox.Show("Switch Out to Tp402 and In/Out to Aux R.",
-                    "Error",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Exclamation,
-                    MessageBoxDefaultButton.Button1);
-                     * */
-
-                    switchChannel0(5);
-                    switchChannel1(0);  // inject signal
-
-
-
-                    short status;
-
-
-                    // turn on Generator
-                    status = Imports.SetSiggenBuiltIn(handle, 0, 500000, Imports.SiggenWaveType.Sine, 1000, 1000, 0, 0, Imports.SiggenSweepType.Up, false, 1, 1, Imports.SiggenTrigType.Rising, Imports.SiggenTrigSource.None, 0);
-                    // allow some settling time
-
-                    Thread.Sleep(1000);
-
-
-                    GetChanB();
-                    Thread.Sleep(500);
-                    GetChanB();  // have to do twice due to offset in buffer.. I don't know why yet.
-
-
-                    // get value for aux from label
-
-                    string rmsValue = Regex.Match(label19.Text, @"\d+").Value;
-
-
-                    AudioInMeasurements[0] = Convert.ToDouble(rmsValue);
-
-
-
-                    /*
-                    MessageBox.Show("Switch Out to Tp402 and In/Out to Aux L.",
-                    "Error",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Exclamation,
-                    MessageBoxDefaultButton.Button1);
-                    */
-                    this.Refresh();
-                   // switchChannel0(5);
-                    switchChannel1(1);
-                    GetChanB();
-
-                    // get value for aux from label
-                    rmsValue = Regex.Match(label19.Text, @"\d+").Value;
-
-                    AudioInMeasurements[1] = Convert.ToDouble(rmsValue);
-                    this.Refresh();
-
-
-                    // validate measurements
-
-                    if ((AudioInMeasurements[0] > 90) & (AudioInMeasurements[0] < 120) & (AudioInMeasurements[1] > 90) & (AudioInMeasurements[1] < 120))
-                    {
-
-                        AuxResult = true;
-
-                        led7.OffColor = Color.LimeGreen;
-
-
-                    }
-                    else
-                    {
-
-
-                        AuxResult = false;
-
-                        led7.OffColor = Color.Red;
-
-                    }
-
-
-                    this.Refresh();
-
-                }
-
-
-                // test mic input
-
-
-                if (instumentStatus == 0)
-                {
-
-
-                    led8.OffColor = Color.Yellow;   /// seems to be crashing here!!!!!!
-                    this.Refresh();
-
-                    MessageBox.Show("Switch Out to Tp402 and In/Out to Mic.",
-                    "Error",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Exclamation,
-                    MessageBoxDefaultButton.Button1);
-
-
-                    short status;
-
-
-                    status = Imports.SetSiggenBuiltIn(handle, 0, 25000, Imports.SiggenWaveType.Sine, 1000, 1000, 0, 0, Imports.SiggenSweepType.Up, false, 1, 1, Imports.SiggenTrigType.Rising, Imports.SiggenTrigSource.None, 0);
-                    // allow some settling time
-
-                    Thread.Sleep(1000);
-
-
-                    GetChanB();
-                    Thread.Sleep(500);
-                    GetChanB();  // have to do twice due to offset in buffer.. I don't know why yet.
-
-
-                    // get value for aux from label
-
-                    string rmsValue = Regex.Match(label19.Text, @"\d+").Value;
-
-
-                    AudioInMeasurements[2] = Convert.ToDouble(rmsValue);
-
-                    if ((AudioInMeasurements[2] > 625) & (AudioInMeasurements[2] < 675))
-                    {
-                        MicResult = true;
-                        led8.OffColor = Color.LimeGreen;
-
-                    }
-                    else
-                    {
-                        MicResult = false;
-                        led8.OffColor = Color.Red;
-
-
-                    }
-
-
-
-                }
 
 
                 // charge current test
@@ -926,8 +992,25 @@ namespace ITM_ISM_Fixture
 
                         string[] tokens;
 
+                        // find the number
+
+
+
                         tokens = Txresponse.Split('=');
-                        IRPW[0] = Convert.ToDouble(tokens[3]);
+                        decimal mynumber;
+
+                        bool canConvert = decimal.TryParse(tokens[1],out mynumber);
+
+                        if (canConvert == true)
+                        {
+                            IRPW[0] = Convert.ToDouble(tokens[1]);
+
+                        }
+                        else
+                        {
+                            IRPW[0] = Convert.ToDouble(tokens[3]);
+
+                        }
 
 
                     }
@@ -979,6 +1062,8 @@ namespace ITM_ISM_Fixture
 
                     // set to low coverage mode
 
+                    TPLabel.Text = "IR Current";
+
                     Txresponse = TxCommand("cov = 1");
                     timer3.Enabled = false;
 
@@ -1013,6 +1098,9 @@ namespace ITM_ISM_Fixture
                     }
                     else
                     {
+
+
+                        MeterReading.Text = IRCurrent.ToString();
 
                         ReturnCurrent = IRCurrent;
                         // record current and ldpot
@@ -1090,6 +1178,7 @@ namespace ITM_ISM_Fixture
                     else
                     {
 
+                        MeterReading.Text = IRCurrent.ToString();
                         ReturnCurrent = IRCurrent;
                         // record current and ldpot
                         mdcurrent[0] = IRCurrent;
@@ -1166,7 +1255,7 @@ namespace ITM_ISM_Fixture
                     }
                     else
                     {
-
+                        MeterReading.Text = IRCurrent.ToString();
                         ReturnCurrent = IRCurrent;
                         // record current and ldpot
                         hdcurrent[0] = IRCurrent;
@@ -1341,7 +1430,7 @@ namespace ITM_ISM_Fixture
                     }
                     else
                     {
-
+                        MeterReading.Text = IRCurrent.ToString();
                         ReturnCurrent = IRCurrent;
                         // record current and ldpot
                         ldcurrent[1] = IRCurrent;
@@ -1414,7 +1503,7 @@ namespace ITM_ISM_Fixture
                     }
                     else
                     {
-
+                        MeterReading.Text = IRCurrent.ToString();
                         ReturnCurrent = IRCurrent;
                         // record current and ldpot
                         mdcurrent[1] = IRCurrent;
@@ -1490,7 +1579,7 @@ namespace ITM_ISM_Fixture
                     }
                     else
                     {
-
+                        MeterReading.Text = IRCurrent.ToString();
                         ReturnCurrent = IRCurrent;
                         // record current and ldpot
                         hdcurrent[1] = IRCurrent;
@@ -1676,7 +1765,7 @@ namespace ITM_ISM_Fixture
                     }
                     else
                     {
-
+                        MeterReading.Text = IRCurrent.ToString();
                         ReturnCurrent = IRCurrent;
                         // record current and ldpot
                         ldcurrent[2] = IRCurrent;
@@ -1751,7 +1840,7 @@ namespace ITM_ISM_Fixture
                     }
                     else
                     {
-
+                        MeterReading.Text = IRCurrent.ToString();
                         ReturnCurrent = IRCurrent;
                         // record current and ldpot
                         mdcurrent[2] = IRCurrent;
@@ -1827,7 +1916,7 @@ namespace ITM_ISM_Fixture
                     }
                     else
                     {
-
+                        MeterReading.Text = IRCurrent.ToString();
                         ReturnCurrent = IRCurrent;
                         // record current and ldpot
                         hdcurrent[2] = IRCurrent;
@@ -2003,7 +2092,7 @@ namespace ITM_ISM_Fixture
                     }
                     else
                     {
-
+                        MeterReading.Text = IRCurrent.ToString();
                         ReturnCurrent = IRCurrent;
                         // record current and ldpot
                         ldcurrent[3] = IRCurrent;
@@ -2078,7 +2167,7 @@ namespace ITM_ISM_Fixture
                     }
                     else
                     {
-
+                        MeterReading.Text = IRCurrent.ToString();
                         ReturnCurrent = IRCurrent;
                         // record current and ldpot
                         mdcurrent[3] = IRCurrent;
@@ -2154,7 +2243,7 @@ namespace ITM_ISM_Fixture
                     }
                     else
                     {
-
+                        MeterReading.Text = IRCurrent.ToString();
                         ReturnCurrent = IRCurrent;
                         // record current and ldpot
                         hdcurrent[3] = IRCurrent;
@@ -2330,7 +2419,7 @@ namespace ITM_ISM_Fixture
                     }
                     else
                     {
-
+                        MeterReading.Text = IRCurrent.ToString();
                         ReturnCurrent = IRCurrent;
                         // record current and ldpot
                         ldcurrent[4] = IRCurrent;
@@ -2405,7 +2494,7 @@ namespace ITM_ISM_Fixture
                     }
                     else
                     {
-
+                        MeterReading.Text = IRCurrent.ToString();
                         ReturnCurrent = IRCurrent;
                         // record current and ldpot
                         mdcurrent[4] = IRCurrent;
@@ -2481,7 +2570,7 @@ namespace ITM_ISM_Fixture
                     }
                     else
                     {
-
+                        MeterReading.Text = IRCurrent.ToString();
                         ReturnCurrent = IRCurrent;
                         // record current and ldpot
                         hdcurrent[4] = IRCurrent;
@@ -2653,7 +2742,7 @@ namespace ITM_ISM_Fixture
                     }
                     else
                     {
-
+                        MeterReading.Text = IRCurrent.ToString();
                         ReturnCurrent = IRCurrent;
                         // record current and ldpot
                         ldcurrent[5] = IRCurrent;
@@ -2728,7 +2817,7 @@ namespace ITM_ISM_Fixture
                     }
                     else
                     {
-
+                        MeterReading.Text = IRCurrent.ToString();
                         ReturnCurrent = IRCurrent;
                         // record current and ldpot
                         mdcurrent[5] = IRCurrent;
@@ -2804,7 +2893,7 @@ namespace ITM_ISM_Fixture
                     }
                     else
                     {
-
+                        MeterReading.Text = IRCurrent.ToString();
                         ReturnCurrent = IRCurrent;
                         // record current and ldpot
                         hdcurrent[5] = IRCurrent;
@@ -2975,7 +3064,7 @@ namespace ITM_ISM_Fixture
                     }
                     else
                     {
-
+                        MeterReading.Text = IRCurrent.ToString();
                         ReturnCurrent = IRCurrent;
                         // record current and ldpot
                         ldcurrent[6] = IRCurrent;
@@ -3050,7 +3139,7 @@ namespace ITM_ISM_Fixture
                     }
                     else
                     {
-
+                        MeterReading.Text = IRCurrent.ToString();
                         ReturnCurrent = IRCurrent;
                         // record current and ldpot
                         mdcurrent[6] = IRCurrent;
@@ -3126,7 +3215,7 @@ namespace ITM_ISM_Fixture
                     }
                     else
                     {
-
+                        MeterReading.Text = IRCurrent.ToString();
                         ReturnCurrent = IRCurrent;
                         // record current and ldpot
                         hdcurrent[6] = IRCurrent;
@@ -3220,8 +3309,15 @@ namespace ITM_ISM_Fixture
                     WriteCSVFile();
 
 
+                    // close scope connection
+
+                    Imports.CloseUnit(handle);  // close the scope
 
 
+                    // close txport
+                    if (DUTport.IsOpen)
+                        DUTport.Close();
+                    
 
                 }
 
@@ -3428,7 +3524,7 @@ namespace ITM_ISM_Fixture
                             if (IRCurrent < .095) 
                                 return IRCurrent;  // error condition
 
-                            if (IRCurrent > .130)
+                            if (IRCurrent > .110)
                             {
 
                                 SetPot = SetPot - 0.05;  // course
@@ -3457,7 +3553,7 @@ namespace ITM_ISM_Fixture
                             if (IRCurrent < .11) 
                                 return IRCurrent;  // error condition
 
-                            if (IRCurrent > .140)
+                            if (IRCurrent > .125)
                             {
 
                                 SetPot = SetPot - 0.05;  // course
@@ -3487,7 +3583,7 @@ namespace ITM_ISM_Fixture
                             if (IRCurrent < .125) 
                                 return IRCurrent;  // error condition
 
-                            if (IRCurrent > .15)
+                            if (IRCurrent > .14)
                             {
 
                                 SetPot = SetPot - 0.05;  // course
@@ -3674,7 +3770,7 @@ namespace ITM_ISM_Fixture
 
         void bgw_DoWork(object sender, DoWorkEventArgs e)
         {
-            int total = 57; //some number (this is your variable to change)!!
+            int total = 90; //some number (this is your variable to change)!!
 
             for (int i = 0; i <= total; i++) //some number (total)
             {
