@@ -104,6 +104,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="barCode.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="barCode.designer.cs">
+      <DependentUpon>barCode.cs</DependentUpon>
+    </Compile>
     <Compile Include="BK1685B_2_GETD.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -190,6 +196,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>IrLEDOn.mxb</DependentUpon>
     </Compile>
+    <Compile Include="limits.cs" />
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -286,6 +293,9 @@
     <Compile Include="WritePort_1.User.cs">
       <DependentUpon>WritePort_1.mxb</DependentUpon>
     </Compile>
+    <EmbeddedResource Include="barCode.resx">
+      <DependentUpon>barCode.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>
     </EmbeddedResource>

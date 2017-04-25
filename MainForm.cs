@@ -43,6 +43,10 @@ namespace ITM_ISM_Fixture
 
     public partial class MainForm : Form
     {
+
+        barCode frm2;
+
+
         private Imports.ps5000aBlockReady _callbackDelegate;
 
         Mitov.SignalLab.RealBuffer DataBufferx = new Mitov.SignalLab.RealBuffer(1024);
@@ -175,6 +179,9 @@ namespace ITM_ISM_Fixture
 
         public double[] hdcurrent = new double[] { 0, 0, 0, 0, 0, 0, 0 };
 
+        public double ReferenceCurrent = 0;
+
+
 
 
         static List<USBDeviceInfo> GetUSBDevices()
@@ -229,6 +236,9 @@ namespace ITM_ISM_Fixture
         {
             // begin test sequence
             progressSleep = 1500;
+            progressBar1.Value = 0;
+
+            ReferenceCurrent = 0;
 
             // clear all LED's
             led1.OffColor = Color.Black;
@@ -255,7 +265,6 @@ namespace ITM_ISM_Fixture
             led23.OffColor = Color.Black;
             led24.OffColor = Color.Black;
             led25.OffColor = Color.Black;
-
             led26.OffColor = Color.Black;
             led27.OffColor = Color.Black;
             led28.OffColor = Color.Black;
@@ -276,7 +285,16 @@ namespace ITM_ISM_Fixture
 
 
 
+            // show serial number box
+            frm2 = new barCode(this);
 
+            frm2.Show();
+
+            while (frm2.Visible == true)
+            {
+                Application.DoEvents();
+
+            }
 
 
 
@@ -375,29 +393,12 @@ namespace ITM_ISM_Fixture
 
                 
 
-               
-                /*
-                MessageBox.Show("Swich fixture to TP102.",
-                                "Error",
-                                MessageBoxButtons.OK,
-                                MessageBoxIcon.Exclamation,
-                                MessageBoxDefaultButton.Button1);
-
-                */
                 switchChannel0(0);
 
                 Test_TP102();
                 this.Refresh();
 
-                /*
 
-                MessageBox.Show("Swich fixture to TP116.",
-                                "Error",
-                                MessageBoxButtons.OK,
-                                MessageBoxIcon.Exclamation,
-                                MessageBoxDefaultButton.Button1);
-
-                */
                 switchChannel0(1);
                 Test_TP116();
                 this.Refresh();
@@ -958,6 +959,59 @@ namespace ITM_ISM_Fixture
                     Console.WriteLine("Response From Juno: {0}", Txresponse); // may have to capture this as soon as we have cr
 
 
+
+
+                    Txresponse = TxCommand("IRLED = 0");
+                    timer3.Enabled = false;
+
+
+                    Console.WriteLine("Response From Juno: {0}", Txresponse); // may have to capture this as soon as we have cr
+
+
+                    // make reference current measurement
+
+                    // measure Current
+
+
+                    BK2831E_2_SetCurrent setupCurrent = new BK2831E_2_SetCurrent();
+
+                    BK2831E_2_ReadCurrent GetIRCurrent = new BK2831E_2_ReadCurrent();
+
+
+
+                    setupCurrent.Run();
+
+
+
+                    Thread.Sleep(1000); // add delay
+
+
+                    BK2831E_2_ReadCurrentResults results = GetIRCurrent.Run();
+
+                    string myCurrent = results.Token2.ToString();
+                    Thread.Sleep(250); // add delay
+
+
+
+                    double IRCurrent = Convert.ToDouble(myCurrent);
+
+
+
+                    // store this value for later
+
+                    ReferenceCurrent = IRCurrent;
+
+
+                    // turn IR back ON
+                    Txresponse = TxCommand("IRLED = 1");
+                    timer3.Enabled = false;
+
+
+                    Console.WriteLine("Response From Juno: {0}", Txresponse); // may have to capture this as soon as we have cr
+
+
+
+
                     led9.OffColor = Color.Yellow;
 
                     this.Refresh();
@@ -1048,16 +1102,7 @@ namespace ITM_ISM_Fixture
                    
 
 
-                    // measure Current
 
-
-                    BK2831E_2_SetCurrent setupCurrent = new BK2831E_2_SetCurrent();
-
-                    BK2831E_2_ReadCurrent GetIRCurrent = new BK2831E_2_ReadCurrent();
-
-
-
-                    setupCurrent.Run();
 
 
                     // set to low coverage mode
@@ -1071,14 +1116,14 @@ namespace ITM_ISM_Fixture
                     Console.WriteLine("Response From Juno: {0}", Txresponse); // may have to capture this as soon as we have cr
 
 
-                    BK2831E_2_ReadCurrentResults results = GetIRCurrent.Run();
+                    results = GetIRCurrent.Run();
 
-                    string myCurrent = results.Token2.ToString();
+                    myCurrent = results.Token2.ToString();
                     Thread.Sleep(250); // add delay
 
 
 
-                    double IRCurrent = Convert.ToDouble(myCurrent);
+                    IRCurrent = Convert.ToDouble(myCurrent);
 
                     double ReturnCurrent = 0;
 
@@ -1090,11 +1135,11 @@ namespace ITM_ISM_Fixture
 
                     //  if current is out of spec, run cal
 
-                    if ((IRCurrent < .095) | (IRCurrent > .105))
+                    if (((IRCurrent-ReferenceCurrent) < (limits.ldCurrentNominal-.005)) | ((IRCurrent-ReferenceCurrent) > (limits.ldCurrentNominal +.005)))
                     {
                         ReturnCurrent=IRSetCurrent(1,0);  // 1 = low, 2 = mid, 3 = high
 
-
+                        IRCurrent = ReturnCurrent;
                     }
                     else
                     {
@@ -1122,7 +1167,7 @@ namespace ITM_ISM_Fixture
                     }
 
 
-                    if ((ReturnCurrent > .095) & (ReturnCurrent < .105))
+                    if (((ReturnCurrent-ReferenceCurrent) > (limits.ldCurrentNominal -limits.IRCurrentTolerance)) & ((ReturnCurrent-ReferenceCurrent) < (limits.ldCurrentNominal + limits.IRCurrentTolerance)))
                     {
                         led14.OffColor = Color.LimeGreen;
 
@@ -1169,11 +1214,11 @@ namespace ITM_ISM_Fixture
 
                     //  if current is out of spec, run cal
 
-                    if ((IRCurrent < .11) | (IRCurrent > .12))
+                    if (((IRCurrent-ReferenceCurrent) < (limits.mdCurrentNominal-limits.IRCurrentTolerance)) | ((IRCurrent-ReferenceCurrent) > (limits.mdCurrentNominal+limits.IRCurrentTolerance)))
                     {
                         ReturnCurrent = IRSetCurrent(3,0);  // 1 = low, 3 = mid, 5 = high
 
-
+                        IRCurrent = ReturnCurrent;
                     }
                     else
                     {
@@ -1198,7 +1243,7 @@ namespace ITM_ISM_Fixture
                     }
 
 
-                    if ((ReturnCurrent > .11) & (ReturnCurrent < .12))
+                    if (((IRCurrent - ReferenceCurrent) > (limits.mdCurrentNominal - limits.IRCurrentTolerance)) & ((IRCurrent - ReferenceCurrent) < (limits.mdCurrentNominal + limits.IRCurrentTolerance)))
                     {
                         led23.OffColor = Color.LimeGreen;
 
@@ -1247,11 +1292,11 @@ namespace ITM_ISM_Fixture
 
                     //  if current is out of spec, run cal
 
-                    if ((IRCurrent < .125) | (IRCurrent > .135))
+                    if (((IRCurrent - ReferenceCurrent) < (limits.hdCurrentNominal - limits.IRCurrentTolerance)) | ((IRCurrent - ReferenceCurrent) > (limits.hdCurrentNominal + limits.IRCurrentTolerance)))
                     {
                         ReturnCurrent = IRSetCurrent(5,0);  // 1 = low, 2 = mid, 3 = high
 
-
+                        IRCurrent = ReturnCurrent;
                     }
                     else
                     {
@@ -1275,7 +1320,7 @@ namespace ITM_ISM_Fixture
                     }
 
 
-                    if ((ReturnCurrent > .125) & (ReturnCurrent < .135))
+                    if (((IRCurrent - ReferenceCurrent) > (limits.hdCurrentNominal - limits.IRCurrentTolerance)) & ((IRCurrent - ReferenceCurrent) < (limits.hdCurrentNominal + limits.IRCurrentTolerance)))
                     {
                         led28.OffColor = Color.LimeGreen;
 
@@ -1422,10 +1467,10 @@ namespace ITM_ISM_Fixture
 
                     //  if current is out of spec, run cal
 
-                    if ((IRCurrent < .095) | (IRCurrent > .105))
+                    if (((IRCurrent - ReferenceCurrent) < (limits.ldCurrentNominal - limits.IRCurrentTolerance)) | ((IRCurrent - ReferenceCurrent) > (limits.ldCurrentNominal + limits.IRCurrentTolerance)))
                     {
                         ReturnCurrent = IRSetCurrent(1,1);  // 1 = low, 2 = mid, 3 = high
-
+                        IRCurrent = ReturnCurrent;
 
                     }
                     else
@@ -1450,7 +1495,7 @@ namespace ITM_ISM_Fixture
                     }
 
 
-                    if ((ReturnCurrent > .095) & (ReturnCurrent < .105))
+                    if (((IRCurrent - ReferenceCurrent) > (limits.ldCurrentNominal - limits.IRCurrentTolerance)) & ((IRCurrent - ReferenceCurrent) < (limits.ldCurrentNominal + limits.IRCurrentTolerance)))
                     {
                         led15.OffColor = Color.LimeGreen;
 
@@ -1495,10 +1540,10 @@ namespace ITM_ISM_Fixture
 
                     //  if current is out of spec, run cal
 
-                    if ((IRCurrent < .11) | (IRCurrent > .12))
+                    if (((IRCurrent - ReferenceCurrent) < (limits.mdCurrentNominal - limits.IRCurrentTolerance)) | ((IRCurrent - ReferenceCurrent) > (limits.mdCurrentNominal + limits.IRCurrentTolerance)))
                     {
                         ReturnCurrent = IRSetCurrent(3,1);  // 1 = low, 2 = mid, 3 = high
-
+                        IRCurrent = ReturnCurrent;
 
                     }
                     else
@@ -1523,7 +1568,7 @@ namespace ITM_ISM_Fixture
                     }
 
 
-                    if ((ReturnCurrent > .11) & (ReturnCurrent < .12))
+                    if (((IRCurrent - ReferenceCurrent) > (limits.mdCurrentNominal - limits.IRCurrentTolerance)) & ((IRCurrent - ReferenceCurrent) < (limits.mdCurrentNominal + limits.IRCurrentTolerance)))
                     {
                         led22.OffColor = Color.LimeGreen;
 
@@ -1571,10 +1616,10 @@ namespace ITM_ISM_Fixture
 
                     //  if current is out of spec, run cal
 
-                    if ((IRCurrent < .125) | (IRCurrent > .135))
+                    if (((IRCurrent - ReferenceCurrent) < (limits.hdCurrentNominal - limits.IRCurrentTolerance)) | ((IRCurrent - ReferenceCurrent) > (limits.hdCurrentNominal + limits.IRCurrentTolerance)))
                     {
                         ReturnCurrent = IRSetCurrent(5,1);  // 1 = low, 2 = mid, 3 = high
-
+                        IRCurrent = ReturnCurrent;
 
                     }
                     else
@@ -1599,7 +1644,7 @@ namespace ITM_ISM_Fixture
                     }
 
 
-                    if ((ReturnCurrent > .125) & (ReturnCurrent < .135))
+                    if (((IRCurrent - ReferenceCurrent) > (limits.hdCurrentNominal - limits.IRCurrentTolerance)) & ((IRCurrent - ReferenceCurrent) < (limits.hdCurrentNominal + limits.IRCurrentTolerance)))
                     {
                         led27.OffColor = Color.LimeGreen;
 
@@ -1757,10 +1802,10 @@ namespace ITM_ISM_Fixture
 
                     //  if current is out of spec, run cal
 
-                    if ((IRCurrent < .095) | (IRCurrent > .105))
+                    if (((IRCurrent - ReferenceCurrent) < (limits.ldCurrentNominal - limits.IRCurrentTolerance)) | ((IRCurrent - ReferenceCurrent) > (limits.ldCurrentNominal + limits.IRCurrentTolerance)))
                     {
                         ReturnCurrent = IRSetCurrent(1,2);  // 1 = low, 3 = mid, 5 = high
-
+                        IRCurrent = ReturnCurrent;
 
                     }
                     else
@@ -1785,7 +1830,7 @@ namespace ITM_ISM_Fixture
                     }
 
 
-                    if ((ReturnCurrent > .095) & (ReturnCurrent < .105))
+                    if (((IRCurrent - ReferenceCurrent) > (limits.ldCurrentNominal - limits.IRCurrentTolerance)) & ((IRCurrent - ReferenceCurrent) < (limits.ldCurrentNominal + limits.IRCurrentTolerance)))
                     {
                         led16.OffColor = Color.LimeGreen;
 
@@ -1832,10 +1877,10 @@ namespace ITM_ISM_Fixture
 
                     //  if current is out of spec, run cal
 
-                    if ((IRCurrent < .11) | (IRCurrent > .12))
+                    if (((IRCurrent - ReferenceCurrent) < (limits.mdCurrentNominal - limits.IRCurrentTolerance)) | ((IRCurrent - ReferenceCurrent) > (limits.mdCurrentNominal + limits.IRCurrentTolerance)))
                     {
                         ReturnCurrent = IRSetCurrent(3,2);  // 1 = low, 3 = mid, 5 = high
-
+                        IRCurrent = ReturnCurrent;
 
                     }
                     else
@@ -1860,7 +1905,7 @@ namespace ITM_ISM_Fixture
                     }
 
 
-                    if ((ReturnCurrent > .11) & (ReturnCurrent < .12))
+                    if (((IRCurrent - ReferenceCurrent) > (limits.mdCurrentNominal - limits.IRCurrentTolerance)) & ((IRCurrent - ReferenceCurrent) < (limits.mdCurrentNominal + limits.IRCurrentTolerance)))
                     {
                         led21.OffColor = Color.LimeGreen;
 
@@ -1908,10 +1953,10 @@ namespace ITM_ISM_Fixture
 
                     //  if current is out of spec, run cal
 
-                    if ((IRCurrent < .125) | (IRCurrent > .135))
+                    if (((IRCurrent - ReferenceCurrent) < (limits.hdCurrentNominal - limits.IRCurrentTolerance)) | ((IRCurrent - ReferenceCurrent) > (limits.hdCurrentNominal + limits.IRCurrentTolerance)))
                     {
                         ReturnCurrent = IRSetCurrent(5,2);  // 1 = low, 3 = mid, 5 = high
-
+                        IRCurrent = ReturnCurrent;
 
                     }
                     else
@@ -1936,7 +1981,7 @@ namespace ITM_ISM_Fixture
                     }
 
 
-                    if ((ReturnCurrent > .125) & (ReturnCurrent < .135))
+                    if (((IRCurrent - ReferenceCurrent) > (limits.hdCurrentNominal - limits.IRCurrentTolerance)) & ((IRCurrent - ReferenceCurrent) < (limits.hdCurrentNominal + limits.IRCurrentTolerance)))
                     {
                         led26.OffColor = Color.LimeGreen;
 
@@ -2084,10 +2129,10 @@ namespace ITM_ISM_Fixture
 
                     //  if current is out of spec, run cal
 
-                    if ((IRCurrent < .095) | (IRCurrent > .105))
+                    if (((IRCurrent - ReferenceCurrent) < (limits.ldCurrentNominal - limits.IRCurrentTolerance)) | ((IRCurrent - ReferenceCurrent) > (limits.ldCurrentNominal + limits.IRCurrentTolerance)))
                     {
                         ReturnCurrent = IRSetCurrent(1,3);  // 1 = low, 2 = mid, 3 = high
-
+                        IRCurrent = ReturnCurrent;
 
                     }
                     else
@@ -2112,7 +2157,7 @@ namespace ITM_ISM_Fixture
                     }
 
 
-                    if ((ReturnCurrent > .095) & (ReturnCurrent < .105))
+                    if (((IRCurrent - ReferenceCurrent) > (limits.ldCurrentNominal - limits.IRCurrentTolerance)) & ((IRCurrent - ReferenceCurrent) < (limits.ldCurrentNominal + limits.IRCurrentTolerance)))
                     {
                         led17.OffColor = Color.LimeGreen;
 
@@ -2159,10 +2204,11 @@ namespace ITM_ISM_Fixture
 
                     //  if current is out of spec, run cal
 
-                    if ((IRCurrent < .11) | (IRCurrent > .12))
+                    if (((IRCurrent - ReferenceCurrent) < (limits.mdCurrentNominal - limits.IRCurrentTolerance)) | ((IRCurrent - ReferenceCurrent) > (limits.mdCurrentNominal + limits.IRCurrentTolerance)))
                     {
                         ReturnCurrent = IRSetCurrent(3,3);  // 1 = low, 3 = mid, 5 = high
 
+                        IRCurrent = ReturnCurrent;
 
                     }
                     else
@@ -2187,7 +2233,7 @@ namespace ITM_ISM_Fixture
                     }
 
 
-                    if ((ReturnCurrent > .11) & (ReturnCurrent < .12))
+                    if (((IRCurrent - ReferenceCurrent) > (limits.mdCurrentNominal - limits.IRCurrentTolerance)) & ((IRCurrent - ReferenceCurrent) < (limits.mdCurrentNominal + limits.IRCurrentTolerance)))
                     {
                         led20.OffColor = Color.LimeGreen;
 
@@ -2235,10 +2281,10 @@ namespace ITM_ISM_Fixture
 
                     //  if current is out of spec, run cal
 
-                    if ((IRCurrent < .125) | (IRCurrent > .135))
+                    if (((IRCurrent - ReferenceCurrent) < (limits.hdCurrentNominal - limits.IRCurrentTolerance)) | ((IRCurrent - ReferenceCurrent) > (limits.hdCurrentNominal + limits.IRCurrentTolerance)))
                     {
                         ReturnCurrent = IRSetCurrent(5,3);  // 1 = low, 3 = mid, 5= high
-
+                        IRCurrent = ReturnCurrent;
 
                     }
                     else
@@ -2263,7 +2309,7 @@ namespace ITM_ISM_Fixture
                     }
 
 
-                    if ((ReturnCurrent > .125) & (ReturnCurrent < .135))
+                    if (((IRCurrent - ReferenceCurrent) > (limits.hdCurrentNominal - limits.IRCurrentTolerance)) & ((IRCurrent - ReferenceCurrent) < (limits.hdCurrentNominal + limits.IRCurrentTolerance)))
                     {
                         led25.OffColor = Color.LimeGreen;
 
@@ -2411,10 +2457,10 @@ namespace ITM_ISM_Fixture
 
                     //  if current is out of spec, run cal
 
-                    if ((IRCurrent < .095) | (IRCurrent > .105))
+                    if (((IRCurrent - ReferenceCurrent) < (limits.ldCurrentNominal - limits.IRCurrentTolerance)) | ((IRCurrent - ReferenceCurrent) > (limits.ldCurrentNominal + limits.IRCurrentTolerance)))
                     {
                         ReturnCurrent = IRSetCurrent(1,4);  // 1 = low, 3 = mid, 5 = high
-
+                        IRCurrent = ReturnCurrent;
 
                     }
                     else
@@ -2439,7 +2485,7 @@ namespace ITM_ISM_Fixture
                     }
 
 
-                    if ((ReturnCurrent > .095) & (ReturnCurrent < .105))
+                    if (((IRCurrent - ReferenceCurrent) > (limits.ldCurrentNominal - limits.IRCurrentTolerance)) & ((IRCurrent - ReferenceCurrent) < (limits.ldCurrentNominal + limits.IRCurrentTolerance)))
                     {
                         led18.OffColor = Color.LimeGreen;
 
@@ -2486,10 +2532,10 @@ namespace ITM_ISM_Fixture
 
                     //  if current is out of spec, run cal
 
-                    if ((IRCurrent < .11) | (IRCurrent > .12))
+                    if (((IRCurrent - ReferenceCurrent) < (limits.mdCurrentNominal - limits.IRCurrentTolerance)) | ((IRCurrent - ReferenceCurrent) > (limits.mdCurrentNominal + limits.IRCurrentTolerance)))
                     {
                         ReturnCurrent = IRSetCurrent(3,4);  // 1 = low, 4 = mid, 5 = high
-
+                        IRCurrent = ReturnCurrent;
 
                     }
                     else
@@ -2514,7 +2560,7 @@ namespace ITM_ISM_Fixture
                     }
 
 
-                    if ((ReturnCurrent > .11) & (ReturnCurrent < .12))
+                    if (((IRCurrent - ReferenceCurrent) > (limits.mdCurrentNominal - limits.IRCurrentTolerance)) & ((IRCurrent - ReferenceCurrent) < (limits.mdCurrentNominal + limits.IRCurrentTolerance)))
                     {
                         led19.OffColor = Color.LimeGreen;
 
@@ -2562,10 +2608,10 @@ namespace ITM_ISM_Fixture
 
                     //  if current is out of spec, run cal
 
-                    if ((IRCurrent < .125) | (IRCurrent > .135))
+                    if (((IRCurrent - ReferenceCurrent) < (limits.hdCurrentNominal - limits.IRCurrentTolerance)) | ((IRCurrent - ReferenceCurrent) > (limits.hdCurrentNominal + limits.IRCurrentTolerance)))
                     {
                         ReturnCurrent = IRSetCurrent(5,4);  // 1 = low, 3 = mid, 5 = high
-
+                        IRCurrent = ReturnCurrent;
 
                     }
                     else
@@ -2590,7 +2636,7 @@ namespace ITM_ISM_Fixture
                     }
 
 
-                    if ((ReturnCurrent > .125) & (ReturnCurrent < .135))
+                    if (((IRCurrent - ReferenceCurrent) > (limits.hdCurrentNominal - limits.IRCurrentTolerance)) & ((IRCurrent - ReferenceCurrent) < (limits.hdCurrentNominal + limits.IRCurrentTolerance)))
                     {
                         led24.OffColor = Color.LimeGreen;
 
@@ -2734,10 +2780,10 @@ namespace ITM_ISM_Fixture
 
                     //  if current is out of spec, run cal
 
-                    if ((IRCurrent < .095) | (IRCurrent > .105))
+                    if (((IRCurrent - ReferenceCurrent) < (limits.ldCurrentNominal - limits.IRCurrentTolerance)) | ((IRCurrent - ReferenceCurrent) > (limits.ldCurrentNominal + limits.IRCurrentTolerance)))
                     {
                         ReturnCurrent = IRSetCurrent(1,5);  // 1 = low, 3 = mid, 5 = high
-
+                        IRCurrent = ReturnCurrent;
 
                     }
                     else
@@ -2762,7 +2808,7 @@ namespace ITM_ISM_Fixture
                     }
 
 
-                    if ((ReturnCurrent > .095) & (ReturnCurrent < .105))
+                    if (((IRCurrent - ReferenceCurrent) > (limits.ldCurrentNominal - limits.IRCurrentTolerance)) & ((IRCurrent - ReferenceCurrent) < (limits.ldCurrentNominal + limits.IRCurrentTolerance)))
                     {
                         led32.OffColor = Color.LimeGreen;
 
@@ -2809,10 +2855,10 @@ namespace ITM_ISM_Fixture
 
                     //  if current is out of spec, run cal
 
-                    if ((IRCurrent < .11) | (IRCurrent > .12))
+                     if (((IRCurrent - ReferenceCurrent) < (limits.mdCurrentNominal - limits.IRCurrentTolerance)) | ((IRCurrent - ReferenceCurrent) > (limits.mdCurrentNominal + limits.IRCurrentTolerance)))
                     {
                         ReturnCurrent = IRSetCurrent(3,5);  // 1 = low, 3 = mid, 5 = high
-
+                        IRCurrent = ReturnCurrent;
 
                     }
                     else
@@ -2837,7 +2883,7 @@ namespace ITM_ISM_Fixture
                     }
 
 
-                    if ((ReturnCurrent > .11) & (ReturnCurrent < .12))
+                     if (((IRCurrent - ReferenceCurrent) > (limits.mdCurrentNominal - limits.IRCurrentTolerance)) & ((IRCurrent - ReferenceCurrent) < (limits.mdCurrentNominal + limits.IRCurrentTolerance)))
                     {
                         led31.OffColor = Color.LimeGreen;
 
@@ -2885,10 +2931,10 @@ namespace ITM_ISM_Fixture
 
                     //  if current is out of spec, run cal
 
-                    if ((IRCurrent < .125) | (IRCurrent > .135))
+                    if (((IRCurrent - ReferenceCurrent) < (limits.hdCurrentNominal - limits.IRCurrentTolerance)) | ((IRCurrent - ReferenceCurrent) > (limits.hdCurrentNominal + limits.IRCurrentTolerance)))
                     {
                         ReturnCurrent = IRSetCurrent(5,5);  // 1 = low, 3 = mid, 5 = high
-
+                        IRCurrent = ReturnCurrent;
 
                     }
                     else
@@ -2913,7 +2959,7 @@ namespace ITM_ISM_Fixture
                     }
 
 
-                    if ((ReturnCurrent > .125) & (ReturnCurrent < .135))
+                    if (((IRCurrent - ReferenceCurrent) > (limits.hdCurrentNominal - limits.IRCurrentTolerance)) & ((IRCurrent - ReferenceCurrent) < (limits.hdCurrentNominal + limits.IRCurrentTolerance)))
                     {
                         led30.OffColor = Color.LimeGreen;
 
@@ -3056,10 +3102,10 @@ namespace ITM_ISM_Fixture
 
                     //  if current is out of spec, run cal
 
-                    if ((IRCurrent < .095) | (IRCurrent > .105))
+                    if (((IRCurrent - ReferenceCurrent) < (limits.ldCurrentNominal - limits.IRCurrentTolerance)) | ((IRCurrent - ReferenceCurrent) > (limits.ldCurrentNominal + limits.IRCurrentTolerance)))
                     {
                         ReturnCurrent = IRSetCurrent(1,6);  // 1 = low, 3 = mid, 5 = high
-
+                        IRCurrent = ReturnCurrent;
 
                     }
                     else
@@ -3084,7 +3130,7 @@ namespace ITM_ISM_Fixture
                     }
 
 
-                    if ((ReturnCurrent > .095) & (ReturnCurrent < .105))
+                    if (((IRCurrent - ReferenceCurrent) > (limits.ldCurrentNominal - limits.IRCurrentTolerance)) & ((IRCurrent - ReferenceCurrent) < (limits.ldCurrentNominal + limits.IRCurrentTolerance)))
                     {
                         led36.OffColor = Color.LimeGreen;
 
@@ -3131,10 +3177,10 @@ namespace ITM_ISM_Fixture
 
                     //  if current is out of spec, run cal
 
-                    if ((IRCurrent < .11) | (IRCurrent > .12))
+                    if (((IRCurrent - ReferenceCurrent) < (limits.mdCurrentNominal - limits.IRCurrentTolerance)) | ((IRCurrent - ReferenceCurrent) > (limits.mdCurrentNominal + limits.IRCurrentTolerance)))
                     {
                         ReturnCurrent = IRSetCurrent(3,6);  // 1 = low, 3 = mid, 5 = high
-
+                        IRCurrent = ReturnCurrent;
 
                     }
                     else
@@ -3159,7 +3205,7 @@ namespace ITM_ISM_Fixture
                     }
 
 
-                    if ((ReturnCurrent > .11) & (ReturnCurrent < .12))
+                    if (((IRCurrent - ReferenceCurrent) > (limits.mdCurrentNominal - limits.IRCurrentTolerance)) & ((IRCurrent - ReferenceCurrent) < (limits.mdCurrentNominal + limits.IRCurrentTolerance)))
                     {
                         led35.OffColor = Color.LimeGreen;
 
@@ -3207,10 +3253,10 @@ namespace ITM_ISM_Fixture
 
                     //  if current is out of spec, run cal
 
-                    if ((IRCurrent < .125) | (IRCurrent > .135))
+                    if (((IRCurrent - ReferenceCurrent) < (limits.hdCurrentNominal - limits.IRCurrentTolerance)) | ((IRCurrent - ReferenceCurrent) > (limits.hdCurrentNominal + limits.IRCurrentTolerance)))
                     {
                         ReturnCurrent = IRSetCurrent(5,6);  // 1 = low, 3 = mid, 5 = high
-
+                        IRCurrent = ReturnCurrent;
 
                     }
                     else
@@ -3235,7 +3281,7 @@ namespace ITM_ISM_Fixture
                     }
 
 
-                    if ((ReturnCurrent > .125) & (ReturnCurrent < .135))
+                    if (((IRCurrent - ReferenceCurrent) > (limits.hdCurrentNominal - limits.IRCurrentTolerance)) & ((IRCurrent - ReferenceCurrent) < (limits.hdCurrentNominal + limits.IRCurrentTolerance)))
                     {
                         led34.OffColor = Color.LimeGreen;
 
@@ -3263,7 +3309,26 @@ namespace ITM_ISM_Fixture
                     Console.WriteLine("Response From Tx: {0}", Txresponse); // may have to capture this as soon as we have cr
 
 
+// save board serial number
 
+
+                    Txresponse = TxCommand("secur = $12348765");
+                    timer3.Enabled = false;
+
+
+                    Console.WriteLine("Response From Tx: {0}", Txresponse); // may have to capture this as soon as we have cr
+
+                    // get serial from textbox
+
+
+                    string commandtext = "board " + textBox1.Text;
+
+
+                    Txresponse = TxCommand(commandtext);
+                    timer3.Enabled = false;
+
+
+                    Console.WriteLine("Response From Tx: {0}", Txresponse); // may have to capture this as soon as we have cr
 
 
                     Txresponse = TxCommand("saves");
@@ -3352,6 +3417,7 @@ namespace ITM_ISM_Fixture
                                   "Mic-In Result, TPxxx," +
                                   "Boot Result, " +
                                   "Charge Result, Charge Current,"+
+                                  "Reference Current,"+
                                   "IRChannel_A_Result, IRPW-A, Chan A Duty, ldpot-A, ld-A Current, mdpot-A, md-A Current, hdpot-A, hd-A Current," +
                                   "IRChannel_B_Result, IRPW-B, Chan B Duty, ldpot-B, ld-B Current, mdpot-B, md-B Current, hdpot-B, hd-B Current," +
                                   "IRChannel_C_Result, IRPW-C, Chan C Duty, ldpot-C, ld-C Current, mdpot-C, md-C Current, hdpot-C, hd-C Current," +
@@ -3368,7 +3434,7 @@ namespace ITM_ISM_Fixture
 
             using (StreamWriter sw = File.AppendText(filename))
             { 
-                sw.WriteLine("ToDo Serial Number" + "," + Model + "," + timestring + 
+                sw.WriteLine(textBox1.Text + "," + Model + "," + timestring + 
                 "," + Convert.ToString(powerupCurrent) +
                 "," + Convert.ToString(VoltageResult) + "," + Convert.ToString(VoltageMeasurements[0]) + "," + Convert.ToString(VoltageMeasurements[1]) +  "," + Convert.ToString(VoltageMeasurements[2]) +  "," + Convert.ToString(VoltageMeasurements[3]) +
                 "," + Convert.ToString(ProgramResult) +
@@ -3376,6 +3442,7 @@ namespace ITM_ISM_Fixture
                 "," + Convert.ToString(MicResult) + "," + Convert.ToString(AudioInMeasurements[2]) + 
                 "," + Convert.ToString(BootResult) +
                 "," + Convert.ToString(ChargeCurrentResult) + "," + Convert.ToString(ChargeCurrent) +
+                "," + Convert.ToString(ReferenceCurrent) +
                 "," + Convert.ToString(IRChannel_A_Result) + "," + Convert.ToString(IRPW[0]) + "," + Convert.ToString(IRDutyCycle[0]) + "," + Convert.ToString(ldpot[0]) + "," + Convert.ToString(ldcurrent[0]) + "," + Convert.ToString(mdpot[0]) + "," + Convert.ToString(mdcurrent[0]) + "," + Convert.ToString(hdpot[0]) + "," + Convert.ToString(hdcurrent[0]) +
                 "," + Convert.ToString(IRChannel_B_Result) + "," + Convert.ToString(IRPW[1]) + "," + Convert.ToString(IRDutyCycle[1]) + "," + Convert.ToString(ldpot[1]) + "," + Convert.ToString(ldcurrent[1]) + "," + Convert.ToString(mdpot[1]) + "," + Convert.ToString(mdcurrent[1]) + "," + Convert.ToString(hdpot[1]) + "," + Convert.ToString(hdcurrent[1]) +
                 "," + Convert.ToString(IRChannel_C_Result) + "," + Convert.ToString(IRPW[2]) + "," + Convert.ToString(IRDutyCycle[2]) + "," + Convert.ToString(ldpot[2]) + "," + Convert.ToString(ldcurrent[2]) + "," + Convert.ToString(mdpot[2]) + "," + Convert.ToString(mdcurrent[2]) + "," + Convert.ToString(hdpot[2]) + "," + Convert.ToString(hdcurrent[2]) +
@@ -3507,7 +3574,7 @@ namespace ITM_ISM_Fixture
                 switch (coverage)
                 {
                     case 1:
-                        if ((IRCurrent > .095) & (IRCurrent < .105))
+                        if (((IRCurrent - ReferenceCurrent) > (limits.ldCurrentNominal - limits.IRCurrentTolerance)) & ((IRCurrent - ReferenceCurrent) < (limits.ldCurrentNominal + limits.IRCurrentTolerance)))
                         {
                             CurrentOK = true;
 
@@ -3526,7 +3593,7 @@ namespace ITM_ISM_Fixture
 
                             if (IRCurrent > .110)
                             {
-
+                                
                                 SetPot = SetPot - 0.05;  // course
                             }
                             else
@@ -3539,7 +3606,7 @@ namespace ITM_ISM_Fixture
                        
                         break;
                     case 3:
-                        if ((IRCurrent > .11) & (IRCurrent < .12))
+                        if (((IRCurrent - ReferenceCurrent) > (limits.mdCurrentNominal - limits.IRCurrentTolerance)) & ((IRCurrent - ReferenceCurrent) < (limits.mdCurrentNominal + limits.IRCurrentTolerance)))
                         {
                             CurrentOK = true;
                             mdpot[channel] = SetPot;
@@ -3568,7 +3635,7 @@ namespace ITM_ISM_Fixture
                         }
                         break;
                     case 5:
-                        if ((IRCurrent > .125) & (IRCurrent < .135))
+                        if (((IRCurrent - ReferenceCurrent) > (limits.hdCurrentNominal - limits.IRCurrentTolerance)) & ((IRCurrent - ReferenceCurrent) < (limits.hdCurrentNominal + limits.IRCurrentTolerance)))
                         {
                             CurrentOK = true;
                             hdpot[channel] = SetPot;
@@ -4203,7 +4270,7 @@ namespace ITM_ISM_Fixture
             powerupCurrent = Math.Abs(Ccurrent);
 
 
-            if ((powerupCurrent < 50))  // takes a bit to settle back on boot
+            if ((powerupCurrent < limits.maxPowerUpCurrent))  // takes a bit to settle back on boot
             {
                 PowerUpCurrentResult = true;
                 led2.OffColor = Color.LimeGreen;
@@ -4289,7 +4356,7 @@ namespace ITM_ISM_Fixture
 
             VoltageMeasurements[0] = Vvalue;
 
-            if ((Vvalue > 2.95) & (Vvalue < 3.05))
+            if ((Vvalue > limits.TP102VoltageMin) & (Vvalue < limits.TP102VoltageMax))
             {
                 TP102Result = true;
 
@@ -4329,7 +4396,7 @@ namespace ITM_ISM_Fixture
 
             VoltageMeasurements[1] = Vvalue;
 
-            if ((Vvalue > 3.25) & (Vvalue < 3.35))
+            if ((Vvalue > limits.TP116VoltageMin) & (Vvalue < limits.TP116VoltageMax))
             {
                 TP116Result = true;
 
@@ -4369,7 +4436,7 @@ namespace ITM_ISM_Fixture
 
             VoltageMeasurements[2] = Vvalue;
 
-            if ((Vvalue > 3.25) & (Vvalue < 3.35))
+            if ((Vvalue > limits.TP115VoltageMin) & (Vvalue < limits.TP115VoltageMax))
             {
                 TP115Result = true;
 
@@ -4410,7 +4477,7 @@ namespace ITM_ISM_Fixture
 
             VoltageMeasurements[3] = Vvalue;
 
-            if ((Vvalue > 1.5) & (Vvalue < 1.7))
+            if ((Vvalue > limits.TP130VolgageMin) & (Vvalue < limits.TP130VolgageMax))
             {
                 TP130Result = true;
 
