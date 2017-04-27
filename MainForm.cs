@@ -388,7 +388,7 @@ namespace ITM_ISM_Fixture
 
 
               
-                
+                // for ism, the one touch switch has to be closed. (TP 409)
                
 
                 
@@ -619,7 +619,7 @@ namespace ITM_ISM_Fixture
 
 
 
-          // if(false)  // skip program
+           //if(false)  // skip program
             if (instumentStatus == 0)
             {
                 led4.OffColor = Color.Yellow;
@@ -4204,7 +4204,7 @@ namespace ITM_ISM_Fixture
 
 
 
-            if ((ChargeCurrent > 200) & (powerupCurrent < 520))  // takes a bit to settle back on boot
+            if ((ChargeCurrent > 100) & (powerupCurrent < 520))  // takes a bit to settle back on boot
             {
                 ChargeCurrentResult = true;
                 led29.OffColor = Color.LimeGreen;
@@ -5637,8 +5637,9 @@ namespace ITM_ISM_Fixture
                 relaydata = (relaydata << 1);
 
 
+            // for ISM,  OR with d7 so tp409 has voltage
 
-
+            relaydata |= 0x80;
 
 
             try
