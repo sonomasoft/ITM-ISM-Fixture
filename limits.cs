@@ -45,7 +45,7 @@ namespace ITM_ISM_Fixture
         public static double hdCurrentNominal = .090;
 
 
-        public static double IRCurrentTolerance = .005;
+        public static double IRCurrentTolerance = .003;
 
 
 // aux level limits

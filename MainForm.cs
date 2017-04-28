@@ -283,7 +283,7 @@ namespace ITM_ISM_Fixture
 
             this.Refresh();
 
-
+            switchChannel0(0xff);
 
             // show serial number box
             frm2 = new barCode(this);
@@ -1135,7 +1135,7 @@ namespace ITM_ISM_Fixture
 
                     //  if current is out of spec, run cal
 
-                    if (((IRCurrent-ReferenceCurrent) < (limits.ldCurrentNominal-.005)) | ((IRCurrent-ReferenceCurrent) > (limits.ldCurrentNominal +.005)))
+                    if (((IRCurrent - ReferenceCurrent) < (limits.ldCurrentNominal - limits.IRCurrentTolerance)) | ((IRCurrent - ReferenceCurrent) > (limits.ldCurrentNominal + limits.IRCurrentTolerance)))
                     {
                         ReturnCurrent=IRSetCurrent(1,0);  // 1 = low, 2 = mid, 3 = high
 
@@ -5633,13 +5633,26 @@ namespace ITM_ISM_Fixture
 
             uint indx;
 
-            for (indx = 0; indx < RelayNo; indx++)
-                relaydata = (relaydata << 1);
+            if (RelayNo == 0xff)
+            {
+                relaydata = 0x00;
+
+            }
+            else
+            {
 
 
-            // for ISM,  OR with d7 so tp409 has voltage
+                for (indx = 0; indx < RelayNo; indx++)
+                    relaydata = (relaydata << 1);
+                // for ISM,  OR with d7 so tp409 has voltage
 
-            relaydata |= 0x80;
+
+                relaydata |= 0x80;
+
+            }
+
+
+
 
 
             try
