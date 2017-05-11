@@ -471,6 +471,10 @@ namespace ITM_ISM_Fixture
             if (instumentStatus == 0)
             {
 
+                scope1.YAxis.AutoScaling.Enabled = true;
+
+
+
 
                 led6.OffColor = Color.Yellow;   /// seems to be crashing here!!!!!!
                 this.Refresh();
@@ -510,7 +514,7 @@ namespace ITM_ISM_Fixture
 
 
                 AudioInMeasurements[0] = Convert.ToDouble(rmsValue);
-
+                scope1.RefreshView();
 
 
                 /*
@@ -530,6 +534,8 @@ namespace ITM_ISM_Fixture
 
                 AudioInMeasurements[1] = Convert.ToDouble(rmsValue);
                 this.Refresh();
+
+                scope1.RefreshView();
 
 
                 // validate measurements
@@ -569,21 +575,23 @@ namespace ITM_ISM_Fixture
                 led8.OffColor = Color.Yellow;   /// seems to be crashing here!!!!!!
                 this.Refresh();
 
+                /*
+
                 MessageBox.Show("Switch Out to Tp402 and In/Out to Mic.",
                 "Error",
                 MessageBoxButtons.OK,
                 MessageBoxIcon.Exclamation,
                 MessageBoxDefaultButton.Button1);
 
-
+                */
                 short status;
 
 
-                status = Imports.SetSiggenBuiltIn(handle, 0, 25000, Imports.SiggenWaveType.Sine, 1000, 1000, 0, 0, Imports.SiggenSweepType.Up, false, 1, 1, Imports.SiggenTrigType.Rising, Imports.SiggenTrigSource.None, 0);
+                status = Imports.SetSiggenBuiltIn(handle, 0, 50000, Imports.SiggenWaveType.Sine, 1000, 1000, 0, 0, Imports.SiggenSweepType.Up, false, 1, 1, Imports.SiggenTrigType.Rising, Imports.SiggenTrigSource.None, 0);
                 // allow some settling time
 
                 Thread.Sleep(1000);
-
+                switchChannel1(2);
 
                 GetChanB();
                 Thread.Sleep(500);
@@ -596,8 +604,9 @@ namespace ITM_ISM_Fixture
 
 
                 AudioInMeasurements[2] = Convert.ToDouble(rmsValue);
+                scope1.RefreshView();
 
-                if ((AudioInMeasurements[2] > 625) & (AudioInMeasurements[2] < 675))
+                if ((AudioInMeasurements[2] > 275) & (AudioInMeasurements[2] < 350))
                 {
                     MicResult = true;
                     led8.OffColor = Color.LimeGreen;
@@ -3820,7 +3829,7 @@ namespace ITM_ISM_Fixture
 
             }
 
-            if(flashstring.Contains("Failed"))
+            if(flashstring.Contains("error"))
             {
                 ProgramResult = false;
 
