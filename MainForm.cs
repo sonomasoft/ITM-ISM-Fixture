@@ -46,6 +46,10 @@ namespace ITM_ISM_Fixture
 
         barCode frm2;
 
+        ResultGood frm6;
+
+        ResultsBad frm7;
+
 
         private Imports.ps5000aBlockReady _callbackDelegate;
 
@@ -287,6 +291,12 @@ namespace ITM_ISM_Fixture
 
             // show serial number box
             frm2 = new barCode(this);
+
+            frm6 = new ResultGood(this);
+            frm7 = new ResultsBad(this);
+
+        
+
 
             frm2.Show();
 
@@ -3395,8 +3405,59 @@ namespace ITM_ISM_Fixture
 
                 }
 
+/*
+                    public bool PowerUpCurrentResult = true;
+
+        public bool VoltageResult = true;
+
+        public bool TP102Result = true;
+        public bool TP116Result = true;
+        public bool TP115Result = true;
+        public bool TP130Result = true;
+
+        public bool AuxResult = true;
+        public bool MicResult = true;
 
 
+        public bool BootResult = true;
+
+
+
+        public bool ChargeCurrentResult = true;
+
+
+
+
+        public bool ProgramInProgress = false;
+
+        public bool ProgramResult = false;
+
+        public bool IRChannel_A_Result = false;
+        public bool IRChannel_B_Result = false;
+        public bool IRChannel_C_Result = false;
+        public bool IRChannel_D_Result = false;
+        public bool IRChannel_E_Result = false;
+        public bool IRChannel_L1_Result = false;
+        public bool IRChannel_L2_Result = false;
+ */
+
+
+                if (PowerUpCurrentResult & VoltageResult & TP102Result & AuxResult & MicResult & BootResult & ChargeCurrentResult & ProgramResult & IRChannel_A_Result & IRChannel_B_Result & IRChannel_C_Result & IRChannel_D_Result & IRChannel_E_Result & IRChannel_L1_Result & IRChannel_L2_Result)
+                {
+                    // show pass
+                 
+                    frm6.Show();
+
+
+
+                }
+                else
+                {
+                    // show fail
+                    frm7.Show();
+
+
+                }
 
 
 
@@ -4926,7 +4987,7 @@ namespace ITM_ISM_Fixture
 
         private void button2_Click(object sender, EventArgs e)
         {
-
+            frm6.Show();
 
             //' Setup channel A
 

@@ -226,6 +226,11 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>pingBK2831e.mxb</DependentUpon>
     </Compile>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
     <Compile Include="PS5000Imports.cs" />
     <Compile Include="PS5000PinnedArray.cs" />
     <Compile Include="Relay_1_ON.cs">
@@ -235,6 +240,18 @@
     </Compile>
     <Compile Include="Relay_1_ON.User.cs">
       <DependentUpon>Relay_1_ON.mxb</DependentUpon>
+    </Compile>
+    <Compile Include="ResultGood.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ResultGood.designer.cs">
+      <DependentUpon>ResultGood.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ResultsBad.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ResultsBad.designer.cs">
+      <DependentUpon>ResultsBad.cs</DependentUpon>
     </Compile>
     <Compile Include="SetChannel_A.cs">
       <AutoGen>True</AutoGen>
@@ -302,13 +319,15 @@
     <EmbeddedResource Include="Properties\licenses.licx" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
+    <EmbeddedResource Include="ResultGood.resx">
+      <DependentUpon>ResultGood.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ResultsBad.resx">
+      <DependentUpon>ResultsBad.cs</DependentUpon>
+    </EmbeddedResource>
     <None Include="app.config" />
     <None Include="BK1685B_2_GETD.mxb">
       <Generator>NationalInstruments.MeasurementStudio.Tools.DotNET.MxbCodeGenerator.2010</Generator>
@@ -435,6 +454,10 @@
       <Generator>NationalInstruments.MeasurementStudio.Tools.DotNET.MxbCodeGenerator.2010</Generator>
       <LastGenOutput>WritePort_1.cs</LastGenOutput>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Resources\frown.png" />
+    <Content Include="Resources\ResultGood.jpeg" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
