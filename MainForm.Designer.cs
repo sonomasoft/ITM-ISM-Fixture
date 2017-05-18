@@ -283,6 +283,8 @@
             this.label22 = new System.Windows.Forms.Label();
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.label7 = new System.Windows.Forms.Label();
+            this.label23 = new System.Windows.Forms.Label();
+            this.led7 = new NationalInstruments.UI.WindowsForms.Led();
             ((System.ComponentModel.ISupportInitialize)(this.led1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.led2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.led3)).BeginInit();
@@ -326,6 +328,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.led35)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.led36)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.led37)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.led7)).BeginInit();
             this.SuspendLayout();
             // 
             // label1
@@ -458,7 +461,7 @@
             // led9
             // 
             this.led9.LedStyle = NationalInstruments.UI.LedStyle.Round3D;
-            this.led9.Location = new System.Drawing.Point(426, 436);
+            this.led9.Location = new System.Drawing.Point(422, 497);
             this.led9.Name = "led9";
             this.led9.Size = new System.Drawing.Size(43, 37);
             this.led9.TabIndex = 15;
@@ -467,7 +470,7 @@
             // 
             this.label9.AutoSize = true;
             this.label9.Font = new System.Drawing.Font("Microsoft Sans Serif", 13.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label9.Location = new System.Drawing.Point(30, 436);
+            this.label9.Location = new System.Drawing.Point(26, 497);
             this.label9.Name = "label9";
             this.label9.Size = new System.Drawing.Size(97, 29);
             this.label9.TabIndex = 14;
@@ -476,7 +479,7 @@
             // led10
             // 
             this.led10.LedStyle = NationalInstruments.UI.LedStyle.Round3D;
-            this.led10.Location = new System.Drawing.Point(426, 479);
+            this.led10.Location = new System.Drawing.Point(422, 540);
             this.led10.Name = "led10";
             this.led10.Size = new System.Drawing.Size(43, 37);
             this.led10.TabIndex = 17;
@@ -485,7 +488,7 @@
             // 
             this.label10.AutoSize = true;
             this.label10.Font = new System.Drawing.Font("Microsoft Sans Serif", 13.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label10.Location = new System.Drawing.Point(30, 479);
+            this.label10.Location = new System.Drawing.Point(26, 540);
             this.label10.Name = "label10";
             this.label10.Size = new System.Drawing.Size(98, 29);
             this.label10.TabIndex = 16;
@@ -494,7 +497,7 @@
             // led11
             // 
             this.led11.LedStyle = NationalInstruments.UI.LedStyle.Round3D;
-            this.led11.Location = new System.Drawing.Point(426, 522);
+            this.led11.Location = new System.Drawing.Point(422, 583);
             this.led11.Name = "led11";
             this.led11.Size = new System.Drawing.Size(43, 37);
             this.led11.TabIndex = 19;
@@ -503,7 +506,7 @@
             // 
             this.label11.AutoSize = true;
             this.label11.Font = new System.Drawing.Font("Microsoft Sans Serif", 13.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label11.Location = new System.Drawing.Point(30, 522);
+            this.label11.Location = new System.Drawing.Point(26, 583);
             this.label11.Name = "label11";
             this.label11.Size = new System.Drawing.Size(99, 29);
             this.label11.TabIndex = 18;
@@ -512,7 +515,7 @@
             // led12
             // 
             this.led12.LedStyle = NationalInstruments.UI.LedStyle.Round3D;
-            this.led12.Location = new System.Drawing.Point(426, 565);
+            this.led12.Location = new System.Drawing.Point(422, 626);
             this.led12.Name = "led12";
             this.led12.Size = new System.Drawing.Size(43, 37);
             this.led12.TabIndex = 21;
@@ -521,7 +524,7 @@
             // 
             this.label12.AutoSize = true;
             this.label12.Font = new System.Drawing.Font("Microsoft Sans Serif", 13.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label12.Location = new System.Drawing.Point(30, 565);
+            this.label12.Location = new System.Drawing.Point(26, 626);
             this.label12.Name = "label12";
             this.label12.Size = new System.Drawing.Size(99, 29);
             this.label12.TabIndex = 20;
@@ -530,7 +533,7 @@
             // led13
             // 
             this.led13.LedStyle = NationalInstruments.UI.LedStyle.Round3D;
-            this.led13.Location = new System.Drawing.Point(426, 608);
+            this.led13.Location = new System.Drawing.Point(422, 669);
             this.led13.Name = "led13";
             this.led13.Size = new System.Drawing.Size(43, 37);
             this.led13.TabIndex = 23;
@@ -539,7 +542,7 @@
             // 
             this.label13.AutoSize = true;
             this.label13.Font = new System.Drawing.Font("Microsoft Sans Serif", 13.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label13.Location = new System.Drawing.Point(30, 608);
+            this.label13.Location = new System.Drawing.Point(26, 669);
             this.label13.Name = "label13";
             this.label13.Size = new System.Drawing.Size(98, 29);
             this.label13.TabIndex = 22;
@@ -548,7 +551,7 @@
             // label14
             // 
             this.label14.AutoSize = true;
-            this.label14.Location = new System.Drawing.Point(412, 405);
+            this.label14.Location = new System.Drawing.Point(408, 466);
             this.label14.Name = "label14";
             this.label14.Size = new System.Drawing.Size(75, 17);
             this.label14.TabIndex = 24;
@@ -557,7 +560,7 @@
             // led14
             // 
             this.led14.LedStyle = NationalInstruments.UI.LedStyle.Round3D;
-            this.led14.Location = new System.Drawing.Point(565, 436);
+            this.led14.Location = new System.Drawing.Point(561, 497);
             this.led14.Name = "led14";
             this.led14.Size = new System.Drawing.Size(43, 37);
             this.led14.TabIndex = 25;
@@ -565,7 +568,7 @@
             // led15
             // 
             this.led15.LedStyle = NationalInstruments.UI.LedStyle.Round3D;
-            this.led15.Location = new System.Drawing.Point(565, 479);
+            this.led15.Location = new System.Drawing.Point(561, 540);
             this.led15.Name = "led15";
             this.led15.Size = new System.Drawing.Size(43, 37);
             this.led15.TabIndex = 26;
@@ -573,7 +576,7 @@
             // led16
             // 
             this.led16.LedStyle = NationalInstruments.UI.LedStyle.Round3D;
-            this.led16.Location = new System.Drawing.Point(565, 522);
+            this.led16.Location = new System.Drawing.Point(561, 583);
             this.led16.Name = "led16";
             this.led16.Size = new System.Drawing.Size(43, 37);
             this.led16.TabIndex = 27;
@@ -581,7 +584,7 @@
             // led17
             // 
             this.led17.LedStyle = NationalInstruments.UI.LedStyle.Round3D;
-            this.led17.Location = new System.Drawing.Point(565, 565);
+            this.led17.Location = new System.Drawing.Point(561, 626);
             this.led17.Name = "led17";
             this.led17.Size = new System.Drawing.Size(43, 37);
             this.led17.TabIndex = 28;
@@ -589,7 +592,7 @@
             // led18
             // 
             this.led18.LedStyle = NationalInstruments.UI.LedStyle.Round3D;
-            this.led18.Location = new System.Drawing.Point(565, 608);
+            this.led18.Location = new System.Drawing.Point(561, 669);
             this.led18.Name = "led18";
             this.led18.Size = new System.Drawing.Size(43, 37);
             this.led18.TabIndex = 29;
@@ -597,7 +600,7 @@
             // led19
             // 
             this.led19.LedStyle = NationalInstruments.UI.LedStyle.Round3D;
-            this.led19.Location = new System.Drawing.Point(635, 608);
+            this.led19.Location = new System.Drawing.Point(631, 669);
             this.led19.Name = "led19";
             this.led19.Size = new System.Drawing.Size(43, 37);
             this.led19.TabIndex = 34;
@@ -605,7 +608,7 @@
             // led20
             // 
             this.led20.LedStyle = NationalInstruments.UI.LedStyle.Round3D;
-            this.led20.Location = new System.Drawing.Point(635, 565);
+            this.led20.Location = new System.Drawing.Point(631, 626);
             this.led20.Name = "led20";
             this.led20.Size = new System.Drawing.Size(43, 37);
             this.led20.TabIndex = 33;
@@ -613,7 +616,7 @@
             // led21
             // 
             this.led21.LedStyle = NationalInstruments.UI.LedStyle.Round3D;
-            this.led21.Location = new System.Drawing.Point(635, 522);
+            this.led21.Location = new System.Drawing.Point(631, 583);
             this.led21.Name = "led21";
             this.led21.Size = new System.Drawing.Size(43, 37);
             this.led21.TabIndex = 32;
@@ -621,7 +624,7 @@
             // led22
             // 
             this.led22.LedStyle = NationalInstruments.UI.LedStyle.Round3D;
-            this.led22.Location = new System.Drawing.Point(635, 479);
+            this.led22.Location = new System.Drawing.Point(631, 540);
             this.led22.Name = "led22";
             this.led22.Size = new System.Drawing.Size(43, 37);
             this.led22.TabIndex = 31;
@@ -629,7 +632,7 @@
             // led23
             // 
             this.led23.LedStyle = NationalInstruments.UI.LedStyle.Round3D;
-            this.led23.Location = new System.Drawing.Point(635, 436);
+            this.led23.Location = new System.Drawing.Point(631, 497);
             this.led23.Name = "led23";
             this.led23.Size = new System.Drawing.Size(43, 37);
             this.led23.TabIndex = 30;
@@ -637,7 +640,7 @@
             // led24
             // 
             this.led24.LedStyle = NationalInstruments.UI.LedStyle.Round3D;
-            this.led24.Location = new System.Drawing.Point(703, 608);
+            this.led24.Location = new System.Drawing.Point(699, 669);
             this.led24.Name = "led24";
             this.led24.Size = new System.Drawing.Size(43, 37);
             this.led24.TabIndex = 39;
@@ -645,7 +648,7 @@
             // led25
             // 
             this.led25.LedStyle = NationalInstruments.UI.LedStyle.Round3D;
-            this.led25.Location = new System.Drawing.Point(703, 565);
+            this.led25.Location = new System.Drawing.Point(699, 626);
             this.led25.Name = "led25";
             this.led25.Size = new System.Drawing.Size(43, 37);
             this.led25.TabIndex = 38;
@@ -653,7 +656,7 @@
             // led26
             // 
             this.led26.LedStyle = NationalInstruments.UI.LedStyle.Round3D;
-            this.led26.Location = new System.Drawing.Point(703, 522);
+            this.led26.Location = new System.Drawing.Point(699, 583);
             this.led26.Name = "led26";
             this.led26.Size = new System.Drawing.Size(43, 37);
             this.led26.TabIndex = 37;
@@ -661,7 +664,7 @@
             // led27
             // 
             this.led27.LedStyle = NationalInstruments.UI.LedStyle.Round3D;
-            this.led27.Location = new System.Drawing.Point(703, 479);
+            this.led27.Location = new System.Drawing.Point(699, 540);
             this.led27.Name = "led27";
             this.led27.Size = new System.Drawing.Size(43, 37);
             this.led27.TabIndex = 36;
@@ -669,7 +672,7 @@
             // led28
             // 
             this.led28.LedStyle = NationalInstruments.UI.LedStyle.Round3D;
-            this.led28.Location = new System.Drawing.Point(703, 436);
+            this.led28.Location = new System.Drawing.Point(699, 497);
             this.led28.Name = "led28";
             this.led28.Size = new System.Drawing.Size(43, 37);
             this.led28.TabIndex = 35;
@@ -677,7 +680,7 @@
             // label15
             // 
             this.label15.AutoSize = true;
-            this.label15.Location = new System.Drawing.Point(610, 405);
+            this.label15.Location = new System.Drawing.Point(606, 466);
             this.label15.Name = "label15";
             this.label15.Size = new System.Drawing.Size(86, 17);
             this.label15.TabIndex = 40;
@@ -1197,7 +1200,7 @@
             // led30
             // 
             this.led30.LedStyle = NationalInstruments.UI.LedStyle.Round3D;
-            this.led30.Location = new System.Drawing.Point(702, 647);
+            this.led30.Location = new System.Drawing.Point(698, 708);
             this.led30.Name = "led30";
             this.led30.Size = new System.Drawing.Size(43, 37);
             this.led30.TabIndex = 59;
@@ -1205,7 +1208,7 @@
             // led31
             // 
             this.led31.LedStyle = NationalInstruments.UI.LedStyle.Round3D;
-            this.led31.Location = new System.Drawing.Point(634, 647);
+            this.led31.Location = new System.Drawing.Point(630, 708);
             this.led31.Name = "led31";
             this.led31.Size = new System.Drawing.Size(43, 37);
             this.led31.TabIndex = 58;
@@ -1213,7 +1216,7 @@
             // led32
             // 
             this.led32.LedStyle = NationalInstruments.UI.LedStyle.Round3D;
-            this.led32.Location = new System.Drawing.Point(564, 647);
+            this.led32.Location = new System.Drawing.Point(560, 708);
             this.led32.Name = "led32";
             this.led32.Size = new System.Drawing.Size(43, 37);
             this.led32.TabIndex = 57;
@@ -1221,7 +1224,7 @@
             // led33
             // 
             this.led33.LedStyle = NationalInstruments.UI.LedStyle.Round3D;
-            this.led33.Location = new System.Drawing.Point(425, 647);
+            this.led33.Location = new System.Drawing.Point(421, 708);
             this.led33.Name = "led33";
             this.led33.Size = new System.Drawing.Size(43, 37);
             this.led33.TabIndex = 56;
@@ -1230,7 +1233,7 @@
             // 
             this.label21.AutoSize = true;
             this.label21.Font = new System.Drawing.Font("Microsoft Sans Serif", 13.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label21.Location = new System.Drawing.Point(29, 647);
+            this.label21.Location = new System.Drawing.Point(25, 708);
             this.label21.Name = "label21";
             this.label21.Size = new System.Drawing.Size(127, 29);
             this.label21.TabIndex = 55;
@@ -1239,7 +1242,7 @@
             // led34
             // 
             this.led34.LedStyle = NationalInstruments.UI.LedStyle.Round3D;
-            this.led34.Location = new System.Drawing.Point(702, 689);
+            this.led34.Location = new System.Drawing.Point(698, 750);
             this.led34.Name = "led34";
             this.led34.Size = new System.Drawing.Size(43, 37);
             this.led34.TabIndex = 64;
@@ -1247,7 +1250,7 @@
             // led35
             // 
             this.led35.LedStyle = NationalInstruments.UI.LedStyle.Round3D;
-            this.led35.Location = new System.Drawing.Point(634, 689);
+            this.led35.Location = new System.Drawing.Point(630, 750);
             this.led35.Name = "led35";
             this.led35.Size = new System.Drawing.Size(43, 37);
             this.led35.TabIndex = 63;
@@ -1255,7 +1258,7 @@
             // led36
             // 
             this.led36.LedStyle = NationalInstruments.UI.LedStyle.Round3D;
-            this.led36.Location = new System.Drawing.Point(564, 689);
+            this.led36.Location = new System.Drawing.Point(560, 750);
             this.led36.Name = "led36";
             this.led36.Size = new System.Drawing.Size(43, 37);
             this.led36.TabIndex = 62;
@@ -1263,7 +1266,7 @@
             // led37
             // 
             this.led37.LedStyle = NationalInstruments.UI.LedStyle.Round3D;
-            this.led37.Location = new System.Drawing.Point(425, 689);
+            this.led37.Location = new System.Drawing.Point(421, 750);
             this.led37.Name = "led37";
             this.led37.Size = new System.Drawing.Size(43, 37);
             this.led37.TabIndex = 61;
@@ -1272,7 +1275,7 @@
             // 
             this.label22.AutoSize = true;
             this.label22.Font = new System.Drawing.Font("Microsoft Sans Serif", 13.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label22.Location = new System.Drawing.Point(29, 689);
+            this.label22.Location = new System.Drawing.Point(25, 750);
             this.label22.Name = "label22";
             this.label22.Size = new System.Drawing.Size(127, 29);
             this.label22.TabIndex = 60;
@@ -1296,11 +1299,31 @@
             this.label7.TabIndex = 66;
             this.label7.Text = "Board Serial Number";
             // 
+            // label23
+            // 
+            this.label23.AutoSize = true;
+            this.label23.Font = new System.Drawing.Font("Microsoft Sans Serif", 13.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label23.Location = new System.Drawing.Point(30, 418);
+            this.label23.Name = "label23";
+            this.label23.Size = new System.Drawing.Size(142, 29);
+            this.label23.TabIndex = 68;
+            this.label23.Text = "UI LED Test";
+            // 
+            // led7
+            // 
+            this.led7.LedStyle = NationalInstruments.UI.LedStyle.Round3D;
+            this.led7.Location = new System.Drawing.Point(345, 418);
+            this.led7.Name = "led7";
+            this.led7.Size = new System.Drawing.Size(43, 37);
+            this.led7.TabIndex = 67;
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1271, 854);
+            this.Controls.Add(this.label23);
+            this.Controls.Add(this.led7);
             this.Controls.Add(this.label7);
             this.Controls.Add(this.textBox1);
             this.Controls.Add(this.led34);
@@ -1413,6 +1436,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.led35)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.led36)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.led37)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.led7)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -1498,6 +1522,8 @@
         private System.Windows.Forms.Label label7;
         public System.Windows.Forms.TextBox textBox1;
         public System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Label label23;
+        private NationalInstruments.UI.WindowsForms.Led led7;
     }
 }
 

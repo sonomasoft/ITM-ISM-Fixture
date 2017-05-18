@@ -99,6 +99,7 @@ namespace ITM_ISM_Fixture
 
 
         public bool BootResult = true;
+        public bool UILEDResult = true;
 
 
 
@@ -244,6 +245,8 @@ namespace ITM_ISM_Fixture
 
             ReferenceCurrent = 0;
 
+            instumentStatus = 0;
+
             // clear all LED's
             led1.OffColor = Color.Black;
             led2.OffColor = Color.Black;
@@ -251,6 +254,7 @@ namespace ITM_ISM_Fixture
             led4.OffColor = Color.Black;
             led5.OffColor = Color.Black;
             led6.OffColor = Color.Black;
+            led7.OffColor = Color.Black;
             led8.OffColor = Color.Black;
             led9.OffColor = Color.Black;
             led10.OffColor = Color.Black;
@@ -455,6 +459,8 @@ namespace ITM_ISM_Fixture
                     VoltageResult = true;
 
                     led3.OffColor = Color.LimeGreen;
+
+    
                 }
                 else
                 {
@@ -861,40 +867,51 @@ namespace ITM_ISM_Fixture
 
                     }
 
-
-
-                    Console.WriteLine("Found Transmitter on {0}", IxM_port);
-
-
-                    DUTport.PortName = IxM_port;
-
-                    DUTport.Open();
-                    Txresponse = TxCommand("ver");
-                    timer3.Enabled = false;
-
-
-                    Console.WriteLine("Response From Juno: {0}", Txresponse); // may have to capture this as soon as we have cr
-
-                    //BootTest();
-                    Thread.Sleep(500);  // need delay between transactions
-
-
-
-                    if (Txresponse.Contains("Firmware:"))
+                    if (IxM_port != "Error!!!")
                     {
 
-                        led5.OffColor = Color.LimeGreen;
+                        Console.WriteLine("Found Transmitter on {0}", IxM_port);
 
 
-                        BootResult = true;
+                        DUTport.PortName = IxM_port;
+
+                        DUTport.Open();
+                        Txresponse = TxCommand("ver");
+                        timer3.Enabled = false;
+
+
+                        Console.WriteLine("Response From Juno: {0}", Txresponse); // may have to capture this as soon as we have cr
+
+                        //BootTest();
+                        Thread.Sleep(500);  // need delay between transactions
 
 
 
+                        if (Txresponse.Contains("Firmware:"))
+                        {
+
+                            led5.OffColor = Color.LimeGreen;
+
+
+                            BootResult = true;
+
+
+
+                        }
+                        else
+                        {
+                            led5.OffColor = Color.Red;
+                            BootResult = false;
+
+                        }
                     }
+
                     else
                     {
+
                         led5.OffColor = Color.Red;
                         BootResult = false;
+
 
                     }
 
@@ -906,7 +923,7 @@ namespace ITM_ISM_Fixture
 
                     // 2.  measure charge current
 
-
+                 if (instumentStatus == 0)
                     ReadChargeCurrent();
 
 
@@ -914,6 +931,316 @@ namespace ITM_ISM_Fixture
                     // 3. connect to shell to make sure boot worked.
 
 
+
+
+                }
+
+
+            // insert LED tests here.   We have to use current to dectect valid LED's
+
+                if (instumentStatus == 0)
+                {
+
+                    led7.OffColor = Color.Yellow;
+                    this.Refresh();
+
+                    Txresponse = TxCommand("mfgt= 1");
+                    timer3.Enabled = false;
+
+
+                    Console.WriteLine("Response From Juno: {0}", Txresponse); // may have to capture this as soon as we have cr
+
+
+
+                    // turn charge OFF
+                    Txresponse = TxCommand("chd= 1");
+                    timer3.Enabled = false;
+
+
+                    Console.WriteLine("Response From Juno: {0}", Txresponse); // may have to capture this as soon as we have cr
+
+
+                    // turn on cled
+
+
+                    Txresponse = TxCommand("pled= 100");
+                    timer3.Enabled = false;
+
+
+                    Console.WriteLine("Response From Juno: {0}", Txresponse); // may have to capture this as soon as we have cr
+
+
+                    // read current
+
+
+
+                    // measure Current
+
+
+                    BK2831E_2_SetCurrent setupCurrent = new BK2831E_2_SetCurrent();
+
+                    BK2831E_2_ReadCurrent GetIRCurrent = new BK2831E_2_ReadCurrent();
+
+
+
+                    setupCurrent.Run();
+
+
+
+                    Thread.Sleep(1000); // add delay
+
+
+                    BK2831E_2_ReadCurrentResults results = GetIRCurrent.Run();
+
+                    string myCurrent = results.Token2.ToString();
+                    Thread.Sleep(250); // add delay
+
+
+
+                    double PLEDCurrent = Convert.ToDouble(myCurrent);
+
+
+
+
+
+       
+
+
+                    // turn off cled
+
+                    Txresponse = TxCommand("pled= 0");
+                    timer3.Enabled = false;
+
+
+                    Console.WriteLine("Response From Juno: {0}", Txresponse); // may have to capture this as soon as we have cr
+
+                    // read current
+
+                    results = GetIRCurrent.Run();
+
+                    myCurrent = results.Token2.ToString();
+                    Thread.Sleep(250); // add delay
+
+
+
+                    double NOLEDCurrent = Convert.ToDouble(myCurrent);
+
+
+                    // validate
+
+
+                    if (PLEDCurrent - NOLEDCurrent > 1)
+                    {
+                        UILEDResult = true;
+
+
+                    }
+                    else
+                    {
+                        UILEDResult = false; ;
+                    }
+
+
+
+
+
+
+
+
+
+                    // turn on mled
+
+
+                    Txresponse = TxCommand("mled= 100");
+                    timer3.Enabled = false;
+
+
+                    Console.WriteLine("Response From Juno: {0}", Txresponse); // may have to capture this as soon as we have cr
+
+                    // read current
+
+                    results = GetIRCurrent.Run();
+
+                    myCurrent = results.Token2.ToString();
+                    Thread.Sleep(250); // add delay
+
+
+
+                    double MLEDCurrent = Convert.ToDouble(myCurrent);
+
+
+           
+
+                    // turn off mled
+
+                    Txresponse = TxCommand("mled= 0");
+                    timer3.Enabled = false;
+
+
+                    Console.WriteLine("Response From Juno: {0}", Txresponse); // may have to capture this as soon as we have cr
+
+                    // read current
+
+                    results = GetIRCurrent.Run();
+
+                    myCurrent = results.Token2.ToString();
+                    Thread.Sleep(250); // add delay
+
+
+
+                    NOLEDCurrent = Convert.ToDouble(myCurrent);
+
+                  
+
+                    // validate
+
+                    if (UILEDResult)
+                        if (MLEDCurrent - NOLEDCurrent > 2)
+                        {
+                            UILEDResult = true;
+
+
+                        }
+                        else
+                        {
+                            UILEDResult = false; ;
+                        }
+
+                    // turn on cgled
+
+                    Txresponse = TxCommand("cgled= 100");
+                    timer3.Enabled = false;
+
+
+                    Console.WriteLine("Response From Juno: {0}", Txresponse); // may have to capture this as soon as we have cr
+
+                    // read current
+
+                    results = GetIRCurrent.Run();
+
+                    myCurrent = results.Token2.ToString();
+                    Thread.Sleep(250); // add delay
+
+
+
+                    double CGLEDCurrent = Convert.ToDouble(myCurrent);
+
+
+
+
+
+                    
+
+                    // turn off cgled
+
+                    Txresponse = TxCommand("cgled= 0");
+                    timer3.Enabled = false;
+
+
+                    Console.WriteLine("Response From Juno: {0}", Txresponse); // may have to capture this as soon as we have cr
+
+                    // read current
+
+                    results = GetIRCurrent.Run();
+
+                    myCurrent = results.Token2.ToString();
+                    Thread.Sleep(250); // add delay
+
+
+
+                    NOLEDCurrent = Convert.ToDouble(myCurrent);
+
+                    // read current
+
+                    // validate
+
+                    if (UILEDResult)
+                        if (CGLEDCurrent - NOLEDCurrent > 1)
+                        {
+                            UILEDResult = true;
+
+
+                        }
+                        else
+                        {
+                            UILEDResult = false; ;
+                        }
+
+
+                    // trun on crled
+                    Txresponse = TxCommand("crled= 100");
+                    timer3.Enabled = false;
+
+
+                    Console.WriteLine("Response From Juno: {0}", Txresponse); // may have to capture this as soon as we have cr
+
+                    // read current
+
+                    results = GetIRCurrent.Run();
+
+                    myCurrent = results.Token2.ToString();
+                    Thread.Sleep(250); // add delay
+
+
+
+                    double CRLEDCurrent = Convert.ToDouble(myCurrent);
+
+
+                    
+
+                    // turn off crled
+
+                    Txresponse = TxCommand("crled= 0");
+                    timer3.Enabled = false;
+
+
+                    Console.WriteLine("Response From Juno: {0}", Txresponse); // may have to capture this as soon as we have cr
+
+                    // read current
+
+                    results = GetIRCurrent.Run();
+
+                    myCurrent = results.Token2.ToString();
+                    Thread.Sleep(250); // add delay
+
+
+
+                    NOLEDCurrent = Convert.ToDouble(myCurrent);
+
+                    
+
+
+                    // validate
+
+                    if (UILEDResult)
+                        if (CRLEDCurrent - NOLEDCurrent > 2)
+                        {
+                            UILEDResult = true;
+
+
+                        }
+                        else
+                        {
+                            UILEDResult = false; ;
+                        }
+
+
+
+                    if (UILEDResult)
+                    {
+
+                        led7.OffColor = Color.LimeGreen; ;
+                    }
+                    else
+                    {
+
+                        instumentStatus = 1;
+
+                        led7.OffColor = Color.Red;
+
+                    }
+
+                    this.Refresh();
 
 
                 }
@@ -3393,9 +3720,7 @@ namespace ITM_ISM_Fixture
                     WriteCSVFile();
 
 
-                    // close scope connection
 
-                    Imports.CloseUnit(handle);  // close the scope
 
 
                     // close txport
@@ -3459,7 +3784,9 @@ namespace ITM_ISM_Fixture
 
                 }
 
+                // close scope connection
 
+                Imports.CloseUnit(handle);  // close the scope
 
                // chgOff(); // turn off charge voltage
 
@@ -3865,6 +4192,12 @@ namespace ITM_ISM_Fixture
             catch
             {
                 Console.Write("Error... \n");
+                ProgramResult = false;
+
+                ProgramInProgress = false;  // only trigger on errore
+                progressSleep = 10;
+
+                //instumentStatus = 1;
 
 
             }
@@ -3895,7 +4228,8 @@ namespace ITM_ISM_Fixture
                 ProgramResult = false;
 
                 ProgramInProgress = false;  // only trigger on errore
-                progressSleep = 10; 
+                progressSleep = 10;
+                instumentStatus = 1;
 
             }
              
