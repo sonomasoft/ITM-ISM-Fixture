@@ -960,6 +960,17 @@ namespace ITM_ISM_Fixture
                     Console.WriteLine("Response From Juno: {0}", Txresponse); // may have to capture this as soon as we have cr
 
 
+
+                    // turn off IR LED's
+
+
+                    Txresponse = TxCommand("irled= 0");
+                    timer3.Enabled = false;
+
+
+                    Console.WriteLine("Response From Juno: {0}", Txresponse); // may have to capture this as soon as we have cr
+
+
                     // turn on cled
 
 
@@ -1029,7 +1040,7 @@ namespace ITM_ISM_Fixture
                     // validate
 
 
-                    if (PLEDCurrent - NOLEDCurrent > 1)
+                    if (PLEDCurrent - NOLEDCurrent > .0005)
                     {
                         UILEDResult = true;
 
@@ -1048,63 +1059,87 @@ namespace ITM_ISM_Fixture
 
 
 
-                    // turn on mled
+                    // turn on mled  Only on TM!
 
 
-                    Txresponse = TxCommand("mled= 100");
+
+                    Txresponse = TxCommand("summ");
                     timer3.Enabled = false;
 
 
-                    Console.WriteLine("Response From Juno: {0}", Txresponse); // may have to capture this as soon as we have cr
-
-                    // read current
-
-                    results = GetIRCurrent.Run();
-
-                    myCurrent = results.Token2.ToString();
-                    Thread.Sleep(250); // add delay
+                    Console.WriteLine("Response From Tx: {0}", Txresponse); // may have to capture this as soon as we have cr
 
 
+                    // figure out Model
 
-                    double MLEDCurrent = Convert.ToDouble(myCurrent);
+                    if (Txresponse.Contains("Teacher"))
+                    {
+                        Model = "ITM";
+                    }
+                    else
+                    {
+                        Model = "ISM";
 
+                    }
 
-           
-
-                    // turn off mled
-
-                    Txresponse = TxCommand("mled= 0");
-                    timer3.Enabled = false;
-
-
-                    Console.WriteLine("Response From Juno: {0}", Txresponse); // may have to capture this as soon as we have cr
-
-                    // read current
-
-                    results = GetIRCurrent.Run();
-
-                    myCurrent = results.Token2.ToString();
-                    Thread.Sleep(250); // add delay
+                    if (Model == "ITM")
+                    {
+                        Txresponse = TxCommand("mled= 100");
+                        timer3.Enabled = false;
 
 
+                        Console.WriteLine("Response From Juno: {0}", Txresponse); // may have to capture this as soon as we have cr
 
-                    NOLEDCurrent = Convert.ToDouble(myCurrent);
+                        // read current
 
-                  
+                        results = GetIRCurrent.Run();
 
-                    // validate
-
-                    if (UILEDResult)
-                        if (MLEDCurrent - NOLEDCurrent > 2)
-                        {
-                            UILEDResult = true;
+                        myCurrent = results.Token2.ToString();
+                        Thread.Sleep(250); // add delay
 
 
-                        }
-                        else
-                        {
-                            UILEDResult = false; ;
-                        }
+
+                        double MLEDCurrent = Convert.ToDouble(myCurrent);
+
+
+
+
+                        // turn off mled
+
+                        Txresponse = TxCommand("mled= 0");
+                        timer3.Enabled = false;
+
+
+                        Console.WriteLine("Response From Juno: {0}", Txresponse); // may have to capture this as soon as we have cr
+
+                        // read current
+
+                        results = GetIRCurrent.Run();
+
+                        myCurrent = results.Token2.ToString();
+                        Thread.Sleep(250); // add delay
+
+
+
+                        NOLEDCurrent = Convert.ToDouble(myCurrent);
+
+
+
+                        // validate
+
+                        if (UILEDResult)
+                            if (MLEDCurrent - NOLEDCurrent > .002)
+                            {
+                                UILEDResult = true;
+
+
+                            }
+                            else
+                            {
+                                UILEDResult = false; ;
+                            }
+
+                    }
 
                     // turn on cgled
 
@@ -1155,7 +1190,7 @@ namespace ITM_ISM_Fixture
                     // validate
 
                     if (UILEDResult)
-                        if (CGLEDCurrent - NOLEDCurrent > 1)
+                        if (CGLEDCurrent - NOLEDCurrent > .0005)
                         {
                             UILEDResult = true;
 
@@ -1213,7 +1248,7 @@ namespace ITM_ISM_Fixture
                     // validate
 
                     if (UILEDResult)
-                        if (CRLEDCurrent - NOLEDCurrent > 2)
+                        if (CRLEDCurrent - NOLEDCurrent > .002)
                         {
                             UILEDResult = true;
 
@@ -2121,6 +2156,10 @@ namespace ITM_ISM_Fixture
 
                     // set to low coverage mode
 
+
+
+                    Thread.Sleep(1000);  // added delay here due to meter not being ready
+
                     Txresponse = TxCommand("cov = 1");
                     timer3.Enabled = false;
 
@@ -2446,6 +2485,12 @@ namespace ITM_ISM_Fixture
                     //setupCurrent.Run();
 
 
+
+
+
+                    
+
+
                     // set to low coverage mode
 
                     Txresponse = TxCommand("cov = 1");
@@ -2454,6 +2499,8 @@ namespace ITM_ISM_Fixture
 
                     Console.WriteLine("Response From Juno: {0}", Txresponse); // may have to capture this as soon as we have cr
 
+
+                    Thread.Sleep(1000);  // added delay here due to meter not being ready
 
                     results = GetIRCurrent.Run();
 

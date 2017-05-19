@@ -92,7 +92,7 @@ namespace ITM_ISM_Fixture
                 throw new ArgumentNullException("session");
 
             _instrumentSession = session;
-            _instrumentSession.Timeout = 2000;
+            _instrumentSession.Timeout = 4000;
             SerialSession ss = (SerialSession)_instrumentSession;
             ss.ReadTermination = SerialTerminationMethod.TerminationCharacter;
             _instrumentSession.TerminationCharacterEnabled = true;
