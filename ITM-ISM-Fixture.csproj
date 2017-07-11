@@ -145,6 +145,11 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>BK2831E_2_ReadCurrent.mxb</DependentUpon>
     </Compile>
+    <Compile Include="bk2831e_2_Reset.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>bk2831e_2_Reset.mxb</DependentUpon>
+    </Compile>
     <Compile Include="BK2831E_2_SetCurrent.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -356,6 +361,10 @@
     <None Include="BK2831E_2_ReadCurrent.mxb">
       <Generator>NationalInstruments.MeasurementStudio.Tools.DotNET.MxbCodeGenerator.2010</Generator>
       <LastGenOutput>BK2831E_2_ReadCurrent.cs</LastGenOutput>
+    </None>
+    <None Include="bk2831e_2_Reset.mxb">
+      <Generator>NationalInstruments.MeasurementStudio.Tools.DotNET.MxbCodeGenerator.2010</Generator>
+      <LastGenOutput>bk2831e_2_Reset.cs</LastGenOutput>
     </None>
     <None Include="BK2831E_2_SetCurrent.mxb">
       <Generator>NationalInstruments.MeasurementStudio.Tools.DotNET.MxbCodeGenerator.2010</Generator>

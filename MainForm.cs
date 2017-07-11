@@ -85,6 +85,9 @@ namespace ITM_ISM_Fixture
 
         public int[] inputRanges = { 10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000, 20000, 50000, 100000 }; // ranges in mV
 
+
+        public bool TestResult = true;
+
         public bool PowerUpCurrentResult = true;
 
         public bool VoltageResult = true;
@@ -386,7 +389,30 @@ namespace ITM_ISM_Fixture
             }
 
 
-            Thread.Sleep(1000);  // stablize
+           // Thread.Sleep(1000);  // stablize
+
+
+
+
+
+
+
+
+
+
+                    
+
+ 
+
+
+                  
+
+
+
+
+
+
+
 
 
             // check our power supplies
@@ -403,19 +429,43 @@ namespace ITM_ISM_Fixture
 
               
                 // for ism, the one touch switch has to be closed. (TP 409)
-               
 
-                
-
-                switchChannel0(0);
-
-                Test_TP102();
-                this.Refresh();
 
 
                 switchChannel0(1);
                 Test_TP116();
                 this.Refresh();
+
+
+                switchChannel0(2);
+
+                Test_TP115();
+                this.Refresh();
+
+
+
+
+                //Thread.Sleep(1000);  // add delay for settling.
+
+                switchChannel0(3);
+                Test_TP130();
+                Test_TP130();
+
+                this.Refresh();
+                
+
+                switchChannel0(0);
+
+               // Thread.Sleep(500);
+
+                Test_TP102();
+                this.Refresh();
+
+
+
+
+
+
 
                 /*
                 MessageBox.Show("Swich fixture to TP115.",
@@ -425,10 +475,7 @@ namespace ITM_ISM_Fixture
                 MessageBoxDefaultButton.Button1);
                 */
 
-                switchChannel0(2);
-            
-                Test_TP115();
-                this.Refresh();
+
 
                 /*
                 MessageBox.Show("Swich fixture to TP130.",
@@ -439,13 +486,6 @@ namespace ITM_ISM_Fixture
                 */
 
 
-                Thread.Sleep(1000);  // add delay for settling.
-
-                switchChannel0(3);
-                Test_TP130();
-                Test_TP130();
-
-                this.Refresh();
 
 
 
@@ -644,140 +684,7 @@ namespace ITM_ISM_Fixture
 
 
 
-           //if(false)  // skip program
-            if (instumentStatus == 0)
-            {
-                led4.OffColor = Color.Yellow;
-                this.Refresh();
-
-                // start timer for progress bar
-                
-          
-
-                // switch in DTR signal on relay 12
-
-                try
-                {
-                    using (Task digitalWriteTask = new Task())
-                    {
-                        digitalWriteTask.DOChannels.CreateChannel("NI-USB-6501/port1/line5", "",
-                            ChannelLineGrouping.OneChannelForAllLines);
-                        bool[] dataArray = new bool[1];
-                        dataArray[0] = false;
-                        DigitalSingleChannelWriter writer = new DigitalSingleChannelWriter(digitalWriteTask.Stream);
-                        writer.WriteSingleSampleMultiLine(true, dataArray);
-                    }
-                }
-                catch (DaqException ex)
-                {
-                    MessageBox.Show(ex.Message);
-                }
-                finally
-                {
-
-                }
-
-                /*
-                MessageBox.Show("Flip COM Switch to program",
-                "Error",
-                MessageBoxButtons.OK,
-                MessageBoxIcon.Exclamation,
-                MessageBoxDefaultButton.Button1);
-                */
-                ProgramInProgress = true;
-
-                progressBar1.Visible = true;
-               
-
-               // create background worker for status bar
-                bgw.DoWork += new DoWorkEventHandler(bgw_DoWork);
-                bgw.ProgressChanged += new ProgressChangedEventHandler(bgw_ProgressChanged);
-                bgw.RunWorkerCompleted += new RunWorkerCompletedEventHandler(bgw_RunWorkerCompleted);
-                bgw.WorkerReportsProgress = true;
-                bgw.RunWorkerAsync();
-
-                // Start the child process.
-                Process p = new Process();
-                // Redirect the output stream of the child process.
-
-
-                p.StartInfo.UseShellExecute = false;
-                p.StartInfo.RedirectStandardOutput = true;
-                p.StartInfo.FileName = "flashme.bat";
-                p.StartInfo.CreateNoWindow = true;
-                p.OutputDataReceived += (s, f) => myMethod(f);
-
-                p.Start();
-
-                p.BeginOutputReadLine();  // this make it async
-
-
-
-            }
-            
-
-
-                // Do not wait for the child process to exit before
-                // reading to the end of its redirected stream.
-                // p.WaitForExit();
-                // Read the output stream first and then wait.
-
-
-           
-                
-
-
-                
-          
-                
-               
-
-                //string output = p.StandardOutput.ReadToEnd();
-               // p.WaitForExit();
-            
-
-                while(ProgramInProgress)  // wait until we have programmed
-                {
-                    Application.DoEvents();
-
-
-                }
-            
-             
-               
-
-                if (ProgramResult==true)
-                {
-                    led4.OffColor = Color.LimeGreen;
-                    this.Refresh();
-                    /*
-                    MessageBox.Show("Programming Complete.",
-                    "Error",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Exclamation,
-                    MessageBoxDefaultButton.Button1);
-                     * */
-
-                }
-                else
-                {
-
-                    led4.OffColor = Color.Red;
-                    this.Refresh();
-
-                    MessageBox.Show("Programming Failed!.",
-                    "Error",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Exclamation,
-                    MessageBoxDefaultButton.Button1);
-
-                    
-
-
-                }
-
-            // kill the bgw
-                bgw.Dispose();
+ 
 
 
 
@@ -813,12 +720,170 @@ namespace ITM_ISM_Fixture
 
 
 
-      
+                //if(false)  // skip program
+                if (instumentStatus == 0)
+                {
+                    led4.OffColor = Color.Yellow;
+                    this.Refresh();
+
+                    // start timer for progress bar
+
+
+
+                    // switch in DTR signal on relay 12
+
+                    try
+                    {
+                        using (Task digitalWriteTask = new Task())
+                        {
+                            digitalWriteTask.DOChannels.CreateChannel("NI-USB-6501/port1/line5", "",
+                                ChannelLineGrouping.OneChannelForAllLines);
+                            bool[] dataArray = new bool[1];
+                            dataArray[0] = false;
+                            DigitalSingleChannelWriter writer = new DigitalSingleChannelWriter(digitalWriteTask.Stream);
+                            writer.WriteSingleSampleMultiLine(true, dataArray);
+                        }
+                    }
+                    catch (DaqException ex)
+                    {
+                        MessageBox.Show(ex.Message);
+                    }
+                    finally
+                    {
+
+                    }
+
+                    /*
+                    MessageBox.Show("Flip COM Switch to program",
+                    "Error",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Exclamation,
+                    MessageBoxDefaultButton.Button1);
+                    ///////////*/
+                    ProgramInProgress = true;
+
+                    progressBar1.Visible = true;
+
+
+                    // create background worker for status bar
+                    bgw.DoWork += new DoWorkEventHandler(bgw_DoWork);
+                    bgw.ProgressChanged += new ProgressChangedEventHandler(bgw_ProgressChanged);
+                    bgw.RunWorkerCompleted += new RunWorkerCompletedEventHandler(bgw_RunWorkerCompleted);
+                    bgw.WorkerReportsProgress = true;
+                    bgw.RunWorkerAsync();
+
+                    // Start the child process.
+                    Process p = new Process();
+                    // Redirect the output stream of the child process.
+
+
+                    p.StartInfo.UseShellExecute = false;
+                    p.StartInfo.RedirectStandardOutput = true;
+                    p.StartInfo.FileName = "flashme.bat";
+                    p.StartInfo.CreateNoWindow = true;
+                    p.OutputDataReceived += (s, f) => myMethod(f);
+
+                    p.Start();
+
+                    p.BeginOutputReadLine();  // this make it async
+
+
+
+                }
+
+            
+
+                // Do not wait for the child process to exit before
+                // reading to the end of its redirected stream.
+                // p.WaitForExit();
+                // Read the output stream first and then wait.
 
 
 
 
-                // charge current test
+
+
+
+
+
+
+
+                //string output = p.StandardOutput.ReadToEnd();
+                // p.WaitForExit();
+
+
+                while (ProgramInProgress)  // wait until we have programmed
+                {
+                    Application.DoEvents();
+
+
+                }
+
+            
+
+
+                if (ProgramResult == true)
+                {
+                    led4.OffColor = Color.LimeGreen;
+                    this.Refresh();
+                    /*
+                    MessageBox.Show("Programming Complete.",
+                    "Error",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Exclamation,
+                    MessageBoxDefaultButton.Button1);
+                     //* */
+
+                }
+                else
+                {
+
+                    led4.OffColor = Color.Red;
+                    this.Refresh();
+
+                    MessageBox.Show("Programming Failed!.",
+                    "Error",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Exclamation,
+                    MessageBoxDefaultButton.Button1);
+
+
+
+
+                }
+
+                // kill the bgw
+                bgw.Dispose();
+
+
+
+
+
+                /// connect to the transmitter  and place it in test mode.
+                /// 
+
+
+                try
+                {
+                    using (Task digitalWriteTask = new Task())
+                    {
+                        digitalWriteTask.DOChannels.CreateChannel("NI-USB-6501/port1/line5", "",
+                            ChannelLineGrouping.OneChannelForAllLines);
+                        bool[] dataArray = new bool[1];
+                        dataArray[0] = true;
+                        DigitalSingleChannelWriter writer = new DigitalSingleChannelWriter(digitalWriteTask.Stream);
+                        writer.WriteSingleSampleMultiLine(true, dataArray);
+                    }
+                }
+                catch (DaqException ex)
+                {
+                    MessageBox.Show(ex.Message);
+                }
+                finally
+                {
+
+                }
+
 
                 if (instumentStatus == 0)
                 {
@@ -832,60 +897,52 @@ namespace ITM_ISM_Fixture
 
                     chgOn();
 
+                // 2.  run boot test
 
 
+                // need to wait for tx to enumerate 
 
-                    
+                // do not enable charge until we have enumerated.  Keep termister out of circuit until we connect.
+                // begin a timer here for valid boot.  It takes about 30 seconds to boot.
 
- 
+                led5.OffColor = Color.Yellow;
 
+                this.Refresh();
 
-                  
+                timer3.Interval = 20000; // 40 seconds
+                timer3.Enabled = true;
 
-                    // 2.  run boot test
+                IxM_port = findIxM();
 
-
-                    // need to wait for tx to enumerate 
-
-                    // do not enable charge until we have enumerated.  Keep termister out of circuit until we connect.
-                    // begin a timer here for valid boot.  It takes about 30 seconds to boot.
-
-                    led5.OffColor = Color.Yellow;
-
-                    this.Refresh();
-
-                    timer3.Interval = 20000; // 40 seconds
-                    timer3.Enabled = true;
+                while (IxM_port == "NoIxM")
+                {
 
                     IxM_port = findIxM();
+                    Application.DoEvents();
 
-                    while (IxM_port == "NoIxM")
+                }
+
+                if (IxM_port != "Error!!!")
+                {
+
+                    Console.WriteLine("Found Transmitter on {0}", IxM_port);
+
+
+                    DUTport.PortName = IxM_port;
+
+                    DUTport.Open();
+                    Txresponse = TxCommand("ver");
+                    timer3.Enabled = false;
+
+
+                    Console.WriteLine("Response From Juno: {0}", Txresponse); // may have to capture this as soon as we have cr
+
+                    //BootTest();
+                    Thread.Sleep(500);  // need delay between transactions
+
+
+                    try
                     {
-
-                        IxM_port = findIxM();
-                        Application.DoEvents();
-
-                    }
-
-                    if (IxM_port != "Error!!!")
-                    {
-
-                        Console.WriteLine("Found Transmitter on {0}", IxM_port);
-
-
-                        DUTport.PortName = IxM_port;
-
-                        DUTport.Open();
-                        Txresponse = TxCommand("ver");
-                        timer3.Enabled = false;
-
-
-                        Console.WriteLine("Response From Juno: {0}", Txresponse); // may have to capture this as soon as we have cr
-
-                        //BootTest();
-                        Thread.Sleep(500);  // need delay between transactions
-
-
 
                         if (Txresponse.Contains("Firmware:"))
                         {
@@ -904,16 +961,210 @@ namespace ITM_ISM_Fixture
                             BootResult = false;
 
                         }
-                    }
 
-                    else
+                    }
+                    catch
                     {
 
-                        led5.OffColor = Color.Red;
-                        BootResult = false;
+                        // no reponse, try again
+
+                        Txresponse = TxCommand("ver");
+                        timer3.Enabled = false;
+
+
+                        Console.WriteLine("Response From Juno: {0}", Txresponse); // may have to capture this as soon as we have cr
+
+                        //BootTest();
+                        Thread.Sleep(500);  // need delay between transactions
+
+                        if (Txresponse.Contains("Firmware:"))
+                        {
+
+                            led5.OffColor = Color.LimeGreen;
+
+
+                            BootResult = true;
+
+
+
+                        }
+                        else
+                        {
+                            led5.OffColor = Color.Red;
+                            BootResult = false;
+
+                        }
 
 
                     }
+
+
+
+                        
+                }
+
+                else
+                {
+
+                    led5.OffColor = Color.Red;
+                    BootResult = false;
+
+
+                }
+
+
+                this.Refresh();
+
+
+
+
+                // 2.  measure charge current
+
+                if (instumentStatus == 0)
+                    ReadChargeCurrent();
+
+
+
+                    // 3. connect to shell to make sure boot worked.
+
+
+
+
+                }
+
+
+               // insert LED tests here.   We have to use current to dectect valid LED's
+
+               if (instumentStatus == 0)
+               {
+
+
+
+
+                   led7.OffColor = Color.Yellow;
+                   this.Refresh();
+
+                   Txresponse = TxCommand("mfgt= 1");
+                   timer3.Enabled = false;
+
+
+                   Console.WriteLine("Response From Juno: {0}", Txresponse); // may have to capture this as soon as we have cr
+
+
+
+                   // turn charge OFF
+                   Txresponse = TxCommand("chd= 1");
+                   timer3.Enabled = false;
+
+
+                   Console.WriteLine("Response From Juno: {0}", Txresponse); // may have to capture this as soon as we have cr
+
+
+
+               }
+
+
+                    // charge current test
+
+                    if (instumentStatus == 0)
+                    {
+
+
+                        // 1.  apply 5 V on VBUSS to enter charge mode
+
+
+
+
+
+                        chgOn();
+
+
+
+
+                    
+
+ 
+
+
+                  
+
+                        // 2.  run boot test
+
+
+                        // need to wait for tx to enumerate 
+
+                        // do not enable charge until we have enumerated.  Keep termister out of circuit until we connect.
+                        // begin a timer here for valid boot.  It takes about 30 seconds to boot.
+
+                        //led5.OffColor = Color.Yellow;
+
+                        this.Refresh();
+
+                        timer3.Interval = 20000; // 40 seconds
+                        timer3.Enabled = true;
+/*
+                        IxM_port = findIxM();
+
+                        while (IxM_port == "NoIxM")
+                        {
+
+                            IxM_port = findIxM();
+                            Application.DoEvents();
+
+                        }
+
+
+
+                        
+
+                        if (IxM_port != "Error!!!")
+                        {
+
+                            Console.WriteLine("Found Transmitter on {0}", IxM_port);
+
+
+                            DUTport.PortName = IxM_port;
+
+                            DUTport.Open();
+                            Txresponse = TxCommand("ver");
+                            timer3.Enabled = false;
+
+
+                            Console.WriteLine("Response From Juno: {0}", Txresponse); // may have to capture this as soon as we have cr
+
+                            //BootTest();
+                            Thread.Sleep(500);  // need delay between transactions
+
+
+
+                            if (Txresponse.Contains("Firmware:"))
+                            {
+
+                                led5.OffColor = Color.LimeGreen;
+
+
+                                BootResult = true;
+
+
+
+                            }
+                            else
+                            {
+                                led5.OffColor = Color.Red;
+                                BootResult = false;
+
+                            }
+                        }
+
+                        else
+                        {
+
+                            led5.OffColor = Color.Red;
+                            BootResult = false;
+
+
+                        }
+                        
 
 
                     this.Refresh();
@@ -931,15 +1182,19 @@ namespace ITM_ISM_Fixture
                     // 3. connect to shell to make sure boot worked.
 
 
-
+*/
 
                 }
+ 
 
 
             // insert LED tests here.   We have to use current to dectect valid LED's
 
                 if (instumentStatus == 0)
                 {
+
+
+
 
                     led7.OffColor = Color.Yellow;
                     this.Refresh();
@@ -1001,7 +1256,10 @@ namespace ITM_ISM_Fixture
                     Thread.Sleep(1000); // add delay
 
 
-                    BK2831E_2_ReadCurrentResults results = GetIRCurrent.Run();
+                    //BK2831E_2_ReadCurrent results = GetIRCurrent.Run();
+
+                   BK2831E_2_ReadCurrentResults results = GetIRCurrent.Run();
+
 
                     string myCurrent = results.Token2.ToString();
                     Thread.Sleep(250); // add delay
@@ -1040,7 +1298,7 @@ namespace ITM_ISM_Fixture
                     // validate
 
 
-                    if (PLEDCurrent - NOLEDCurrent > .0005)
+                    if (PLEDCurrent - NOLEDCurrent > .0003)
                     {
                         UILEDResult = true;
 
@@ -1190,7 +1448,7 @@ namespace ITM_ISM_Fixture
                     // validate
 
                     if (UILEDResult)
-                        if (CGLEDCurrent - NOLEDCurrent > .0005)
+                        if (CGLEDCurrent - NOLEDCurrent > .0003)
                         {
                             UILEDResult = true;
 
@@ -1248,7 +1506,7 @@ namespace ITM_ISM_Fixture
                     // validate
 
                     if (UILEDResult)
-                        if (CRLEDCurrent - NOLEDCurrent > .002)
+                        if (CRLEDCurrent - NOLEDCurrent > .0005)
                         {
                             UILEDResult = true;
 
@@ -1999,8 +2257,17 @@ namespace ITM_ISM_Fixture
 
                     if (((IRCurrent - ReferenceCurrent) < (limits.hdCurrentNominal - limits.IRCurrentTolerance)) | ((IRCurrent - ReferenceCurrent) > (limits.hdCurrentNominal + limits.IRCurrentTolerance)))
                     {
-                        ReturnCurrent = IRSetCurrent(5,1);  // 1 = low, 2 = mid, 3 = high
-                        IRCurrent = ReturnCurrent;
+
+                        try
+                        {
+                            ReturnCurrent = IRSetCurrent(5, 1);  // 1 = low, 2 = mid, 3 = high
+                            IRCurrent = ReturnCurrent;
+                        }
+                        catch
+                        {
+                            Console.WriteLine("we have an exception");
+
+                        }
 
                     }
                     else
@@ -2524,8 +2791,54 @@ namespace ITM_ISM_Fixture
 
                     if (((IRCurrent - ReferenceCurrent) < (limits.ldCurrentNominal - limits.IRCurrentTolerance)) | ((IRCurrent - ReferenceCurrent) > (limits.ldCurrentNominal + limits.IRCurrentTolerance)))
                     {
-                        ReturnCurrent = IRSetCurrent(1,3);  // 1 = low, 2 = mid, 3 = high
-                        IRCurrent = ReturnCurrent;
+
+                        // exception is happening when we are greater than 210mA  even in auto mode.  checking meter specs to see if we can catch overload condition
+
+
+
+                        try
+                        {
+                            ReturnCurrent = IRSetCurrent(1, 3);  // 1 = low, 2 = mid, 3 = high
+                            IRCurrent = ReturnCurrent;
+                        }
+                        catch
+                        {
+
+
+                            // RESET INSTRUMENT
+
+                
+                            bk2831e_2_Reset resetmeter = new bk2831e_2_Reset();
+
+                            resetmeter.Run();
+
+                            Thread.Sleep(500);
+
+
+
+                            // try again
+                            Console.WriteLine("we have an exception");
+                            try
+                            {
+                                ReturnCurrent = IRSetCurrent(1, 3);  // 1 = low, 2 = mid, 3 = high
+                                IRCurrent = ReturnCurrent;
+                            }
+                            catch
+                            {
+
+                                // try again
+                                Console.WriteLine("we have an exception");
+
+                            }
+
+                        }
+
+
+
+
+
+
+
 
                     }
                     else
@@ -2676,8 +2989,34 @@ namespace ITM_ISM_Fixture
 
                     if (((IRCurrent - ReferenceCurrent) < (limits.hdCurrentNominal - limits.IRCurrentTolerance)) | ((IRCurrent - ReferenceCurrent) > (limits.hdCurrentNominal + limits.IRCurrentTolerance)))
                     {
-                        ReturnCurrent = IRSetCurrent(5,3);  // 1 = low, 3 = mid, 5= high
-                        IRCurrent = ReturnCurrent;
+
+
+
+                        try
+                        {
+                            ReturnCurrent = IRSetCurrent(5, 3);  // 1 = low, 2 = mid, 3 = high
+                            IRCurrent = ReturnCurrent;
+                        }
+                        catch
+                        {
+
+                            // try again
+                            Console.WriteLine("we have an exception");
+                            try
+                            {
+                                ReturnCurrent = IRSetCurrent(5, 3);  // 1 = low, 2 = mid, 3 = high
+                                IRCurrent = ReturnCurrent;
+                            }
+                            catch
+                            {
+
+                                // try again
+                                Console.WriteLine("we have an exception");
+
+                            }
+
+                        }
+
 
                     }
                     else
@@ -3671,6 +4010,7 @@ namespace ITM_ISM_Fixture
                         tokens = Txresponse.Split('=');
                         hdpot[6] = Convert.ToDouble(tokens[1]);
 
+
                     }
 
 
@@ -3762,9 +4102,7 @@ namespace ITM_ISM_Fixture
                     // look at output signal
 
 
-                    // save data
 
-                    WriteCSVFile();
 
 
 
@@ -3813,6 +4151,28 @@ namespace ITM_ISM_Fixture
         public bool IRChannel_L2_Result = false;
  */
 
+                if (PowerUpCurrentResult & VoltageResult & TP102Result & AuxResult & MicResult & BootResult & ChargeCurrentResult & ProgramResult & IRChannel_A_Result & IRChannel_B_Result & IRChannel_C_Result & IRChannel_D_Result & IRChannel_E_Result & IRChannel_L1_Result & IRChannel_L2_Result)
+                {
+
+                    TestResult = true;
+
+
+                }
+                else
+                {
+
+                    TestResult = false;
+
+                }
+
+
+
+                // save data
+
+                WriteCSVFile();
+
+
+
 
                 if (PowerUpCurrentResult & VoltageResult & TP102Result & AuxResult & MicResult & BootResult & ChargeCurrentResult & ProgramResult & IRChannel_A_Result & IRChannel_B_Result & IRChannel_C_Result & IRChannel_D_Result & IRChannel_E_Result & IRChannel_L1_Result & IRChannel_L2_Result)
                 {
@@ -3854,7 +4214,7 @@ namespace ITM_ISM_Fixture
                 using (StreamWriter sw = File.AppendText(filename))
                 {
 
-                    sw.WriteLine("Serial Number,Model,Time, Power Up Current, " +
+                    sw.WriteLine("Serial Number,Model,Time, Test Result, Power Up Current, " +
                                   "Voltage Result, TP102, TP116, TP115, TP130, " +
                                   "Program Result," +
                                   "Aux-In Result, TPxxx,TPXXX," +
@@ -3877,8 +4237,8 @@ namespace ITM_ISM_Fixture
 
 
             using (StreamWriter sw = File.AppendText(filename))
-            { 
-                sw.WriteLine(textBox1.Text + "," + Model + "," + timestring + 
+            {
+                sw.WriteLine(textBox1.Text + "," + Model + "," + timestring + "," + Convert.ToString(TestResult) +
                 "," + Convert.ToString(powerupCurrent) +
                 "," + Convert.ToString(VoltageResult) + "," + Convert.ToString(VoltageMeasurements[0]) + "," + Convert.ToString(VoltageMeasurements[1]) +  "," + Convert.ToString(VoltageMeasurements[2]) +  "," + Convert.ToString(VoltageMeasurements[3]) +
                 "," + Convert.ToString(ProgramResult) +
@@ -3908,9 +4268,9 @@ namespace ITM_ISM_Fixture
             BK2831E_2_ReadCurrent GetIRCurrent = new BK2831E_2_ReadCurrent();
             bool CurrentOK = false;
 
-            double LDpot = 3.6;
-            double MDpot = 3.6;
-            double HDpot = 3.62;
+            double LDpot = 2.75;   // start with lower value to avoid overload condition on meter
+            double MDpot = 2.9;
+            double HDpot = 3.0;  // was 3.62
             double stepsize = .01;
             double ReturnCurrent = 0;
 
@@ -3918,7 +4278,7 @@ namespace ITM_ISM_Fixture
             string txcommandstring;
 
 
-
+            Thread.Sleep(500);  // add delay to prevent issues????
 
 
 
@@ -4032,17 +4392,17 @@ namespace ITM_ISM_Fixture
                         else
                         {
 
-                            if (IRCurrent < .095) 
+                            if (IRCurrent < .05) 
                                 return IRCurrent;  // error condition
 
-                            if (IRCurrent > .110)
+                            if (IRCurrent < .09)
                             {
                                 
-                                SetPot = SetPot - 0.05;  // course
+                                SetPot = SetPot + 0.05;  // course
                             }
                             else
                             {
-                                SetPot = SetPot - 0.01;  // fine
+                                SetPot = SetPot + 0.01;  // fine
                             }
 
                         }
@@ -4061,17 +4421,17 @@ namespace ITM_ISM_Fixture
                         else
                         {
 
-                            if (IRCurrent < .11) 
+                            if (IRCurrent < .05) 
                                 return IRCurrent;  // error condition
 
-                            if (IRCurrent > .125)
+                            if (IRCurrent < .11)
                             {
 
-                                SetPot = SetPot - 0.05;  // course
+                                SetPot = SetPot + 0.05;  // course
                             }
                             else
                             {
-                                SetPot = SetPot - 0.01;  // fine
+                                SetPot = SetPot + 0.01;  // fine
                             }
 
                      
@@ -4091,20 +4451,22 @@ namespace ITM_ISM_Fixture
                         {
 
 
-                            if (IRCurrent < .125) 
+                            if (IRCurrent < .05) 
                                 return IRCurrent;  // error condition
 
-                            if (IRCurrent > .14)
+                            if (IRCurrent < .12)
                             {
 
-                                SetPot = SetPot - 0.05;  // course
+                                SetPot = SetPot + 0.05;  // course
                             }
                             else
                             {
-                                SetPot = SetPot - 0.01;  // fine
+                                SetPot = SetPot + 0.01;  // fine
                             }
 
-                       
+
+                            if( SetPot >3.62)
+                                return IRCurrent;  // error condition
 
                         }
                         break;
@@ -4118,14 +4480,14 @@ namespace ITM_ISM_Fixture
                         else
                         {
 
-                            if (IRCurrent > 1.4)
+                            if (IRCurrent < .11)
                             {
 
-                                SetPot = SetPot - 0.05;  // course
+                                SetPot = SetPot + 0.05;  // course
                             }
                             else
                             {
-                                SetPot = SetPot - 0.01;  // fine
+                                SetPot = SetPot + 0.01;  // fine
                             }
 
                   
@@ -5332,7 +5694,7 @@ namespace ITM_ISM_Fixture
             Console.WriteLine("RMS value = {0}mV.", rms);
 
 
-            label19.Text = rms.ToString() + " Vrms";
+            label19.Text = rms.ToString() + " mVrms";
 
             dBV = 20 * Math.Log10(rms / 1000);
 

@@ -1074,12 +1074,14 @@
             // 
             // button2
             // 
+            this.button2.Enabled = false;
             this.button2.Location = new System.Drawing.Point(1089, 275);
             this.button2.Name = "button2";
             this.button2.Size = new System.Drawing.Size(129, 63);
             this.button2.TabIndex = 46;
             this.button2.Text = "Scope";
             this.button2.UseVisualStyleBackColor = true;
+            this.button2.Visible = false;
             this.button2.Click += new System.EventHandler(this.button2_Click);
             // 
             // label17
@@ -1155,12 +1157,14 @@
             // 
             // button3
             // 
+            this.button3.Enabled = false;
             this.button3.Location = new System.Drawing.Point(1089, 181);
             this.button3.Name = "button3";
             this.button3.Size = new System.Drawing.Size(129, 63);
             this.button3.TabIndex = 52;
             this.button3.Text = "Scope B";
             this.button3.UseVisualStyleBackColor = true;
+            this.button3.Visible = false;
             this.button3.Click += new System.EventHandler(this.button3_Click);
             // 
             // led29
