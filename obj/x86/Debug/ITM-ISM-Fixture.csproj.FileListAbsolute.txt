@@ -7,7 +7,7 @@ C:\Users\Lee Henderson\documents\visual studio 2010\Projects\ITM-ISM-Fixture\ITM
 C:\Users\Lee Henderson\documents\visual studio 2010\Projects\ITM-ISM-Fixture\ITM-ISM-Fixture\bin\x86\Debug\ITM-ISM-Fixture.pdb
 C:\Users\Lee Henderson\documents\visual studio 2010\Projects\ITM-ISM-Fixture\ITM-ISM-Fixture\obj\x86\Debug\ITM-ISM-Fixture.exe
 C:\Users\Lee Henderson\documents\visual studio 2010\Projects\ITM-ISM-Fixture\ITM-ISM-Fixture\obj\x86\Debug\ITM-ISM-Fixture.pdb
-C:\Users\Lee Henderson\documents\visual studio 2010\Projects\ITM-ISM-Fixture\ITM-ISM-Fixture\obj\x86\Debug\ITM-ISM-Fixture.csprojResolveAssemblyReference.cache
 C:\Users\Lee Henderson\documents\visual studio 2010\Projects\ITM-ISM-Fixture\ITM-ISM-Fixture\obj\x86\Debug\ITM_ISM_Fixture.barCode.resources
 C:\Users\Lee Henderson\documents\visual studio 2010\Projects\ITM-ISM-Fixture\ITM-ISM-Fixture\obj\x86\Debug\ITM_ISM_Fixture.ResultGood.resources
 C:\Users\Lee Henderson\documents\visual studio 2010\Projects\ITM-ISM-Fixture\ITM-ISM-Fixture\obj\x86\Debug\ITM_ISM_Fixture.ResultsBad.resources
+C:\Users\Lee Henderson\documents\visual studio 2010\Projects\ITM-ISM-Fixture\ITM-ISM-Fixture\obj\x86\Debug\ITM-ISM-Fixture.csprojResolveAssemblyReference.cache

@@ -288,19 +288,22 @@ namespace ITM_ISM_Fixture
             led35.OffColor = Color.Black;
             led36.OffColor = Color.Black;
             led37.OffColor = Color.Black;
-          
-
-
-
-            this.Refresh();
-
-            switchChannel0(0xff);
 
             // show serial number box
             frm2 = new barCode(this);
 
             frm6 = new ResultGood(this);
             frm7 = new ResultsBad(this);
+
+      
+            this.Refresh();
+
+            switchChannel0(0xff);
+
+
+
+
+           
 
         
 
