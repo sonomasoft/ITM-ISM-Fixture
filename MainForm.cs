@@ -166,6 +166,9 @@ namespace ITM_ISM_Fixture
 
         public double[] AudioInMeasurements = new double[] { 0, 0, 0 };
 
+        public double[] Mic = new double[] { 0, 0, 0 };
+
+
         public double powerupCurrent = 0;  // power up current
 
 
@@ -645,27 +648,70 @@ namespace ITM_ISM_Fixture
                 */
                 short status;
 
+                // test at 3 frequencies   100hz, k1kh and 5khz
 
-                status = Imports.SetSiggenBuiltIn(handle, 0, 50000, Imports.SiggenWaveType.Sine, 1000, 1000, 0, 0, Imports.SiggenSweepType.Up, false, 1, 1, Imports.SiggenTrigType.Rising, Imports.SiggenTrigSource.None, 0);
-                // allow some settling time
+                uint indx;
 
-                Thread.Sleep(1000);
-                switchChannel1(2);
+                for (indx = 0; indx < 3; indx++)
+                {
 
-                GetChanB();
-                Thread.Sleep(500);
-                // GetChanB();  // have to do twice due to offset in buffer.. I don't know why yet.
+                    // set the frequency for each pass
+
+                    Int32 freq;
 
 
-                // get value for aux from label
+                    switch (indx)
+                    {
+                        case 0:
+                            freq = 100;
+                         break;
+
+
+                        case 1:
+                         freq = 1000;
+
+                         break;
+
+                        case 2:
+                         freq = 5000;
+                         break;
+                        default:
+
+                         freq = 1000;
+                         break;
+
+
+                    }
+                    status = Imports.SetSiggenBuiltIn(handle, 0, 10000, Imports.SiggenWaveType.Sine, freq, freq, 0, 0, Imports.SiggenSweepType.Up, false, 1, 1, Imports.SiggenTrigType.Rising, Imports.SiggenTrigSource.None, 0);
+                    // allow some settling time
+
+                    Thread.Sleep(1000);
+                    switchChannel1(2);
+
+                    GetChanB();
+                    Thread.Sleep(500);
+                    // GetChanB();  // have to do twice due to offset in buffer.. I don't know why yet.
+
+
+                    // get value for mic from label
+
+                    
+                    // we have three values now.  Called Mic[indx];
+
+                    string micValue = Regex.Match(label19.Text, @"\d+").Value;
+
+                    Mic[indx] = Convert.ToDouble(micValue);
+
+                }
 
                 string rmsValue = Regex.Match(label19.Text, @"\d+").Value;
-
-
                 AudioInMeasurements[2] = Convert.ToDouble(rmsValue);
                 scope1.RefreshView();
 
-                if ((AudioInMeasurements[2] > 275) & (AudioInMeasurements[2] < 350))
+
+             
+
+                if ((Mic[0] > limits.Mic500low) & (Mic[0] < limits.Mic500high) & (Mic[1] > limits.Mic1klow) & (Mic[1] < limits.Mic1khigh) & (Mic[2] > limits.Mic5klow) & (Mic[2] < limits.Mic5khigh))
                 {
                     MicResult = true;
                     led8.OffColor = Color.LimeGreen;
@@ -1745,6 +1791,8 @@ namespace ITM_ISM_Fixture
 
 
 
+
+                    // create a sub-routine to do this.   
 
 
                     // set to low coverage mode
@@ -4221,7 +4269,7 @@ namespace ITM_ISM_Fixture
                                   "Voltage Result, TP102, TP116, TP115, TP130, " +
                                   "Program Result," +
                                   "Aux-In Result, TPxxx,TPXXX," +
-                                  "Mic-In Result, TPxxx," +
+                                  "Mic-In Result, TPxxx," + "500Hz, 1000Hz, 5000Hz," +
                                   "Boot Result, " +
                                   "Charge Result, Charge Current,"+
                                   "Reference Current,"+
@@ -4246,7 +4294,7 @@ namespace ITM_ISM_Fixture
                 "," + Convert.ToString(VoltageResult) + "," + Convert.ToString(VoltageMeasurements[0]) + "," + Convert.ToString(VoltageMeasurements[1]) +  "," + Convert.ToString(VoltageMeasurements[2]) +  "," + Convert.ToString(VoltageMeasurements[3]) +
                 "," + Convert.ToString(ProgramResult) +
                 "," + Convert.ToString(AuxResult) + "," + Convert.ToString(AudioInMeasurements[0]) + "," + Convert.ToString(AudioInMeasurements[1]) +
-                "," + Convert.ToString(MicResult) + "," + Convert.ToString(AudioInMeasurements[2]) + 
+                "," + Convert.ToString(MicResult) + "," + Convert.ToString(AudioInMeasurements[2]) + "," + Convert.ToString(Mic[0]) + "," + Convert.ToString(Mic[1]) + "," + Convert.ToString(Mic[2]) + 
                 "," + Convert.ToString(BootResult) +
                 "," + Convert.ToString(ChargeCurrentResult) + "," + Convert.ToString(ChargeCurrent) +
                 "," + Convert.ToString(ReferenceCurrent) +

@@ -56,6 +56,21 @@ namespace ITM_ISM_Fixture
         public static double auxMinLevel = -12;
 
 
+        // mic levels
+
+        public static double Mic500low = 45;
+        public static double Mic500high = 260;
+
+
+        public static double Mic1klow = 120;
+        public static double Mic1khigh = 200;
+
+        public static double Mic5klow = 200;
+        public static double Mic5khigh = 300;
+
+
+
+
         //half volume -20-23 nominal
 
 
