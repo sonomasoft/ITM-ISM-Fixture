@@ -127,6 +127,9 @@ namespace ITM_ISM_Fixture
 
         public string flashstring = "Data";
 
+        public string failureString = null;
+
+
         public string IxM_port = null;
 
         public string Txresponse = null;
@@ -292,6 +295,114 @@ namespace ITM_ISM_Fixture
             led36.OffColor = Color.Black;
             led37.OffColor = Color.Black;
 
+
+            // clear all data point from previous test (if any)
+
+                TestResult = false;
+
+                powerupCurrent = 0;
+
+                VoltageResult= false;
+                VoltageMeasurements[0] = 0;
+                VoltageMeasurements[1] = 0;
+                VoltageMeasurements[2] = 0;
+                VoltageMeasurements[3] = 0;
+
+                ProgramResult = false;
+                AuxResult = false;
+                AudioInMeasurements[0] = 0;
+                AudioInMeasurements[1] = 0;
+                MicResult =  false;
+                AudioInMeasurements[2] = 0;
+                Mic[0] = 0;
+                Mic[1] = 0;
+                Mic[2] = 0;
+
+                BootResult = false;
+                ChargeCurrentResult = false;
+                ChargeCurrent = 0;
+                ReferenceCurrent = 0;
+      
+                IRChannel_A_Result= false;
+                IRPW[0] = 0;
+                IRDutyCycle[0] = 0;
+                ldpot[0] = 0;
+                ldcurrent[0] = 0;
+                mdpot[0] = 0;
+                mdcurrent[0] = 0;
+                hdpot[0] = 0;
+                hdcurrent[0] = 0;
+            
+                IRChannel_B_Result = false;
+                IRPW[1]= 0;
+                IRDutyCycle[1] = 0;
+                ldpot[1] = 0;
+                ldcurrent[1] = 0;
+                mdpot[1] = 0;
+                mdcurrent[1] = 0;
+                hdpot[1] = 0;
+                hdcurrent[1] = 0;
+
+                IRChannel_C_Result = false;
+                IRPW[2] = 0;
+                IRDutyCycle[2] = 0;
+                ldpot[2] = 0;
+                ldcurrent[2] = 0;
+                mdpot[2] = 0;
+                mdcurrent[2] = 0;
+                hdpot[2] = 0;
+                hdcurrent[2] = 0;
+
+                IRChannel_D_Result = false;
+                IRPW[3] = 0;
+                IRDutyCycle[3] = 0;
+                ldpot[3] = 0;
+                ldcurrent[3] = 0;
+                mdpot[3] = 0;
+                mdcurrent[3] = 0;
+                hdpot[3] = 0;
+                hdcurrent[3] = 0;
+
+                IRChannel_E_Result = false;
+                IRPW[4] = 0;
+                IRDutyCycle[4] = 0;
+                ldpot[4] =  0;
+                ldcurrent[4] = 0;
+                mdpot[4] = 0;
+                mdcurrent[4] = 0;
+                hdpot[4] = 0; 
+                hdcurrent[4] = 0;
+
+                IRChannel_L1_Result = false;
+                IRPW[5] = 0;
+                IRDutyCycle[5] = 0;
+                ldpot[5] = 0;
+                ldcurrent[5] = 0;
+                mdpot[5] = 0;
+                mdcurrent[5] = 0;
+                hdpot[5] = 0;
+                hdcurrent[5] = 0;
+
+                IRChannel_L2_Result = false;
+                IRPW[6] = 0;
+                IRDutyCycle[6] = 0;
+                ldpot[6] = 0;
+                ldcurrent[6] = 0;
+                mdpot[6] = 0;
+                mdcurrent[6] = 0;
+                hdpot[6] = 0;
+                hdcurrent[6] = 0;
+
+                
+
+
+
+
+
+
+
+
+
             // show serial number box
             frm2 = new barCode(this);
 
@@ -359,6 +470,13 @@ namespace ITM_ISM_Fixture
             }
             else
             {
+                failureString = failureString + "Equipment Malfucntion....\r\n";
+
+                textBox2.Text = failureString;
+
+                this.Refresh();
+
+
                 led1.OffColor = Color.Red;
                 MessageBox.Show("Not all equipment initilized Correctly.  Check your connections.",
                 "Error",
@@ -443,11 +561,15 @@ namespace ITM_ISM_Fixture
                 this.Refresh();
 
 
+                Application.DoEvents();
+
+
                 switchChannel0(2);
 
                 Test_TP115();
                 this.Refresh();
 
+                Application.DoEvents();
 
 
 
@@ -458,6 +580,8 @@ namespace ITM_ISM_Fixture
                 Test_TP130();
 
                 this.Refresh();
+
+                Application.DoEvents();
                 
 
                 switchChannel0(0);
@@ -466,6 +590,9 @@ namespace ITM_ISM_Fixture
 
                 Test_TP102();
                 this.Refresh();
+
+
+                Application.DoEvents();
 
 
 
@@ -529,6 +656,9 @@ namespace ITM_ISM_Fixture
             // move aux and mic to here
             // test Aux inputs
 
+            Application.DoEvents();
+                
+
 
             if (instumentStatus == 0)
             {
@@ -550,7 +680,7 @@ namespace ITM_ISM_Fixture
                 MessageBoxDefaultButton.Button1);
                  * */
 
-                switchChannel0(5);
+                switchChannel0(5);    //  tp 302
                 switchChannel1(0);  // inject signal
 
 
@@ -577,6 +707,10 @@ namespace ITM_ISM_Fixture
 
                 AudioInMeasurements[0] = Convert.ToDouble(rmsValue);
                 scope1.RefreshView();
+
+
+                Application.DoEvents();
+                
 
 
                 /*
@@ -619,6 +753,42 @@ namespace ITM_ISM_Fixture
 
                     led6.OffColor = Color.Red;
 
+
+                    if ((AudioInMeasurements[0] > 90) & (AudioInMeasurements[0] < 120))
+                    {
+
+
+                    }
+                    else
+                    {
+                        failureString = failureString + "Voltage at TP201 Failure (Aux In Right)....\r\n";
+
+                        textBox2.Text = failureString;
+
+                        this.Refresh();
+
+                    }
+
+                    if ((AudioInMeasurements[1] > 90) & (AudioInMeasurements[1] < 120))
+                    {
+
+
+                    }
+                    else
+                    {
+
+                        failureString = failureString + "Voltage at TP201 Failure (Aux In Left)....\r\n";
+
+                        textBox2.Text = failureString;
+
+                        this.Refresh();
+
+                    }
+
+
+
+
+
                 }
 
 
@@ -628,6 +798,9 @@ namespace ITM_ISM_Fixture
 
 
             // test mic input
+
+            Application.DoEvents();
+                
 
 
             if (instumentStatus == 0)
@@ -709,6 +882,12 @@ namespace ITM_ISM_Fixture
                 scope1.RefreshView();
 
 
+                this.Refresh();
+
+                Application.DoEvents();
+                
+
+
              
 
                 if ((Mic[0] > limits.Mic500low) & (Mic[0] < limits.Mic500high) & (Mic[1] > limits.Mic1klow) & (Mic[1] < limits.Mic1khigh) & (Mic[2] > limits.Mic5klow) & (Mic[2] < limits.Mic5khigh))
@@ -731,7 +910,8 @@ namespace ITM_ISM_Fixture
 
 
 
-
+            Application.DoEvents();
+                
 
  
 
@@ -779,13 +959,13 @@ namespace ITM_ISM_Fixture
 
 
 
-                    // switch in DTR signal on relay 12
+                    // switch in DTR signal on relay 14     - schematic was correct!
 
                     try
                     {
                         using (Task digitalWriteTask = new Task())
                         {
-                            digitalWriteTask.DOChannels.CreateChannel("NI-USB-6501/port1/line5", "",
+                            digitalWriteTask.DOChannels.CreateChannel("NI-USB-6501/port1/line5", "",    
                                 ChannelLineGrouping.OneChannelForAllLines);
                             bool[] dataArray = new bool[1];
                             dataArray[0] = false;
@@ -1576,7 +1756,7 @@ namespace ITM_ISM_Fixture
                     else
                     {
 
-                        instumentStatus = 1;
+                       //// instumentStatus = 1;
 
                         led7.OffColor = Color.Red;
 
@@ -5068,7 +5248,7 @@ namespace ITM_ISM_Fixture
 
 
 
-            if ((ChargeCurrent > 100) & (powerupCurrent < 520))  // takes a bit to settle back on boot
+            if ((ChargeCurrent > 90) & (powerupCurrent < 520))  // takes a bit to settle back on boot
             {
                 ChargeCurrentResult = true;
                 led29.OffColor = Color.LimeGreen;
@@ -5154,6 +5334,12 @@ namespace ITM_ISM_Fixture
                 */
                 // ToDo   exit test!
 
+                failureString = failureString + "Power up Current Failure...\r\n";
+
+                textBox2.Text = failureString;
+
+                this.Refresh();
+
 
                 instumentStatus = 1;
 
@@ -5230,6 +5416,13 @@ namespace ITM_ISM_Fixture
                 TP102Result = false;
 
 
+                failureString = failureString + "Voltage at TP102 Failure....\r\n";
+
+                textBox2.Text = failureString;
+
+                this.Refresh();
+
+
             }
 
 
@@ -5268,6 +5461,12 @@ namespace ITM_ISM_Fixture
             else
             {
                 TP116Result = false;
+
+                failureString = failureString + "Voltage at TP116 Failure....\r\n";
+
+                textBox2.Text = failureString;
+
+                this.Refresh();
 
 
             }
@@ -5310,6 +5509,13 @@ namespace ITM_ISM_Fixture
                 TP115Result = false;
 
 
+                failureString = failureString + "Voltage at TP115 Failure....\r\n";
+
+                textBox2.Text = failureString;
+
+                this.Refresh();
+
+
             }
 
 
@@ -5349,6 +5555,13 @@ namespace ITM_ISM_Fixture
             else
             {
                 TP130Result = false;
+
+
+                failureString = failureString + "Voltage at TP130 Failure....\r\n";
+
+                textBox2.Text = failureString;
+
+                this.Refresh();
 
 
             }
@@ -6772,6 +6985,29 @@ namespace ITM_ISM_Fixture
             //if (!JunoSeralClearLine)   // so we can use with fsk, we use a timer to set comResponse on a FSK task
             if (comResponseString.Contains((char)13))
                 comResponse = true;
+        }
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+            instumentStatus = 1;
+
+            failureString = failureString + "User Abort\r\n";
+
+            textBox2.Text = failureString;
+
+            this.Refresh();
+            // user cancel
+        }
+
+        private void button4_KeyDown(object sender, KeyEventArgs e)
+        {
+            instumentStatus = 1;
+
+            failureString = failureString + "User Abort\r\n";
+
+            textBox2.Text = failureString;
+
+            this.Refresh();
         }
 
 

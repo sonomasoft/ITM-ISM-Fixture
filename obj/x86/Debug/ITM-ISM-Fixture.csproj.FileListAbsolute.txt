@@ -10,3 +10,4 @@ C:\Users\Lee Henderson\documents\visual studio 2010\Projects\ITM-ISM-Fixture\ITM
 C:\Users\Lee Henderson\documents\visual studio 2010\Projects\ITM-ISM-Fixture\ITM-ISM-Fixture\obj\x86\Debug\ITM_ISM_Fixture.barCode.resources
 C:\Users\Lee Henderson\documents\visual studio 2010\Projects\ITM-ISM-Fixture\ITM-ISM-Fixture\obj\x86\Debug\ITM_ISM_Fixture.ResultGood.resources
 C:\Users\Lee Henderson\documents\visual studio 2010\Projects\ITM-ISM-Fixture\ITM-ISM-Fixture\obj\x86\Debug\ITM_ISM_Fixture.ResultsBad.resources
+C:\Users\Lee Henderson\documents\visual studio 2010\Projects\ITM-ISM-Fixture\ITM-ISM-Fixture\obj\x86\Debug\ITM-ISM-Fixture.csprojResolveAssemblyReference.cache
