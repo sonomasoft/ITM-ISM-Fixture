@@ -11,7 +11,7 @@ namespace ITM_ISM_Fixture
 
         // current limuts
         public static double minPowerUpCurrent = 0;  // set low for debug
-        public static double maxPowerUpCurrent = 50;// set high for debug
+        public static double maxPowerUpCurrent = 70;// set high for debug
 
 
       // DC voltage limits
@@ -56,16 +56,16 @@ namespace ITM_ISM_Fixture
         public static double auxMinLevel = -12;
 
 
-        // mic levels
+        // mic levels  -- adjusted to +/- 3dB on 1/10 @ vTech
 
-        public static double Mic500low = 45;
-        public static double Mic500high = 260;
+        public static double Mic500low = 20;
+        public static double Mic500high = 320;    // 10 dB tolerance for 500Hz
 
 
-        public static double Mic1klow = 120;
-        public static double Mic1khigh = 200;
+        public static double Mic1klow = 80;
+        public static double Mic1khigh = 320;
 
-        public static double Mic5klow = 200;
+        public static double Mic5klow = 75;
         public static double Mic5khigh = 300;
 
 

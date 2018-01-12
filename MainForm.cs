@@ -393,8 +393,12 @@ namespace ITM_ISM_Fixture
                 hdpot[6] = 0;
                 hdcurrent[6] = 0;
 
-                
 
+                failureString = null;
+
+                textBox2.Text = failureString;
+
+         
 
 
 
@@ -736,7 +740,7 @@ namespace ITM_ISM_Fixture
 
                 // validate measurements
 
-                if ((AudioInMeasurements[0] > 90) & (AudioInMeasurements[0] < 120) & (AudioInMeasurements[1] > 90) & (AudioInMeasurements[1] < 120))
+                if ((AudioInMeasurements[0] > 35) & (AudioInMeasurements[0] < 210) & (AudioInMeasurements[1] > 35) & (AudioInMeasurements[1] < 210))
                 {
 
                     AuxResult = true;
@@ -754,7 +758,7 @@ namespace ITM_ISM_Fixture
                     led6.OffColor = Color.Red;
 
 
-                    if ((AudioInMeasurements[0] > 90) & (AudioInMeasurements[0] < 120))
+                    if ((AudioInMeasurements[0] > 35) & (AudioInMeasurements[0] < 210))
                     {
 
 
@@ -769,7 +773,7 @@ namespace ITM_ISM_Fixture
 
                     }
 
-                    if ((AudioInMeasurements[1] > 90) & (AudioInMeasurements[1] < 120))
+                    if ((AudioInMeasurements[1] > 35) & (AudioInMeasurements[1] < 210))
                     {
 
 
@@ -821,7 +825,7 @@ namespace ITM_ISM_Fixture
                 */
                 short status;
 
-                // test at 3 frequencies   100hz, k1kh and 5khz
+                // test at 3 frequencies   500hz, k1kh and 5khz
 
                 uint indx;
 
@@ -836,7 +840,7 @@ namespace ITM_ISM_Fixture
                     switch (indx)
                     {
                         case 0:
-                            freq = 100;
+                            freq = 500;    // was 100 Hz
                          break;
 
 
@@ -860,6 +864,8 @@ namespace ITM_ISM_Fixture
 
                     Thread.Sleep(1000);
                     switchChannel1(2);
+
+                    Thread.Sleep(1000);  // allow for more settling time after switch
 
                     GetChanB();
                     Thread.Sleep(500);
@@ -900,6 +906,42 @@ namespace ITM_ISM_Fixture
                 {
                     MicResult = false;
                     led8.OffColor = Color.Red;
+
+                    if ((Mic[0] > limits.Mic500low) & (Mic[0] < limits.Mic500high))
+                    { }
+                    else
+                    {
+                        failureString = failureString + "Voltage at TP201 Failure (Mic In 500Hz)....\r\n";
+
+                        textBox2.Text = failureString;
+
+                        this.Refresh();
+                    }
+
+                    if ((Mic[1] > limits.Mic500low) & (Mic[1] < limits.Mic500high))
+                    { }
+                    else
+                    {
+                        failureString = failureString + "Voltage at TP201 Failure (Mic In 1000Hz)....\r\n";
+
+                        textBox2.Text = failureString;
+
+                        this.Refresh();
+                    }
+                    
+
+                    if ((Mic[2] > limits.Mic500low) & (Mic[2] < limits.Mic500high))
+                    { }
+                    else
+                    {
+                        failureString = failureString + "Voltage at TP201 Failure (Mic In 5000Hz)....\r\n";
+
+                        textBox2.Text = failureString;
+
+                        this.Refresh();
+                    }
+                    
+
 
 
                 }
@@ -1048,7 +1090,7 @@ namespace ITM_ISM_Fixture
 
                 }
 
-            
+                ProgramResult = true;
 
 
                 if (ProgramResult == true)
@@ -1076,14 +1118,21 @@ namespace ITM_ISM_Fixture
                     MessageBoxIcon.Exclamation,
                     MessageBoxDefaultButton.Button1);
 
+                    failureString = failureString + "Programming Failure....\r\n";
 
+                    textBox2.Text = failureString;
+
+                    this.Refresh();
+
+
+                   // instumentStatus = 1;
 
 
                 }
 
                 // kill the bgw
                 bgw.Dispose();
-
+                Application.DoEvents();
 
 
 
@@ -1249,6 +1298,7 @@ namespace ITM_ISM_Fixture
 
                 // 2.  measure charge current
 
+          
                 if (instumentStatus == 0)
                     ReadChargeCurrent();
 
@@ -5248,7 +5298,7 @@ namespace ITM_ISM_Fixture
 
 
 
-            if ((ChargeCurrent > 90) & (powerupCurrent < 520))  // takes a bit to settle back on boot
+            if ((ChargeCurrent > 60) & (powerupCurrent < 520))  // takes a bit to settle back on boot
             {
                 ChargeCurrentResult = true;
                 led29.OffColor = Color.LimeGreen;
