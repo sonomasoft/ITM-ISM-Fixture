@@ -525,443 +525,53 @@ namespace ITM_ISM_Fixture
 
 
 
-
-
-
-                    
-
- 
-
-
-                  
-
-
-
-
-
-
-
-
-
-            // check our power supplies
-            if (instumentStatus == 0)
-            {
-                // prompt manual switch to TP102
-
-
-                led3.OffColor = Color.Yellow;
-                this.Refresh();
-
-              
-
-
-              
-                // for ism, the one touch switch has to be closed. (TP 409)
-
-
-
-                switchChannel0(1);
-                Test_TP116();
-                this.Refresh();
-
-
-                Application.DoEvents();
-
-
-                switchChannel0(2);
-
-                Test_TP115();
-                this.Refresh();
-
-                Application.DoEvents();
-
-
-
-                //Thread.Sleep(1000);  // add delay for settling.
-
-                switchChannel0(3);
-                Test_TP130();
-                Test_TP130();
-
-                this.Refresh();
-
-                Application.DoEvents();
-                
-
-                switchChannel0(0);
-
-               // Thread.Sleep(500);
-
-                Test_TP102();
-                this.Refresh();
-
-
-                Application.DoEvents();
-
-
-
-
-
-
-
-                /*
-                MessageBox.Show("Swich fixture to TP115.",
-                "Error",
-                MessageBoxButtons.OK,
-                MessageBoxIcon.Exclamation,
-                MessageBoxDefaultButton.Button1);
-                */
-
-
-
-                /*
-                MessageBox.Show("Swich fixture to TP130.",
-                "Error",
-                MessageBoxButtons.OK,
-                MessageBoxIcon.Exclamation,
-                MessageBoxDefaultButton.Button1);
-                */
-
-
-
-
-
-
-
-
-                // check all of our voltage results and see if we passed
-
-                if (TP102Result & TP116Result & TP115Result & TP130Result)
-                {
-                    VoltageResult = true;
-
-                    led3.OffColor = Color.LimeGreen;
-
-    
-                }
-                else
-                {
-
-                    VoltageResult = false;
-
-                    led3.OffColor = Color.Red;
-
-
-                }
-
-
-            }
-
-            this.Refresh();
-
-                // program the board
-           // ExecuteCommand("flashme.bat");
-
-            // move aux and mic to here
-            // test Aux inputs
-
-            Application.DoEvents();
-                
-
-
-            if (instumentStatus == 0)
-            {
-
-                scope1.YAxis.AutoScaling.Enabled = true;
-
-
-
-
-                led6.OffColor = Color.Yellow;   /// seems to be crashing here!!!!!!
-                this.Refresh();
-
-
-                /*
-                MessageBox.Show("Switch Out to Tp402 and In/Out to Aux R.",
-                "Error",
-                MessageBoxButtons.OK,
-                MessageBoxIcon.Exclamation,
-                MessageBoxDefaultButton.Button1);
-                 * */
-
-                switchChannel0(5);    //  tp 302
-                switchChannel1(0);  // inject signal
-
-
-
-                short status;
-
-
-                // turn on Generator
-                status = Imports.SetSiggenBuiltIn(handle, 0, 500000, Imports.SiggenWaveType.Sine, 1000, 1000, 0, 0, Imports.SiggenSweepType.Up, false, 1, 1, Imports.SiggenTrigType.Rising, Imports.SiggenTrigSource.None, 0);
-                // allow some settling time
-
-                // Thread.Sleep(1000);
-
-
-                GetChanB();
-                Thread.Sleep(1500);
-                GetChanB();  // have to do twice due to offset in buffer.. I don't know why yet.
-
-
-                // get value for aux from label
-
-                string rmsValue = Regex.Match(label19.Text, @"\d+").Value;
-
-
-                AudioInMeasurements[0] = Convert.ToDouble(rmsValue);
-                scope1.RefreshView();
-
-
-                Application.DoEvents();
-                
-
-
-                /*
-                MessageBox.Show("Switch Out to Tp402 and In/Out to Aux L.",
-                "Error",
-                MessageBoxButtons.OK,
-                MessageBoxIcon.Exclamation,
-                MessageBoxDefaultButton.Button1);
-                */
-                this.Refresh();
-                // switchChannel0(5);
-                switchChannel1(1);
-                GetChanB();
-
-                // get value for aux from label
-                rmsValue = Regex.Match(label19.Text, @"\d+").Value;
-
-                AudioInMeasurements[1] = Convert.ToDouble(rmsValue);
-                this.Refresh();
-
-                scope1.RefreshView();
-
-
-                // validate measurements
-
-                if ((AudioInMeasurements[0] > 35) & (AudioInMeasurements[0] < 210) & (AudioInMeasurements[1] > 35) & (AudioInMeasurements[1] < 210))
-                {
-
-                    AuxResult = true;
-
-                    led6.OffColor = Color.LimeGreen;
-
-
-                }
-                else
-                {
-
-
-                    AuxResult = false;
-
-                    led6.OffColor = Color.Red;
-
-
-                    if ((AudioInMeasurements[0] > 35) & (AudioInMeasurements[0] < 210))
-                    {
-
-
-                    }
-                    else
-                    {
-                        failureString = failureString + "Voltage at TP201 Failure (Aux In Right)....\r\n";
-
-                        textBox2.Text = failureString;
-
-                        this.Refresh();
-
-                    }
-
-                    if ((AudioInMeasurements[1] > 35) & (AudioInMeasurements[1] < 210))
-                    {
-
-
-                    }
-                    else
-                    {
-
-                        failureString = failureString + "Voltage at TP201 Failure (Aux In Left)....\r\n";
-
-                        textBox2.Text = failureString;
-
-                        this.Refresh();
-
-                    }
-
-
-
-
-
-                }
-
-
-                this.Refresh();
-
-            }
-
-
-            // test mic input
-
-            Application.DoEvents();
-                
-
-
-            if (instumentStatus == 0)
-            {
-
-
-                led8.OffColor = Color.Yellow;   /// seems to be crashing here!!!!!!
-                this.Refresh();
-
-                /*
-
-                MessageBox.Show("Switch Out to Tp402 and In/Out to Mic.",
-                "Error",
-                MessageBoxButtons.OK,
-                MessageBoxIcon.Exclamation,
-                MessageBoxDefaultButton.Button1);
-
-                */
-                short status;
-
-                // test at 3 frequencies   500hz, k1kh and 5khz
-
-                uint indx;
-
-                for (indx = 0; indx < 3; indx++)
-                {
-
-                    // set the frequency for each pass
-
-                    Int32 freq;
-
-
-                    switch (indx)
-                    {
-                        case 0:
-                            freq = 500;    // was 100 Hz
-                         break;
-
-
-                        case 1:
-                         freq = 1000;
-
-                         break;
-
-                        case 2:
-                         freq = 5000;
-                         break;
-                        default:
-
-                         freq = 1000;
-                         break;
-
-
-                    }
-                    status = Imports.SetSiggenBuiltIn(handle, 0, 10000, Imports.SiggenWaveType.Sine, freq, freq, 0, 0, Imports.SiggenSweepType.Up, false, 1, 1, Imports.SiggenTrigType.Rising, Imports.SiggenTrigSource.None, 0);
-                    // allow some settling time
-
-                    Thread.Sleep(1000);
-                    switchChannel1(2);
-
-                    Thread.Sleep(1000);  // allow for more settling time after switch
-
-                    GetChanB();
-                    Thread.Sleep(500);
-                    // GetChanB();  // have to do twice due to offset in buffer.. I don't know why yet.
-
-
-                    // get value for mic from label
-
-                    
-                    // we have three values now.  Called Mic[indx];
-
-                    string micValue = Regex.Match(label19.Text, @"\d+").Value;
-
-                    Mic[indx] = Convert.ToDouble(micValue);
-
-                }
-
-                string rmsValue = Regex.Match(label19.Text, @"\d+").Value;
-                AudioInMeasurements[2] = Convert.ToDouble(rmsValue);
-                scope1.RefreshView();
-
-
-                this.Refresh();
-
-                Application.DoEvents();
-                
-
-
-             
-
-                if ((Mic[0] > limits.Mic500low) & (Mic[0] < limits.Mic500high) & (Mic[1] > limits.Mic1klow) & (Mic[1] < limits.Mic1khigh) & (Mic[2] > limits.Mic5klow) & (Mic[2] < limits.Mic5khigh))
-                {
-                    MicResult = true;
-                    led8.OffColor = Color.LimeGreen;
-
-                }
-                else
-                {
-                    MicResult = false;
-                    led8.OffColor = Color.Red;
-
-                    if ((Mic[0] > limits.Mic500low) & (Mic[0] < limits.Mic500high))
-                    { }
-                    else
-                    {
-                        failureString = failureString + "Voltage at TP201 Failure (Mic In 500Hz)....\r\n";
-
-                        textBox2.Text = failureString;
-
-                        this.Refresh();
-                    }
-
-                    if ((Mic[1] > limits.Mic500low) & (Mic[1] < limits.Mic500high))
-                    { }
-                    else
-                    {
-                        failureString = failureString + "Voltage at TP201 Failure (Mic In 1000Hz)....\r\n";
-
-                        textBox2.Text = failureString;
-
-                        this.Refresh();
-                    }
-                    
-
-                    if ((Mic[2] > limits.Mic500low) & (Mic[2] < limits.Mic500high))
-                    { }
-                    else
-                    {
-                        failureString = failureString + "Voltage at TP201 Failure (Mic In 5000Hz)....\r\n";
-
-                        textBox2.Text = failureString;
-
-                        this.Refresh();
-                    }
-                    
-
-
-
-                }
-
-
-
-            }
-
-
-
-            Application.DoEvents();
-                
-
- 
-
-
+            //**************************************************************************************************************************************
+            // begin program steps
 
             // switch off DTR signal on Relay 12 so we can connect to tx
 
 
+            try
+            {
+                using (Task digitalWriteTask = new Task())
+                {
+                    digitalWriteTask.DOChannels.CreateChannel("NI-USB-6501/port1/line5", "",
+                        ChannelLineGrouping.OneChannelForAllLines);
+                    bool[] dataArray = new bool[1];
+                    dataArray[0] = true;
+                    DigitalSingleChannelWriter writer = new DigitalSingleChannelWriter(digitalWriteTask.Stream);
+                    writer.WriteSingleSampleMultiLine(true, dataArray);
+                }
+            }
+            catch (DaqException ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+
+            }
+
+
+
+
+
+            progressBar1.Visible = false;
+
+
+
+            //if(false)  // skip program
+            if (instumentStatus == 0)
+            {
+                led4.OffColor = Color.Yellow;
+                this.Refresh();
+
+                // start timer for progress bar
+
+
+
+                // switch in DTR signal on relay 14     - schematic was correct!
+
                 try
                 {
                     using (Task digitalWriteTask = new Task())
@@ -969,7 +579,7 @@ namespace ITM_ISM_Fixture
                         digitalWriteTask.DOChannels.CreateChannel("NI-USB-6501/port1/line5", "",
                             ChannelLineGrouping.OneChannelForAllLines);
                         bool[] dataArray = new bool[1];
-                        dataArray[0] = true;
+                        dataArray[0] = false;
                         DigitalSingleChannelWriter writer = new DigitalSingleChannelWriter(digitalWriteTask.Stream);
                         writer.WriteSingleSampleMultiLine(true, dataArray);
                     }
@@ -982,92 +592,51 @@ namespace ITM_ISM_Fixture
                 {
 
                 }
-                
+
+                /*
+                MessageBox.Show("Flip COM Switch to program",
+                "Error",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Exclamation,
+                MessageBoxDefaultButton.Button1);
+                ///////////*/
+                ProgramInProgress = true;
+
+                progressBar1.Visible = true;
+
+
+                // create background worker for status bar
+                bgw.DoWork += new DoWorkEventHandler(bgw_DoWork);
+                bgw.ProgressChanged += new ProgressChangedEventHandler(bgw_ProgressChanged);
+                bgw.RunWorkerCompleted += new RunWorkerCompletedEventHandler(bgw_RunWorkerCompleted);
+                bgw.WorkerReportsProgress = true;
+                bgw.RunWorkerAsync();
+
+                // Start the child process.
+                Process p = new Process();
+                // Redirect the output stream of the child process.
+
+
+                p.StartInfo.UseShellExecute = false;
+                p.StartInfo.RedirectStandardOutput = true;
+                p.StartInfo.FileName = "flashme.bat";
+                p.StartInfo.CreateNoWindow = true;
+                p.OutputDataReceived += (s, f) => myMethod(f);
+
+                p.Start();
+
+                p.BeginOutputReadLine();  // this make it async
 
 
 
-
-                progressBar1.Visible = false;
-
-
-
-                //if(false)  // skip program
-                if (instumentStatus == 0)
-                {
-                    led4.OffColor = Color.Yellow;
-                    this.Refresh();
-
-                    // start timer for progress bar
+            }
 
 
 
-                    // switch in DTR signal on relay 14     - schematic was correct!
-
-                    try
-                    {
-                        using (Task digitalWriteTask = new Task())
-                        {
-                            digitalWriteTask.DOChannels.CreateChannel("NI-USB-6501/port1/line5", "",    
-                                ChannelLineGrouping.OneChannelForAllLines);
-                            bool[] dataArray = new bool[1];
-                            dataArray[0] = false;
-                            DigitalSingleChannelWriter writer = new DigitalSingleChannelWriter(digitalWriteTask.Stream);
-                            writer.WriteSingleSampleMultiLine(true, dataArray);
-                        }
-                    }
-                    catch (DaqException ex)
-                    {
-                        MessageBox.Show(ex.Message);
-                    }
-                    finally
-                    {
-
-                    }
-
-                    /*
-                    MessageBox.Show("Flip COM Switch to program",
-                    "Error",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Exclamation,
-                    MessageBoxDefaultButton.Button1);
-                    ///////////*/
-                    ProgramInProgress = true;
-
-                    progressBar1.Visible = true;
-
-
-                    // create background worker for status bar
-                    bgw.DoWork += new DoWorkEventHandler(bgw_DoWork);
-                    bgw.ProgressChanged += new ProgressChangedEventHandler(bgw_ProgressChanged);
-                    bgw.RunWorkerCompleted += new RunWorkerCompletedEventHandler(bgw_RunWorkerCompleted);
-                    bgw.WorkerReportsProgress = true;
-                    bgw.RunWorkerAsync();
-
-                    // Start the child process.
-                    Process p = new Process();
-                    // Redirect the output stream of the child process.
-
-
-                    p.StartInfo.UseShellExecute = false;
-                    p.StartInfo.RedirectStandardOutput = true;
-                    p.StartInfo.FileName = "flashme.bat";
-                    p.StartInfo.CreateNoWindow = true;
-                    p.OutputDataReceived += (s, f) => myMethod(f);
-
-                    p.Start();
-
-                    p.BeginOutputReadLine();  // this make it async
-
-
-
-                }
-
-            
-
-                // Do not wait for the child process to exit before
-                // reading to the end of its redirected stream.
-                // p.WaitForExit();
-                // Read the output stream first and then wait.
+            // Do not wait for the child process to exit before
+            // reading to the end of its redirected stream.
+            // p.WaitForExit();
+            // Read the output stream first and then wait.
 
 
 
@@ -1079,101 +648,101 @@ namespace ITM_ISM_Fixture
 
 
 
-                //string output = p.StandardOutput.ReadToEnd();
-                // p.WaitForExit();
+            //string output = p.StandardOutput.ReadToEnd();
+            // p.WaitForExit();
 
 
-                while (ProgramInProgress)  // wait until we have programmed
-                {
-                    Application.DoEvents();
-
-
-                }
-
-                ProgramResult = true;
-
-
-                if (ProgramResult == true)
-                {
-                    led4.OffColor = Color.LimeGreen;
-                    this.Refresh();
-                    /*
-                    MessageBox.Show("Programming Complete.",
-                    "Error",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Exclamation,
-                    MessageBoxDefaultButton.Button1);
-                     //* */
-
-                }
-                else
-                {
-
-                    led4.OffColor = Color.Red;
-                    this.Refresh();
-
-                    MessageBox.Show("Programming Failed!.",
-                    "Error",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Exclamation,
-                    MessageBoxDefaultButton.Button1);
-
-                    failureString = failureString + "Programming Failure....\r\n";
-
-                    textBox2.Text = failureString;
-
-                    this.Refresh();
-
-
-                   // instumentStatus = 1;
-
-
-                }
-
-                // kill the bgw
-                bgw.Dispose();
+            while (ProgramInProgress)  // wait until we have programmed
+            {
                 Application.DoEvents();
 
 
+            }
+
+            ProgramResult = true;
 
 
-                /// connect to the transmitter  and place it in test mode.
-                /// 
+            if (ProgramResult == true)
+            {
+                led4.OffColor = Color.LimeGreen;
+                this.Refresh();
+                /*
+                MessageBox.Show("Programming Complete.",
+                "Error",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Exclamation,
+                MessageBoxDefaultButton.Button1);
+                 //* */
+
+            }
+            else
+            {
+
+                led4.OffColor = Color.Red;
+                this.Refresh();
+
+                MessageBox.Show("Programming Failed!.",
+                "Error",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Exclamation,
+                MessageBoxDefaultButton.Button1);
+
+                failureString = failureString + "Programming Failure....\r\n";
+
+                textBox2.Text = failureString;
+
+                this.Refresh();
 
 
-                try
+                // instumentStatus = 1;
+
+
+            }
+
+            // kill the bgw
+            bgw.Dispose();
+            Application.DoEvents();
+
+
+
+
+            /// connect to the transmitter  and place it in test mode.
+            /// 
+
+
+            try
+            {
+                using (Task digitalWriteTask = new Task())
                 {
-                    using (Task digitalWriteTask = new Task())
-                    {
-                        digitalWriteTask.DOChannels.CreateChannel("NI-USB-6501/port1/line5", "",
-                            ChannelLineGrouping.OneChannelForAllLines);
-                        bool[] dataArray = new bool[1];
-                        dataArray[0] = true;
-                        DigitalSingleChannelWriter writer = new DigitalSingleChannelWriter(digitalWriteTask.Stream);
-                        writer.WriteSingleSampleMultiLine(true, dataArray);
-                    }
+                    digitalWriteTask.DOChannels.CreateChannel("NI-USB-6501/port1/line5", "",
+                        ChannelLineGrouping.OneChannelForAllLines);
+                    bool[] dataArray = new bool[1];
+                    dataArray[0] = true;
+                    DigitalSingleChannelWriter writer = new DigitalSingleChannelWriter(digitalWriteTask.Stream);
+                    writer.WriteSingleSampleMultiLine(true, dataArray);
                 }
-                catch (DaqException ex)
-                {
-                    MessageBox.Show(ex.Message);
-                }
-                finally
-                {
+            }
+            catch (DaqException ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            finally
+            {
 
-                }
-
-
-                if (instumentStatus == 0)
-                {
+            }
 
 
-                    // 1.  apply 5 V on VBUSS to enter charge mode
+            if (instumentStatus == 0)
+            {
+
+
+                // 1.  apply 5 V on VBUSS to enter charge mode
 
 
 
 
 
-                    chgOn();
+                chgOn();
 
                 // 2.  run boot test
 
@@ -1214,6 +783,8 @@ namespace ITM_ISM_Fixture
 
 
                     Console.WriteLine("Response From Juno: {0}", Txresponse); // may have to capture this as soon as we have cr
+
+                    textBox2.Text = textBox2.Text + "IxM found on " + IxM_port;
 
                     //BootTest();
                     Thread.Sleep(500);  // need delay between transactions
@@ -1278,7 +849,7 @@ namespace ITM_ISM_Fixture
 
 
 
-                        
+
                 }
 
                 else
@@ -1298,49 +869,74 @@ namespace ITM_ISM_Fixture
 
                 // 2.  measure charge current
 
-          
+
                 if (instumentStatus == 0)
                     ReadChargeCurrent();
 
 
 
-                    // 3. connect to shell to make sure boot worked.
+                // 3. connect to shell to make sure boot worked.
 
 
 
 
-                }
+            }
 
 
-               // insert LED tests here.   We have to use current to dectect valid LED's
+            // insert LED tests here.   We have to use current to dectect valid LED's
 
-               if (instumentStatus == 0)
-               {
-
-
-
-
-                   led7.OffColor = Color.Yellow;
-                   this.Refresh();
-
-                   Txresponse = TxCommand("mfgt= 1");
-                   timer3.Enabled = false;
-
-
-                   Console.WriteLine("Response From Juno: {0}", Txresponse); // may have to capture this as soon as we have cr
+            if (instumentStatus == 0)
+            {
 
 
 
-                   // turn charge OFF
-                   Txresponse = TxCommand("chd= 1");
-                   timer3.Enabled = false;
+
+                led7.OffColor = Color.Yellow;
+                this.Refresh();
+
+                Txresponse = TxCommand("mfgt= 1");
+                timer3.Enabled = false;
 
 
-                   Console.WriteLine("Response From Juno: {0}", Txresponse); // may have to capture this as soon as we have cr
+                Console.WriteLine("Response From Juno: {0}", Txresponse); // may have to capture this as soon as we have cr
 
 
 
-               }
+                // turn charge OFF
+                Txresponse = TxCommand("chd= 1");
+                timer3.Enabled = false;
+
+
+                Console.WriteLine("Response From Juno: {0}", Txresponse); // may have to capture this as soon as we have cr
+
+
+
+            }
+
+
+
+
+            //************************************************************************************************************************************
+            // end of programming tests
+
+
+                    
+
+ 
+
+
+                  
+
+
+
+
+
+
+
+                
+
+ // programming step was here.  now getting port closed exception
+
 
 
                     // charge current test
@@ -1349,13 +945,16 @@ namespace ITM_ISM_Fixture
                     {
 
 
-                        // 1.  apply 5 V on VBUSS to enter charge mode
+                        // 1.  apply 5 V on VBUSS to enter charge mode and trun on usb
 
 
 
 
 
                         chgOn();
+
+
+                   
 
 
 
@@ -1379,8 +978,8 @@ namespace ITM_ISM_Fixture
 
                         this.Refresh();
 
-                        timer3.Interval = 20000; // 40 seconds
-                        timer3.Enabled = true;
+                        //timer3.Interval = 20000; // 40 seconds
+                        //timer3.Enabled = true;
 /*
                         IxM_port = findIxM();
 
@@ -1468,6 +1067,11 @@ namespace ITM_ISM_Fixture
 
 
             // insert LED tests here.   We have to use current to dectect valid LED's
+
+                    switchChannel0(1);   // this must be done before IR LED test to turn unit on. (closes the push button)
+
+
+              
 
                 if (instumentStatus == 0)
                 {
@@ -4384,7 +3988,424 @@ namespace ITM_ISM_Fixture
 
 
 
+                    // beginning of voltage measurements.   Move to end of procedure!
 
+
+                    // check our power supplies
+                    if (instumentStatus == 0)
+                    {
+                        // prompt manual switch to TP102
+
+
+                        led3.OffColor = Color.Yellow;
+                        this.Refresh();
+
+
+
+
+
+                        // for ism, the one touch switch has to be closed. (TP 409)
+
+
+
+                        switchChannel0(1);
+                        Test_TP116();
+                        this.Refresh();
+
+
+                        Application.DoEvents();
+
+
+                        switchChannel0(2);
+
+                        Test_TP115();
+                        this.Refresh();
+
+                        Application.DoEvents();
+
+
+
+                        //Thread.Sleep(1000);  // add delay for settling.
+
+                        switchChannel0(3);
+                        Test_TP130();
+                        Test_TP130();
+
+                        this.Refresh();
+
+                        Application.DoEvents();
+
+
+                        switchChannel0(0);
+
+                        // Thread.Sleep(500);
+
+                        Test_TP102();
+                        this.Refresh();
+
+
+                        Application.DoEvents();
+
+
+
+
+
+
+
+                        /*
+                        MessageBox.Show("Swich fixture to TP115.",
+                        "Error",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Exclamation,
+                        MessageBoxDefaultButton.Button1);
+                        */
+
+
+
+                        /*
+                        MessageBox.Show("Swich fixture to TP130.",
+                        "Error",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Exclamation,
+                        MessageBoxDefaultButton.Button1);
+                        */
+
+
+
+
+
+
+
+
+                        // check all of our voltage results and see if we passed
+
+                        if (TP102Result & TP116Result & TP115Result & TP130Result)
+                        {
+                            VoltageResult = true;
+
+                            led3.OffColor = Color.LimeGreen;
+
+
+                        }
+                        else
+                        {
+
+                            VoltageResult = false;
+
+                            led3.OffColor = Color.Red;
+
+
+                        }
+
+
+                    }
+
+                    this.Refresh();
+
+                    // program the board
+                    // ExecuteCommand("flashme.bat");
+
+                    // move aux and mic to here
+                    // test Aux inputs
+
+                    Application.DoEvents();
+
+
+
+                    if (instumentStatus == 0)
+                    {
+
+                        scope1.YAxis.AutoScaling.Enabled = true;
+
+
+
+
+                        led6.OffColor = Color.Yellow;   /// seems to be crashing here!!!!!!
+                        this.Refresh();
+
+
+                        /*
+                        MessageBox.Show("Switch Out to Tp402 and In/Out to Aux R.",
+                        "Error",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Exclamation,
+                        MessageBoxDefaultButton.Button1);
+                         * */
+
+                        switchChannel0(5);    //  tp 302
+                        switchChannel1(0);  // inject signal
+
+
+
+                        short status;
+
+
+                        // turn on Generator
+                        status = Imports.SetSiggenBuiltIn(handle, 0, 500000, Imports.SiggenWaveType.Sine, 1000, 1000, 0, 0, Imports.SiggenSweepType.Up, false, 1, 1, Imports.SiggenTrigType.Rising, Imports.SiggenTrigSource.None, 0);
+                        // allow some settling time
+
+                        // Thread.Sleep(1000);
+
+
+                        GetChanB();
+                        Thread.Sleep(1500);
+                        GetChanB();  // have to do twice due to offset in buffer.. I don't know why yet.
+
+
+                        // get value for aux from label
+
+                        string rmsValue = Regex.Match(label19.Text, @"\d+").Value;
+
+
+                        AudioInMeasurements[0] = Convert.ToDouble(rmsValue);
+                        scope1.RefreshView();
+
+
+                        Application.DoEvents();
+
+
+
+                        /*
+                        MessageBox.Show("Switch Out to Tp402 and In/Out to Aux L.",
+                        "Error",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Exclamation,
+                        MessageBoxDefaultButton.Button1);
+                        */
+                        this.Refresh();
+                        // switchChannel0(5);
+                        switchChannel1(1);
+                        GetChanB();
+
+                        // get value for aux from label
+                        rmsValue = Regex.Match(label19.Text, @"\d+").Value;
+
+                        AudioInMeasurements[1] = Convert.ToDouble(rmsValue);
+                        this.Refresh();
+
+                        scope1.RefreshView();
+
+
+                        // validate measurements
+
+                        if ((AudioInMeasurements[0] > 35) & (AudioInMeasurements[0] < 210) & (AudioInMeasurements[1] > 35) & (AudioInMeasurements[1] < 210))
+                        {
+
+                            AuxResult = true;
+
+                            led6.OffColor = Color.LimeGreen;
+
+
+                        }
+                        else
+                        {
+
+
+                            AuxResult = false;
+
+                            led6.OffColor = Color.Red;
+
+
+                            if ((AudioInMeasurements[0] > 35) & (AudioInMeasurements[0] < 210))
+                            {
+
+
+                            }
+                            else
+                            {
+                                failureString = failureString + "Voltage at TP201 Failure (Aux In Right)....\r\n";
+
+                                textBox2.Text = failureString;
+
+                                this.Refresh();
+
+                            }
+
+                            if ((AudioInMeasurements[1] > 35) & (AudioInMeasurements[1] < 210))
+                            {
+
+
+                            }
+                            else
+                            {
+
+                                failureString = failureString + "Voltage at TP201 Failure (Aux In Left)....\r\n";
+
+                                textBox2.Text = failureString;
+
+                                this.Refresh();
+
+                            }
+
+
+
+
+
+                        }
+
+
+                        this.Refresh();
+
+                    }
+
+
+                    // test mic input
+
+                    Application.DoEvents();
+
+
+
+                    if (instumentStatus == 0)
+                    {
+
+
+                        led8.OffColor = Color.Yellow;   /// seems to be crashing here!!!!!!
+                        this.Refresh();
+
+                        /*
+
+                        MessageBox.Show("Switch Out to Tp402 and In/Out to Mic.",
+                        "Error",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Exclamation,
+                        MessageBoxDefaultButton.Button1);
+
+                        */
+                        short status;
+
+                        // test at 3 frequencies   500hz, k1kh and 5khz
+
+                        uint indx;
+
+                        for (indx = 0; indx < 3; indx++)
+                        {
+
+                            // set the frequency for each pass
+
+                            Int32 freq;
+
+
+                            switch (indx)
+                            {
+                                case 0:
+                                    freq = 500;    // was 100 Hz
+                                    break;
+
+
+                                case 1:
+                                    freq = 1000;
+
+                                    break;
+
+                                case 2:
+                                    freq = 5000;
+                                    break;
+                                default:
+
+                                    freq = 1000;
+                                    break;
+
+
+                            }
+                            status = Imports.SetSiggenBuiltIn(handle, 0, 10000, Imports.SiggenWaveType.Sine, freq, freq, 0, 0, Imports.SiggenSweepType.Up, false, 1, 1, Imports.SiggenTrigType.Rising, Imports.SiggenTrigSource.None, 0);
+                            // allow some settling time
+
+                            Thread.Sleep(1000);
+                            switchChannel1(2);
+
+                            Thread.Sleep(1000);  // allow for more settling time after switch
+
+                            GetChanB();
+                            Thread.Sleep(500);
+                            // GetChanB();  // have to do twice due to offset in buffer.. I don't know why yet.
+
+
+                            // get value for mic from label
+
+
+                            // we have three values now.  Called Mic[indx];
+
+                            string micValue = Regex.Match(label19.Text, @"\d+").Value;
+
+                            Mic[indx] = Convert.ToDouble(micValue);
+
+                        }
+
+                        string rmsValue = Regex.Match(label19.Text, @"\d+").Value;
+                        AudioInMeasurements[2] = Convert.ToDouble(rmsValue);
+                        scope1.RefreshView();
+
+
+                        this.Refresh();
+
+                        Application.DoEvents();
+
+
+
+
+
+                        if ((Mic[0] > limits.Mic500low) & (Mic[0] < limits.Mic500high) & (Mic[1] > limits.Mic1klow) & (Mic[1] < limits.Mic1khigh) & (Mic[2] > limits.Mic5klow) & (Mic[2] < limits.Mic5khigh))
+                        {
+                            MicResult = true;
+                            led8.OffColor = Color.LimeGreen;
+
+                        }
+                        else
+                        {
+                            MicResult = false;
+                            led8.OffColor = Color.Red;
+
+                            if ((Mic[0] > limits.Mic500low) & (Mic[0] < limits.Mic500high))
+                            { }
+                            else
+                            {
+                                failureString = failureString + "Voltage at TP201 Failure (Mic In 500Hz)....\r\n";
+
+                                textBox2.Text = failureString;
+
+                                this.Refresh();
+                            }
+
+                            if ((Mic[1] > limits.Mic500low) & (Mic[1] < limits.Mic500high))
+                            { }
+                            else
+                            {
+                                failureString = failureString + "Voltage at TP201 Failure (Mic In 1000Hz)....\r\n";
+
+                                textBox2.Text = failureString;
+
+                                this.Refresh();
+                            }
+
+
+                            if ((Mic[2] > limits.Mic500low) & (Mic[2] < limits.Mic500high))
+                            { }
+                            else
+                            {
+                                failureString = failureString + "Voltage at TP201 Failure (Mic In 5000Hz)....\r\n";
+
+                                textBox2.Text = failureString;
+
+                                this.Refresh();
+                            }
+
+
+
+
+                        }
+
+
+
+                    }
+
+
+
+                    Application.DoEvents();
+
+
+
+
+                    //// end of voltage measurements ---- move to end of procedure.
 
 
 
@@ -6959,6 +6980,10 @@ namespace ITM_ISM_Fixture
         public string TxCommand(string command)
         {
             string theResponse;
+
+
+            textBox2.Text = textBox2 + "DUTPort=" + DUTport.PortName + "\r\n";
+
 
             DUTport.Write(command + "\n\r");
 
