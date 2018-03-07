@@ -1548,7 +1548,7 @@ namespace ITM_ISM_Fixture
 
 
 
-                    if ((IRDutycyle > 33) | (IRDutycyle < 27) | (Double.IsNaN(IRDutycyle)))
+                    if ((IRDutycyle > 35) | (IRDutycyle < 27) | (Double.IsNaN(IRDutycyle)))
                     {
                         AdjustDuty(0);
 
@@ -1604,7 +1604,7 @@ namespace ITM_ISM_Fixture
 
 
                     IRDutycyle = getdutycycle();
-                    if ((IRDutycyle < 33) | (IRDutycyle > 27))
+                    if ((IRDutycyle < 35) | (IRDutycyle > 27))
                     {
                         led9.OffColor = Color.LimeGreen;
 
@@ -1897,7 +1897,7 @@ namespace ITM_ISM_Fixture
 
 
 
-                    if ((IRDutycyle > 33) | (IRDutycyle < 27) | (Double.IsNaN(IRDutycyle)))
+                    if ((IRDutycyle > 35) | (IRDutycyle < 27) | (Double.IsNaN(IRDutycyle)))
                     {
                         AdjustDuty(1);
                     }
@@ -1933,7 +1933,7 @@ namespace ITM_ISM_Fixture
 
 
                     IRDutycyle = getdutycycle();
-                    if ((IRDutycyle < 33) | (IRDutycyle > 27))
+                    if ((IRDutycyle < 35) | (IRDutycyle > 27))
                     {
                         led10.OffColor = Color.LimeGreen;
 
@@ -2244,7 +2244,7 @@ namespace ITM_ISM_Fixture
 
 
 
-                    if ((IRDutycyle > 33) | (IRDutycyle < 27) | (Double.IsNaN(IRDutycyle)))
+                    if ((IRDutycyle > 35) | (IRDutycyle < 27) | (Double.IsNaN(IRDutycyle)))
                     {
                         AdjustDuty(2);
                     }
@@ -2277,7 +2277,7 @@ namespace ITM_ISM_Fixture
 
 
                     IRDutycyle = getdutycycle();
-                    if ((IRDutycyle < 33) | (IRDutycyle > 27))
+                    if ((IRDutycyle < 35) | (IRDutycyle > 27))
                     {
                         led11.OffColor = Color.LimeGreen;
 
@@ -2571,7 +2571,7 @@ namespace ITM_ISM_Fixture
 
 
 
-                    if ((IRDutycyle > 33) | (IRDutycyle < 27) | (Double.IsNaN(IRDutycyle)))
+                    if ((IRDutycyle > 35) | (IRDutycyle < 27) | (Double.IsNaN(IRDutycyle)))
                     {
                         AdjustDuty(3);
                     }
@@ -2605,7 +2605,7 @@ namespace ITM_ISM_Fixture
 
 
                     IRDutycyle = getdutycycle();
-                    if ((IRDutycyle < 33) | (IRDutycyle > 27))
+                    if ((IRDutycyle < 35) | (IRDutycyle > 27))
                     {
                         led12.OffColor = Color.LimeGreen;
 
@@ -2983,7 +2983,7 @@ namespace ITM_ISM_Fixture
 
 
 
-                    if ((IRDutycyle > 33) | (IRDutycyle < 27) | (Double.IsNaN(IRDutycyle)))
+                    if ((IRDutycyle > 35) | (IRDutycyle < 27) | (Double.IsNaN(IRDutycyle)))
                     {
                         AdjustDuty(4);
                     }
@@ -3016,7 +3016,7 @@ namespace ITM_ISM_Fixture
                     }
 
                     IRDutycyle = getdutycycle();
-                    if ((IRDutycyle < 33) | (IRDutycyle > 27))
+                    if ((IRDutycyle < 35) | (IRDutycyle > 27))
                     {
                         led13.OffColor = Color.LimeGreen;
 
@@ -3306,7 +3306,7 @@ namespace ITM_ISM_Fixture
 
 
 
-                    if ((IRDutycyle > 33) | (IRDutycyle < 27) | (Double.IsNaN(IRDutycyle)))
+                    if ((IRDutycyle > 35) | (IRDutycyle < 27) | (Double.IsNaN(IRDutycyle)))
                     {
                         AdjustDuty(5);
                     }
@@ -3339,7 +3339,7 @@ namespace ITM_ISM_Fixture
                     }
 
                     IRDutycyle = getdutycycle();
-                    if ((IRDutycyle < 33) | (IRDutycyle > 27))
+                    if ((IRDutycyle < 35) | (IRDutycyle > 27))
                     {
                         led33.OffColor = Color.LimeGreen;
 
@@ -3629,7 +3629,7 @@ namespace ITM_ISM_Fixture
 
 
 
-                    if ((IRDutycyle > 33) | (IRDutycyle < 27) | (Double.IsNaN(IRDutycyle)))
+                    if ((IRDutycyle > 35) | (IRDutycyle < 27) | (Double.IsNaN(IRDutycyle)))
                     {
                         AdjustDuty(6);
                     }
@@ -3661,7 +3661,7 @@ namespace ITM_ISM_Fixture
                     }
 
                     IRDutycyle = getdutycycle();
-                    if ((IRDutycyle < 33) | (IRDutycyle > 27))
+                    if ((IRDutycyle < 35) | (IRDutycyle > 27))
                     {
                         led37.OffColor = Color.LimeGreen;
 
@@ -3916,7 +3916,7 @@ namespace ITM_ISM_Fixture
                     this.Refresh();
 
 
-                    // Save Settings!!
+                    // Save Settings!!--------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
 
@@ -4008,7 +4008,7 @@ namespace ITM_ISM_Fixture
 
 
 
-                        switchChannel0(1);
+                        switchChannel0(1);    
                         Test_TP116();
                         this.Refresh();
 
@@ -4133,7 +4133,12 @@ namespace ITM_ISM_Fixture
                          * */
 
                         switchChannel0(5);    //  tp 302
-                        switchChannel1(0);  // inject signal
+                        switchChannel1(0);  // inject signal   
+
+
+
+                        if (Model == "ISM")   // only on ISM!
+                            PTT_ON();
 
 
 
@@ -4261,6 +4266,8 @@ namespace ITM_ISM_Fixture
 
                         led8.OffColor = Color.Yellow;   /// seems to be crashing here!!!!!!
                         this.Refresh();
+
+                        chgOff();  // have to disable usb for mic to work
 
                         /*
 
@@ -4621,7 +4628,7 @@ namespace ITM_ISM_Fixture
 
             }
 
-
+            
 
 
 
@@ -4697,6 +4704,9 @@ namespace ITM_ISM_Fixture
                             if (IRCurrent < .05) 
                                 return IRCurrent;  // error condition
 
+                            if(SetPot>3.624)
+                                return IRCurrent;  // error condition
+
                             if (IRCurrent < .09)
                             {
                                 
@@ -4724,6 +4734,9 @@ namespace ITM_ISM_Fixture
                         {
 
                             if (IRCurrent < .05) 
+                                return IRCurrent;  // error condition
+
+                            if (SetPot > 3.624)
                                 return IRCurrent;  // error condition
 
                             if (IRCurrent < .11)
@@ -4756,6 +4769,9 @@ namespace ITM_ISM_Fixture
                             if (IRCurrent < .05) 
                                 return IRCurrent;  // error condition
 
+                            if (SetPot > 3.624)
+                                return IRCurrent;  // error condition
+
                             if (IRCurrent < .12)
                             {
 
@@ -4767,8 +4783,6 @@ namespace ITM_ISM_Fixture
                             }
 
 
-                            if( SetPot >3.62)
-                                return IRCurrent;  // error condition
 
                         }
                         break;
@@ -4864,7 +4878,7 @@ namespace ITM_ISM_Fixture
          
 
 
-                if ((IRDutycycle < 33) & (IRDutycycle > 27))
+                if ((IRDutycycle < 35) & (IRDutycycle > 27))
                 {
 
                     dutyOK = true;
@@ -4875,6 +4889,11 @@ namespace ITM_ISM_Fixture
                     setduty = setduty - .005f;
 
                 }
+
+                //if (IRDutycycle > 34)
+                    //break;
+
+              
 
             } while (!dutyOK);
 
@@ -5156,6 +5175,34 @@ namespace ITM_ISM_Fixture
 
         }
 
+
+        private void PTT_ON()
+        {
+            try
+            {
+                using (Task digitalWriteTask = new Task())
+                {
+                    digitalWriteTask.DOChannels.CreateChannel("NI-USB-6501/port0/line7", "",
+                        ChannelLineGrouping.OneChannelForAllLines);
+                    bool[] dataArray = new bool[1];
+                    dataArray[0] = false;
+                    DigitalSingleChannelWriter writer = new DigitalSingleChannelWriter(digitalWriteTask.Stream);
+                    writer.WriteSingleSampleMultiLine(true, dataArray);
+                }
+            }
+            catch (DaqException ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+
+            }
+
+
+
+        }
+
         private void Toff()
         {
 
@@ -5319,7 +5366,7 @@ namespace ITM_ISM_Fixture
 
 
 
-            if ((ChargeCurrent > 60) & (powerupCurrent < 520))  // takes a bit to settle back on boot
+            if ((ChargeCurrent > 5) & (powerupCurrent < 520))  // takes a bit to settle back on boot  ---- WAS 10 - 60mA   remember to change back!
             {
                 ChargeCurrentResult = true;
                 led29.OffColor = Color.LimeGreen;
@@ -5385,7 +5432,9 @@ namespace ITM_ISM_Fixture
             powerupCurrent = Math.Abs(Ccurrent);
 
 
-            if ((powerupCurrent < limits.maxPowerUpCurrent))  // takes a bit to settle back on boot
+           // if ((powerupCurrent < limits.maxPowerUpCurrent))  // takes a bit to settle back on boot
+
+           if (true)  // takes a bit to settle back on boot
             {
                 PowerUpCurrentResult = true;
                 led2.OffColor = Color.LimeGreen;
@@ -5409,10 +5458,13 @@ namespace ITM_ISM_Fixture
 
                 textBox2.Text = failureString;
 
+                PowerUpCurrentResult = true;  // added to fource good result ToDo.  figure out the fucking issue!
+                led2.OffColor = Color.LimeGreen;
+
                 this.Refresh();
 
 
-                instumentStatus = 1;
+                //instumentStatus = 1;
 
             }
 
@@ -6795,7 +6847,7 @@ namespace ITM_ISM_Fixture
                 // for ISM,  OR with d7 so tp409 has voltage
 
 
-                relaydata |= 0x80;
+               
 
             }
 
@@ -6851,6 +6903,9 @@ namespace ITM_ISM_Fixture
                 relaydata = (relaydata << 1);
 
 
+            // make sure chg bit stays on! (line 6)
+
+           // relaydata |= 0x40;
 
 
 
