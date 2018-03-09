@@ -398,7 +398,7 @@ namespace ITM_ISM_Fixture
 
                 textBox2.Text = failureString;
 
-         
+                IR_ON();
 
 
 
@@ -703,7 +703,7 @@ namespace ITM_ISM_Fixture
             bgw.Dispose();
             Application.DoEvents();
 
-
+            IR_OFF();  // switch resistor out of circuit
 
 
             /// connect to the transmitter  and place it in test mode.
@@ -5272,6 +5272,68 @@ namespace ITM_ISM_Fixture
                         ChannelLineGrouping.OneChannelForAllLines);
                     bool[] dataArray = new bool[1];
                     dataArray[0] = true;
+                    DigitalSingleChannelWriter writer = new DigitalSingleChannelWriter(digitalWriteTask.Stream);
+                    writer.WriteSingleSampleMultiLine(true, dataArray);
+                }
+            }
+            catch (DaqException ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+
+            }
+
+
+
+        }
+
+
+
+
+
+        private void IR_OFF()
+        {
+
+            try
+            {
+                using (Task digitalWriteTask = new Task())
+                {
+                    digitalWriteTask.DOChannels.CreateChannel("NI-USB-6501/port1/line3", "",
+                        ChannelLineGrouping.OneChannelForAllLines);
+                    bool[] dataArray = new bool[1];
+                    dataArray[0] = true;
+                    DigitalSingleChannelWriter writer = new DigitalSingleChannelWriter(digitalWriteTask.Stream);
+                    writer.WriteSingleSampleMultiLine(true, dataArray);
+                }
+            }
+            catch (DaqException ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+
+            }
+
+
+
+        }
+
+
+
+        private void IR_ON()
+        {
+
+            try
+            {
+                using (Task digitalWriteTask = new Task())
+                {
+                    digitalWriteTask.DOChannels.CreateChannel("NI-USB-6501/port1/line3", "",
+                        ChannelLineGrouping.OneChannelForAllLines);
+                    bool[] dataArray = new bool[1];
+                    dataArray[0] = false;
                     DigitalSingleChannelWriter writer = new DigitalSingleChannelWriter(digitalWriteTask.Stream);
                     writer.WriteSingleSampleMultiLine(true, dataArray);
                 }
