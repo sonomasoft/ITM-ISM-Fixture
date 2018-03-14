@@ -756,7 +756,7 @@ namespace ITM_ISM_Fixture
 
                 this.Refresh();
 
-                timer3.Interval = 20000; // 40 seconds
+                timer3.Interval = 30000; // 40 seconds
                 timer3.Enabled = true;
 
                 IxM_port = findIxM();
@@ -773,6 +773,10 @@ namespace ITM_ISM_Fixture
                 {
 
                     Console.WriteLine("Found Transmitter on {0}", IxM_port);
+
+
+
+                    Thread.Sleep(3000);  // added delay for Vtech computer (might be too slow).
 
 
                     DUTport.PortName = IxM_port;
@@ -4193,7 +4197,7 @@ namespace ITM_ISM_Fixture
 
                         // validate measurements
 
-                        if ((AudioInMeasurements[0] > 35) & (AudioInMeasurements[0] < 210) & (AudioInMeasurements[1] > 35) & (AudioInMeasurements[1] < 210))
+                        if ((AudioInMeasurements[0] > 75) & (AudioInMeasurements[0] < 210) & (AudioInMeasurements[1] > 75) & (AudioInMeasurements[1] < 210))
                         {
 
                             AuxResult = true;
@@ -4211,7 +4215,7 @@ namespace ITM_ISM_Fixture
                             led6.OffColor = Color.Red;
 
 
-                            if ((AudioInMeasurements[0] > 35) & (AudioInMeasurements[0] < 210))
+                            if ((AudioInMeasurements[0] > 75) & (AudioInMeasurements[0] < 210))
                             {
 
 
@@ -4226,7 +4230,7 @@ namespace ITM_ISM_Fixture
 
                             }
 
-                            if ((AudioInMeasurements[1] > 35) & (AudioInMeasurements[1] < 210))
+                            if ((AudioInMeasurements[1] > 75) & (AudioInMeasurements[1] < 210))
                             {
 
 

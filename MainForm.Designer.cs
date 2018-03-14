@@ -1419,7 +1419,7 @@
             this.Controls.Add(this.led1);
             this.Controls.Add(this.label1);
             this.Name = "MainForm";
-            this.Text = "ITM/ISM PCB Test 1.0.25";
+            this.Text = "ITM/ISM PCB Test 1.0.27";
             this.Load += new System.EventHandler(this.MainForm_Load);
             ((System.ComponentModel.ISupportInitialize)(this.led1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.led2)).EndInit();
