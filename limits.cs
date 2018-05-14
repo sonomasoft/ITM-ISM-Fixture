@@ -11,7 +11,7 @@ namespace ITM_ISM_Fixture
 
         // current limuts
         public static double minPowerUpCurrent = 0;  // set low for debug
-        public static double maxPowerUpCurrent = 500;// set to level of old test fixture
+        public static double maxPowerUpCurrent = 100;// set to level of old test fixture
 
 
       // DC voltage limits
@@ -45,7 +45,7 @@ namespace ITM_ISM_Fixture
         public static double hdCurrentNominal = .090;
 
 
-        public static double IRCurrentTolerance = .003;
+        public static double IRCurrentTolerance = .003;  
 
 
 // aux level limits

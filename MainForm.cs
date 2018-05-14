@@ -560,7 +560,7 @@ namespace ITM_ISM_Fixture
 
 
 
-            //if(false)  // skip program
+           //if(false)  // skip program------------------------------------------------------------------------------------------------------------------------
             if (instumentStatus == 0)
             {
                 led4.OffColor = Color.Yellow;
@@ -1552,7 +1552,7 @@ namespace ITM_ISM_Fixture
 
 
 
-                    if ((IRDutycyle > 35) | (IRDutycyle < 27) | (Double.IsNaN(IRDutycyle)))
+                    if ((IRDutycyle > 35) | (IRDutycyle < 29) | (Double.IsNaN(IRDutycyle)))
                     {
                         AdjustDuty(0);
 
@@ -1901,7 +1901,7 @@ namespace ITM_ISM_Fixture
 
 
 
-                    if ((IRDutycyle > 35) | (IRDutycyle < 27) | (Double.IsNaN(IRDutycyle)))
+                    if ((IRDutycyle > 35) | (IRDutycyle < 29) | (Double.IsNaN(IRDutycyle)))
                     {
                         AdjustDuty(1);
                     }
@@ -2248,7 +2248,7 @@ namespace ITM_ISM_Fixture
 
 
 
-                    if ((IRDutycyle > 35) | (IRDutycyle < 27) | (Double.IsNaN(IRDutycyle)))
+                    if ((IRDutycyle > 35) | (IRDutycyle < 29) | (Double.IsNaN(IRDutycyle)))
                     {
                         AdjustDuty(2);
                     }
@@ -2575,7 +2575,7 @@ namespace ITM_ISM_Fixture
 
 
 
-                    if ((IRDutycyle > 35) | (IRDutycyle < 27) | (Double.IsNaN(IRDutycyle)))
+                    if ((IRDutycyle > 35) | (IRDutycyle < 29) | (Double.IsNaN(IRDutycyle)))
                     {
                         AdjustDuty(3);
                     }
@@ -2987,7 +2987,7 @@ namespace ITM_ISM_Fixture
 
 
 
-                    if ((IRDutycyle > 35) | (IRDutycyle < 27) | (Double.IsNaN(IRDutycyle)))
+                    if ((IRDutycyle > 35) | (IRDutycyle < 29) | (Double.IsNaN(IRDutycyle)))
                     {
                         AdjustDuty(4);
                     }
@@ -3310,7 +3310,7 @@ namespace ITM_ISM_Fixture
 
 
 
-                    if ((IRDutycyle > 35) | (IRDutycyle < 27) | (Double.IsNaN(IRDutycyle)))
+                    if ((IRDutycyle > 35) | (IRDutycyle < 29) | (Double.IsNaN(IRDutycyle)))
                     {
                         AdjustDuty(5);
                     }
@@ -3633,7 +3633,7 @@ namespace ITM_ISM_Fixture
 
 
 
-                    if ((IRDutycyle > 35) | (IRDutycyle < 27) | (Double.IsNaN(IRDutycyle)))
+                    if ((IRDutycyle > 35) | (IRDutycyle < 29) | (Double.IsNaN(IRDutycyle)))
                     {
                         AdjustDuty(6);
                     }
@@ -4005,7 +4005,30 @@ namespace ITM_ISM_Fixture
                         this.Refresh();
 
 
+                        // turn chd=0 AND irl=0  for least voltage drop accross current meter.
 
+
+                        Txresponse = TxCommand("chd=1");
+                        timer3.Enabled = false;
+
+
+                        Console.WriteLine("Response From Tx: {0}", Txresponse); // may have to capture this as soon as we have cr
+
+
+
+                        Txresponse = TxCommand("vcc=1");
+                        timer3.Enabled = false;
+
+
+                        Console.WriteLine("Response From Tx: {0}", Txresponse); // may have to capture this as soon as we have cr
+
+
+
+                        Txresponse = TxCommand("irl=0");
+                        timer3.Enabled = false;
+
+
+                        Console.WriteLine("Response From Tx: {0}", Txresponse); // may have to capture this as soon as we have cr
 
 
                         // for ism, the one touch switch has to be closed. (TP 409)
@@ -4032,7 +4055,9 @@ namespace ITM_ISM_Fixture
                         //Thread.Sleep(1000);  // add delay for settling.
 
                         switchChannel0(3);
-                        Test_TP130();
+                        //Test_TP130();  // first time produces a failuree
+
+                        Thread.Sleep(1000);  // use delay instead to allow voltage to settle
                         Test_TP130();
 
                         this.Refresh();
@@ -4119,6 +4144,12 @@ namespace ITM_ISM_Fixture
                     if (instumentStatus == 0)
                     {
 
+
+
+
+
+
+
                         scope1.YAxis.AutoScaling.Enabled = true;
 
 
@@ -4136,8 +4167,8 @@ namespace ITM_ISM_Fixture
                         MessageBoxDefaultButton.Button1);
                          * */
 
-                        switchChannel0(5);    //  tp 302
-                        switchChannel1(0);  // inject signal   
+                        switchChannel0(5);    //  tp 302               //-------------------------------- check if we are switch chg off here
+                        switchChannel1(true, 0);  // inject signal         /////////////////////////////// this is it!!!!!!
 
 
 
@@ -4183,7 +4214,7 @@ namespace ITM_ISM_Fixture
                         */
                         this.Refresh();
                         // switchChannel0(5);
-                        switchChannel1(1);
+                        switchChannel1(true, 1);    // here too!
                         GetChanB();
 
                         // get value for aux from label
@@ -4271,7 +4302,7 @@ namespace ITM_ISM_Fixture
                         led8.OffColor = Color.Yellow;   /// seems to be crashing here!!!!!!
                         this.Refresh();
 
-                        chgOff();  // have to disable usb for mic to work
+                        //  chgOff();  // have to disable usb for mic to work remarked out now that we use vcc=1
 
                         /*
 
@@ -4322,11 +4353,13 @@ namespace ITM_ISM_Fixture
                             // allow some settling time
 
                             Thread.Sleep(1000);
-                            switchChannel1(2);
+                            switchChannel1(false, 2);
 
                             Thread.Sleep(1000);  // allow for more settling time after switch
 
                             GetChanB();
+                            this.Refresh();
+                            scope1.RefreshView();
                             Thread.Sleep(500);
                             // GetChanB();  // have to do twice due to offset in buffer.. I don't know why yet.
 
@@ -4503,6 +4536,14 @@ namespace ITM_ISM_Fixture
 
 
                 }
+
+            // turn power off
+                initBK1685B.Run();
+
+            // ToDo:  open all relays here too
+
+                switchChannel0(0xff);
+                switchChannel1(false, 0xff);
 
                 // close scope connection
 
@@ -4708,6 +4749,15 @@ namespace ITM_ISM_Fixture
                             if (IRCurrent < .05) 
                                 return IRCurrent;  // error condition
 
+                            if (IRCurrent > .110)
+                            {
+                             // reset to low level
+                                ldpot[channel] = 2.66;
+
+
+                            }
+
+
                             if(SetPot>3.624)
                                 return IRCurrent;  // error condition
 
@@ -4718,7 +4768,17 @@ namespace ITM_ISM_Fixture
                             }
                             else
                             {
-                                SetPot = SetPot + 0.01;  // fine
+                                if (IRCurrent < .103)
+                                {
+                                    SetPot = SetPot + 0.01;  // fine
+                                }
+                                else
+                                {
+                                    SetPot = SetPot - 0.01;  // fine
+
+                                    if (SetPot < 2.66)
+                                        return IRCurrent; // error
+                                }
                             }
 
                         }
@@ -4750,7 +4810,19 @@ namespace ITM_ISM_Fixture
                             }
                             else
                             {
-                                SetPot = SetPot + 0.01;  // fine
+                                if (IRCurrent < .118)
+                                {
+                                    SetPot = SetPot + 0.01;  // fine
+                                }
+                                else
+                                {
+
+                                    SetPot = SetPot - 0.01;  // fine
+
+                                    if (SetPot < 2.66)
+                                        return IRCurrent; // error
+
+                                }
                             }
 
                      
@@ -4783,7 +4855,18 @@ namespace ITM_ISM_Fixture
                             }
                             else
                             {
-                                SetPot = SetPot + 0.01;  // fine
+                                if (IRCurrent < .132)
+                                {
+                                    SetPot = SetPot + 0.01;  // fine
+                                }
+                                else
+                                {
+                                    SetPot = SetPot - 0.01;  // fine
+
+                                    if (SetPot < 2.66)
+                                        return IRCurrent; // error
+
+                                }
                             }
 
 
@@ -4844,6 +4927,9 @@ namespace ITM_ISM_Fixture
         {
             // start at .25 IRPW and step by .005 until we get to 25%
 
+
+            // 5/14/18 -  Changed algorithum for setting duty cycle.  find mid point of low and high
+
             float IRDutycycle;
             float setduty = 0.25f;
             bool dutyOK = false;
@@ -4882,7 +4968,7 @@ namespace ITM_ISM_Fixture
          
 
 
-                if ((IRDutycycle < 35) & (IRDutycycle > 27))
+                if ((IRDutycycle < 36) & (IRDutycycle > 29))  // raised to 29 from 27  5/14/18
                 {
 
                     dutyOK = true;
@@ -4890,12 +4976,29 @@ namespace ITM_ISM_Fixture
                 else
                 {
 
-                    setduty = setduty - .005f;
+                    if (IRDutycycle > 34)     
+                    {
+                        setduty = setduty + .005f;  // prevents overset
+                    }
+                    else
+                    {
+
+                        setduty = setduty - .005f;
+
+                    }
+
+                    /*  this will bail out at the early part of adjustment if the duty cycle is high
+                    if (IRDutycycle > 35)
+                    {
+                        dutyOK = true;
+                        break;
+
+                    }
+                     * */
 
                 }
 
-                //if (IRDutycycle > 34)
-                    //break;
+ 
 
               
 
@@ -5500,7 +5603,7 @@ namespace ITM_ISM_Fixture
 
            // if ((powerupCurrent < limits.maxPowerUpCurrent))  // takes a bit to settle back on boot
 
-           if (true)  // takes a bit to settle back on boot
+            if (powerupCurrent < limits.maxPowerUpCurrent)  // takes a bit to settle back on boot
             {
                 PowerUpCurrentResult = true;
                 led2.OffColor = Color.LimeGreen;
@@ -6740,20 +6843,69 @@ namespace ITM_ISM_Fixture
                     int FallingEdge = 0;
                     int Risingedge2 = 0;
 
+                    // set threashold based upon max and min (set to 50& for duty cycle)
+
+                    int min = 9999999;
+
+                    int max = 0;
+
+                    int trig = 0;
+
+                    Console.WriteLine("Determining trigger point\n");
 
                     for (x = 1; x < sampleCount; x++)
                     {
+                        if (mVBuf[x] < min)
+                            min = mVBuf[x];
+
+
+                        if (mVBuf[x] > max)
+                            max = mVBuf[x];
+
+
+
+
+                    }
+
+
+                    // only set trigger point if difference is greater than 500
+
+                    if ((max - min) > 500)
+                    {
+
+                        trig = min + ((max - min) / 2);
+                    }
+                    else
+                    {
+
+                        trig = 1700;
+
+
+                    }
+
+
+                    Console.WriteLine("Trigger threshold: {0} ", trig);
+                     
+
+
+                    // this is not working.  geting values of 80% at times......
+                    /*
+
+                    for (x = 2; x < sampleCount; x++)
+                    {
 
                         if (RisingEdge == 0)
-                            if (mVBuf[x] > 1700)
-                                if (mVBuf[x - 1] < 1700)
-                                    RisingEdge = x;
+                            if (mVBuf[x] > trig)           // was 1700
+                                if (mVBuf[x - 1] < trig)
+                                    if (mVBuf[x - 2] < trig)  // checking for at least two samples
+                                        RisingEdge = x;
 
                         if (RisingEdge > 0)  // only do after we find the first rising edge
                             if (FallingEdge == 0)
-                                if (mVBuf[x] < 1600)    // find the next rising edge for 1 full cycle
-                                    if (mVBuf[x - 1] > 1600)
-                                        FallingEdge = x;
+                                if (mVBuf[x] < (trig - 100))    // find the next rising edge for 1 full cycle  was 100
+                                    if (mVBuf[x + 1] > (trig-100))  // changed to +1  was -1
+                                        if (mVBuf[x + 2] > (trig - 100)) // checking for at least two samples  changed to +2 was -2
+                                            FallingEdge = x;
 
                     }
 
@@ -6763,17 +6915,20 @@ namespace ITM_ISM_Fixture
                     for (x = FallingEdge; x < sampleCount; x++)
                     {
                         if (Risingedge2 == 0)
-                            if (mVBuf[x] > 1700)
-                                if (mVBuf[x - 1] < 1700)
-                                    Risingedge2 = x;
+                            if (mVBuf[x] > trig)
+                                if (mVBuf[x - 1] < trig)
+                                    if (mVBuf[x - 2] < trig)  // checking for at least two samples
+                                         Risingedge2 = x;
 
                     }
 
+                    */
 
+                    /*
 
                     for (x = RisingEdge; x < Risingedge2; x++)
                     {
-                        if (mVBuf[x] < 1700)
+                        if (mVBuf[x] < trig)
                         {
                             low++;
                         }
@@ -6782,11 +6937,26 @@ namespace ITM_ISM_Fixture
 
                             high++;
                         }
+                    */
 
 
+                    // simplified method.....
 
+                        for (x = 0; x < sampleCount; x++)
+                        {
+                            if (mVBuf[x] < trig)
+                            {
+                                low++;
+                            }
+                            else
+                            {
 
-                    }
+                                high++;
+                            }
+
+                        }
+
+                    
 
 
                     
@@ -6794,6 +6964,10 @@ namespace ITM_ISM_Fixture
                     dutycycle = (high / (high + low)) * 100;
 
                     label17.Text = "Duty Cycle = " + (dutycycle.ToString());
+
+
+                    if(dutycycle > 35)
+                        Console.WriteLine("duty cycle: {0} ", dutycycle);
 
                     // for frequency we just need to kno the sample period  and count the wavelength and invert
                     double frequency;
@@ -6956,7 +7130,7 @@ namespace ITM_ISM_Fixture
 
 
 
-        private void switchChannel1(byte RelayNo)
+        private void switchChannel1(bool ChargeBit,   byte RelayNo)
         {
 
 
@@ -6969,9 +7143,10 @@ namespace ITM_ISM_Fixture
                 relaydata = (relaydata << 1);
 
 
-            // make sure chg bit stays on! (line 6)
+            // make sure chg bit stays on! (line 6)  if set
 
-           // relaydata |= 0x40;
+            if(ChargeBit)
+              relaydata |= 0x40;  // added back in
 
 
 
