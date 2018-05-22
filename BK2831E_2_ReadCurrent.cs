@@ -25,27 +25,13 @@ namespace ITM_ISM_Fixture
     /// </summary>    
     public sealed class BK2831E_2_ReadCurrentResults
     {
-        private string _token;
-        private string _token3;
-        private string _token4;
+        private double _token;
         private double _token2;
         
-        public string Token
+        public double Token
         {
             get { return _token; }
             set { _token = value; }
-        }
-        
-        public string Token3
-        {
-            get { return _token3; }
-            set { _token3 = value; }
-        }
-        
-        public string Token4
-        {
-            get { return _token4; }
-            set { _token4 = value; }
         }
         
         public double Token2
@@ -146,15 +132,9 @@ namespace ITM_ISM_Fixture
 
             // Query step
             // Does a VISA Write
-            _instrumentSession.Write("*IDN?\n");
-            // Parses out one ASCII string separated by one or more delimiters
-            outputs.Token = _reader.ReadMismatch(",;\r\n\t");
-            _reader.ReadMatch(",;\r\n\t");
-            // Parses out one ASCII string separated by one or more delimiters
-            outputs.Token3 = _reader.ReadMismatch(",;\r\n\t");
-            _reader.ReadMatch(",;\r\n\t");
-            // Parses out one ASCII string separated by one or more delimiters
-            outputs.Token4 = _reader.ReadMismatch(",;\r\n\t");
+            _instrumentSession.Write(":FETC?\n");
+            // Parses out one ASCII number separated by one or more delimiters
+            outputs.Token = _reader.ReadDouble();
             _reader.ReadMatch(",;\r\n\t");
             // Read and discard the rest of the response
             _reader.DiscardUnreadData();
