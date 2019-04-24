@@ -23,9 +23,9 @@ NationalInstruments.UI.WindowsForms.Gauge, NationalInstruments.UI.WindowsForms, 
 NationalInstruments.UI.WindowsForms.DigitalWaveformGraph, NationalInstruments.UI.WindowsForms, Version=15.0.40.49153, Culture=neutral, PublicKeyToken=dc6ad606294fc298
 NationalInstruments.UI.WindowsForms.ComplexGraph, NationalInstruments.UI.WindowsForms, Version=15.0.40.49153, Culture=neutral, PublicKeyToken=dc6ad606294fc298
 NationalInstruments.Tdms.TdmsLicenser, NationalInstruments.Tdms, Version=15.0.40.49153, Culture=neutral, PublicKeyToken=dc6ad606294fc298
-NationalInstruments.Restricted.AnalysisLicenser, NationalInstruments.Analysis.Professional, Version=15.0.40.49153, Culture=neutral, PublicKeyToken=dc6ad606294fc298
 NationalInstruments.NetworkVariable.WindowsForms.NetworkVariableBrowserDialog, NationalInstruments.NetworkVariable, Version=15.0.40.49153, Culture=neutral, PublicKeyToken=dc6ad606294fc298
 NationalInstruments.NetworkVariable.NetworkVariableLicenser, NationalInstruments.NetworkVariable, Version=15.0.40.49153, Culture=neutral, PublicKeyToken=dc6ad606294fc298
 NationalInstruments.NetworkVariable.WindowsForms.NetworkVariableDataSource, NationalInstruments.NetworkVariable, Version=15.0.40.49153, Culture=neutral, PublicKeyToken=dc6ad606294fc298
 NationalInstruments.NetworkVariable.WebForms.NetworkVariableDataSource, NationalInstruments.NetworkVariable, Version=15.0.40.49153, Culture=neutral, PublicKeyToken=dc6ad606294fc298
+NationalInstruments.Restricted.AnalysisLicenser, NationalInstruments.Analysis.Professional, Version=15.0.40.49153, Culture=neutral, PublicKeyToken=dc6ad606294fc298
 # End Measurement Studio licenses

@@ -1,7 +1,7 @@
 ﻿using NationalInstruments;
 using NationalInstruments.UI;
 using NationalInstruments.DAQmx;
-using NationalInstruments.NI4882;
+//using NationalInstruments.NI4882;
 using NationalInstruments.VisaNS;
 using NationalInstruments.NetworkVariable;
 using NationalInstruments.NetworkVariable.WindowsForms;
@@ -49,6 +49,10 @@ namespace ITM_ISM_Fixture
         ResultGood frm6;
 
         ResultsBad frm7;
+
+        VtechInput frm8;
+
+
 
 
         private Imports.ps5000aBlockReady _callbackDelegate;
@@ -730,6 +734,16 @@ namespace ITM_ISM_Fixture
             {
 
             }
+
+            /*  this did not work!
+
+            MessageBox.Show("Please Put Current Meter back into test.",
+                    "On Current Test",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Exclamation,
+                    MessageBoxDefaultButton.Button1);
+            */
+
 
 
             if (instumentStatus == 0)
@@ -4518,7 +4532,7 @@ namespace ITM_ISM_Fixture
                 WriteCSVFile();
 
 
-
+                WriteVtechFile();  // write to Vtech log file
 
                 if (PowerUpCurrentResult & VoltageResult & TP102Result & AuxResult & MicResult & BootResult & ChargeCurrentResult & ProgramResult & IRChannel_A_Result & IRChannel_B_Result & IRChannel_C_Result & IRChannel_D_Result & IRChannel_E_Result & IRChannel_L1_Result & IRChannel_L2_Result)
                 {
@@ -4590,6 +4604,9 @@ namespace ITM_ISM_Fixture
 
 
 
+
+
+
             using (StreamWriter sw = File.AppendText(filename))
             {
                 sw.WriteLine(textBox1.Text + "," + Model + "," + timestring + "," + Convert.ToString(TestResult) +
@@ -4615,6 +4632,56 @@ namespace ITM_ISM_Fixture
 
             }
         }
+
+
+        /* WriteVtechfile
+         *      
+         *      Write data file to Vtech's specifications
+         *      Log file will have the following format:
+         *      
+         *                                              Route
+         *          SN                    Result         step                      Order No.     
+         *      1781051469 20170314172408 Failed 3F01_T03 T03 80-00A123-000-R000 110000123456 NV0001
+         *                     Sys Time           Stn No.           Model No.                 Operator ID
+         * 
+         * 
+         * 
+         * 
+         * 
+         * 
+         */
+        public void WriteVtechFile()
+        {
+            //frm8 = new VtechInput(this);
+
+            string filename = "c:\\data\\IXMData" + DateTime.Now.ToString("yyyyMMdd") + ".txt";
+
+            string timestring = DateTime.Now.ToString("yyyyMMddhmmss tt");
+
+            string Result = "Pass";
+
+
+            if (TestResult)
+                Result = "Pass";
+            else
+                Result = "Failed";
+
+
+
+
+            using (StreamWriter sw = File.AppendText(filename))
+                    {
+                        sw.WriteLine(textBox1.Text + " " + timestring + " " + Result + " " + frm8.StationName.Text + " " + frm8.RouteStep.Text + " " + frm8.ProductName.Text + " " + frm8.OrderNumber.Text + " " + frm8.Operator.Text + "\n" );
+
+                    }
+
+
+
+
+
+
+        }
+
 
 
         private double IRSetCurrent(int coverage,int channel)
@@ -5476,7 +5543,7 @@ namespace ITM_ISM_Fixture
             this.Refresh();
 
 
-      
+           
 
 
             BK1685B_2_INIT BKPS2_INIT = new BK1685B_2_INIT();
@@ -5501,16 +5568,63 @@ namespace ITM_ISM_Fixture
 
 
             // read charge current
-            
-            
-            
-            
+
+
+            // use new method to get charge current from BK2831E_2
+
+            //  !%#
+
+            // init the meter!
+
+
+            BK2831E_2_ReadCurrent GetIRCurrent = new BK2831E_2_ReadCurrent();
+            BK2831E_2_SetCurrent setupCurrent = new BK2831E_2_SetCurrent();
+
+       
+
+
+
+            setupCurrent.Run();
+
+
+
+      
+
+
+        
+
+
+
+            Thread.Sleep(1000); // add delay
+
+
+            //BK2831E_2_ReadCurrent results = GetIRCurrent.Run();
+
+            BK2831E_2_ReadCurrentResults results = GetIRCurrent.Run();
+
+
+            string myCurrent = results.Token2.ToString();
+            Thread.Sleep(250); // add delay
+
+
+
+            ChargeCurrent = (Convert.ToDouble(myCurrent)*1000);
+
+
+
+
+
+
+
+
+
+           /* 
             BK1685B_2_GETDResults results = ReadChargeCurrent.Run();
 
 
             // display results
 
-
+            */
 
 
             Toff();   // remove thermistor
@@ -5524,6 +5638,8 @@ namespace ITM_ISM_Fixture
 
             Thread.Sleep(1000);
 
+            /*
+
             string current = results.Token.Substring(results.Token.Length - 3);
 
             double Ccurrent;
@@ -5532,10 +5648,10 @@ namespace ITM_ISM_Fixture
             MeterReading.Text = Ccurrent.ToString() + " mA";
 
             ChargeCurrent = Math.Abs(Ccurrent);
+            */
 
-
-
-            if ((ChargeCurrent > 5) & (powerupCurrent < 520))  // takes a bit to settle back on boot  ---- WAS 10 - 60mA   remember to change back!
+            /// change this back to 5mA once you figure out the issue with the power supplies.  I think they are reversed!
+            if ((ChargeCurrent > 10) & (ChargeCurrent < 20))  // takes a bit to settle back on boot  ---- WAS 10 - 60mA   remember to change back!
             {
                 ChargeCurrentResult = true;
                 led29.OffColor = Color.LimeGreen;
@@ -5575,6 +5691,22 @@ namespace ITM_ISM_Fixture
 
             led2.OffColor = Color.Yellow;
             this.Refresh();
+
+
+            // place dialog box here to bypass current meter
+
+            /* this did not work!
+
+            MessageBox.Show("Please Bypass Current Meter for this test.",
+                "On Current Test",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Exclamation,
+                MessageBoxDefaultButton.Button1);
+             * 
+             * */
+
+
+
 
 
             BK1685BGETD ReadChargeCurrent = new BK1685BGETD();
@@ -7053,6 +7185,29 @@ namespace ITM_ISM_Fixture
 
         private void MainForm_Load(object sender, EventArgs e)
         {
+
+
+            // show Vtech routing information box
+
+            frm8 = new VtechInput(this);
+
+
+            this.Refresh();
+
+
+
+
+            frm8.Show();
+
+            while (frm8.Visible == true)
+            {
+                Application.DoEvents();
+
+            }
+
+
+
+
 
         }
 

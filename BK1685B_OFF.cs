@@ -32,7 +32,7 @@ namespace ITM_ISM_Fixture
             if (sessionName == null)
                 throw new ArgumentNullException("sessionName");
 
-            return (MessageBasedSession)ResourceManager.GetLocalManager().Open(sessionName, (AccessModes)4, 0);
+            return (MessageBasedSession)ResourceManager.GetLocalManager().Open(sessionName, (AccessModes)0, 0);
         }
         
         /// <summary>
@@ -70,8 +70,6 @@ namespace ITM_ISM_Fixture
 
             _instrumentSession = session;
             _instrumentSession.Timeout = 2000;
-            SerialSession ss = (SerialSession)_instrumentSession;
-            ss.ReadTermination = SerialTerminationMethod.TerminationCharacter;
             _instrumentSession.TerminationCharacterEnabled = true;
             _instrumentSession.TerminationCharacter = 13;
             

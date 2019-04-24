@@ -80,11 +80,9 @@
     <Reference Include="Mitov.SignalLab, Version=7.6.0.0, Culture=neutral, PublicKeyToken=0f7dd317c9b1aa3e, processorArchitecture=MSIL" />
     <Reference Include="Mitov.SignalLabBasic, Version=7.6.0.0, Culture=neutral, PublicKeyToken=0b44e28582c522cf, processorArchitecture=MSIL" />
     <Reference Include="NationalInstruments.Analysis.Professional, Version=15.0.40.49153, Culture=neutral, PublicKeyToken=dc6ad606294fc298, processorArchitecture=MSIL" />
-    <Reference Include="NationalInstruments.Common, Version=15.1.40.49152, Culture=neutral, PublicKeyToken=dc6ad606294fc298, processorArchitecture=MSIL" />
-    <Reference Include="NationalInstruments.DAQmx, Version=15.5.40.109, Culture=neutral, PublicKeyToken=dc6ad606294fc298, processorArchitecture=x86">
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="NationalInstruments.DAQmx.ComponentModel, Version=15.5.40.109, Culture=neutral, PublicKeyToken=dc6ad606294fc298, processorArchitecture=MSIL" />
+    <Reference Include="NationalInstruments.Common, Version=17.5.40.49153, Culture=neutral, PublicKeyToken=dc6ad606294fc298, processorArchitecture=MSIL" />
+    <Reference Include="NationalInstruments.DAQmx, Version=17.6.40.181, Culture=neutral, PublicKeyToken=dc6ad606294fc298, processorArchitecture=x86" />
+    <Reference Include="NationalInstruments.DAQmx.ComponentModel, Version=17.6.40.181, Culture=neutral, PublicKeyToken=dc6ad606294fc298, processorArchitecture=MSIL" />
     <Reference Include="NationalInstruments.NetworkVariable, Version=15.0.40.49153, Culture=neutral, PublicKeyToken=dc6ad606294fc298, processorArchitecture=MSIL" />
     <Reference Include="NationalInstruments.NI4882, Version=13.0.40.159, Culture=neutral, PublicKeyToken=dc6ad606294fc298, processorArchitecture=MSIL" />
     <Reference Include="NationalInstruments.Tdms, Version=15.0.40.49153, Culture=neutral, PublicKeyToken=dc6ad606294fc298, processorArchitecture=MSIL" />
@@ -299,6 +297,12 @@
     <Compile Include="Thermistor_ON.User.cs">
       <DependentUpon>Thermistor_ON.mxb</DependentUpon>
     </Compile>
+    <Compile Include="VtechInput.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="VtechInput.Designer.cs">
+      <DependentUpon>VtechInput.cs</DependentUpon>
+    </Compile>
     <Compile Include="WritePort_0.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -332,6 +336,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="ResultsBad.resx">
       <DependentUpon>ResultsBad.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="VtechInput.resx">
+      <DependentUpon>VtechInput.cs</DependentUpon>
     </EmbeddedResource>
     <None Include="app.config" />
     <None Include="BK1685B_2_GETD.mxb">
