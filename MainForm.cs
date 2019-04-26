@@ -1483,6 +1483,12 @@ namespace ITM_ISM_Fixture
 
                     // SetChannel(1);  CHI = 0
 
+
+                    //-----------------------------------make this a function call
+
+
+
+
                     Txresponse = TxCommand("CHI = 0");
                     timer3.Enabled = false;
 
@@ -1879,6 +1885,8 @@ namespace ITM_ISM_Fixture
 
 
 
+                    //--------------------------------------------------------------------------------------------------------------------------------------------
+
                   //  SetChannel(2);
 
 
@@ -2214,7 +2222,7 @@ namespace ITM_ISM_Fixture
 
 
 
-
+                    //------------------------------------------------------------------------------------------------------------------------
 
 
 
@@ -4567,6 +4575,872 @@ namespace ITM_ISM_Fixture
 
         }
 
+
+
+
+        public void stub(int channel)
+        {
+
+            //-----------------------------------make this a function call
+
+            float IRDutycyle = 0;
+
+            string channelString = channel.ToString();
+
+
+            Txresponse = TxCommand("CHI = " + channelString);
+            timer3.Enabled = false;
+
+
+            Console.WriteLine("Response From Juno: {0}", Txresponse); // may have to capture this as soon as we have cr
+
+            IRChannel_A_Result = true;
+
+
+            Txresponse = TxCommand("mfgt= 1");
+            timer3.Enabled = false;
+
+
+            Console.WriteLine("Response From Juno: {0}", Txresponse); // may have to capture this as soon as we have cr
+
+
+
+
+            Txresponse = TxCommand("IRLED = 0");
+            timer3.Enabled = false;
+
+
+            Console.WriteLine("Response From Juno: {0}", Txresponse); // may have to capture this as soon as we have cr
+
+
+            // make reference current measurement
+
+            // measure Current
+
+
+            BK2831E_2_SetCurrent setupCurrent = new BK2831E_2_SetCurrent();
+
+            BK2831E_2_ReadCurrent GetIRCurrent = new BK2831E_2_ReadCurrent();
+
+
+
+            setupCurrent.Run();
+
+
+
+            Thread.Sleep(1000); // add delay
+
+
+            BK2831E_2_ReadCurrentResults results = GetIRCurrent.Run();
+
+            string myCurrent = results.Token2.ToString();
+            Thread.Sleep(250); // add delay
+
+
+
+            double IRCurrent = Convert.ToDouble(myCurrent);
+
+
+
+            // store this value for later
+
+            ReferenceCurrent = IRCurrent;
+
+
+            // turn IR back ON
+            Txresponse = TxCommand("IRLED = 1");
+            timer3.Enabled = false;
+
+
+            Console.WriteLine("Response From Juno: {0}", Txresponse); // may have to capture this as soon as we have cr
+
+
+            // switch statment for duty cycle measurement
+
+            switch (channel)
+            {
+                case 0:
+                led9.OffColor = Color.Yellow;
+                break;
+
+                case 1:
+                led10.OffColor = Color.Yellow;
+                break;
+
+                case 2:
+                led11.OffColor = Color.Yellow;
+                break;
+
+                case 3:
+                led12.OffColor = Color.Yellow;
+                break;
+
+                case 4:
+                led13.OffColor = Color.Yellow;
+                break;
+
+                case 5:
+                led33.OffColor = Color.Yellow;
+                break;
+
+                case 6:
+                led37.OffColor = Color.Yellow;
+                break;
+
+           }
+
+            this.Refresh();
+
+            // measure duty cycle
+            //button2.PerformClick();
+            timer2.Enabled = true;
+
+
+            // Adjust to 25%
+            IRDutycyle = getdutycycle();
+
+
+
+            if ((IRDutycyle > 35) | (IRDutycyle < 29) | (Double.IsNaN(IRDutycyle)))
+            {
+                AdjustDuty(0);
+
+            }
+            else
+            {
+                // store data
+                IRDutyCycle[channel] = IRDutycyle;
+
+                Txresponse = null;
+
+                Txresponse = TxCommand("irpw");
+                timer3.Enabled = false;
+
+
+                Console.WriteLine("Response From Juno: {0}", Txresponse); // may have to capture this as soon as we have cr
+
+                string[] tokens;
+
+                // find the number
+
+
+
+                tokens = Txresponse.Split('=');
+                decimal mynumber;
+
+                bool canConvert = decimal.TryParse(tokens[1], out mynumber);
+
+                if (canConvert == true)
+                {
+                    IRPW[channel] = Convert.ToDouble(tokens[1]);
+
+                }
+                else
+                {
+                    IRPW[channel] = Convert.ToDouble(tokens[3]);
+
+                }
+
+
+            }
+
+
+            while (timer2.Enabled == true)
+            {
+
+                Application.DoEvents();
+
+            }
+
+
+            // validate
+
+
+            IRDutycyle = getdutycycle();
+            if ((IRDutycyle < 35) | (IRDutycyle > 27))
+            {
+
+                switch (channel)
+                {
+                    case 0:
+                        led9.OffColor = Color.LimeGreen;
+                        break;
+
+                    case 1:
+                        led10.OffColor = Color.LimeGreen;                        
+
+                        break;
+
+                    case 2:
+                        led11.OffColor = Color.LimeGreen;
+                        break;
+
+                    case 3:
+                        led12.OffColor = Color.LimeGreen;
+                        break;
+
+                    case 4:
+                        led13.OffColor = Color.LimeGreen;
+                        break;
+
+                    case 5:
+                        led33.OffColor = Color.LimeGreen;
+                        break;
+
+                    case 6:
+                        led37.OffColor = Color.LimeGreen;
+                        break;
+
+                }
+
+
+
+
+
+            }
+            else
+            {
+
+                // ToDo: - Make this find the right LED using switch statement?
+                switch (channel)
+                {
+                    case 0:
+                        led9.OffColor = Color.Red;
+                        IRChannel_A_Result = false;
+                        break;
+
+                    case 1:
+                        led10.OffColor = Color.Red;
+                        IRChannel_B_Result = false;
+                        break;
+
+                    case 2:
+                        led11.OffColor = Color.Red;
+                        IRChannel_C_Result = false;
+                        break;
+
+                    case 3:
+                        led12.OffColor = Color.Red;
+                        IRChannel_D_Result = false;
+                        break;
+
+                    case 4:
+                        led13.OffColor = Color.Red;
+                        IRChannel_E_Result = false;
+                        break;
+
+                    case 5:
+                        led33.OffColor = Color.Red;
+                        IRChannel_L1_Result = false;
+                        break;
+
+                    case 6:
+                        led37.OffColor = Color.Red;
+                        IRChannel_L2_Result = false;
+                        break;
+
+                }
+
+
+
+
+
+
+
+
+            }
+
+
+
+
+            this.Refresh();
+
+
+
+
+
+            // create a sub-routine to do this.   
+
+
+            // set to low coverage mode
+
+            TPLabel.Text = "IR Current";
+
+            Txresponse = TxCommand("cov = 1");
+            timer3.Enabled = false;
+
+
+            Console.WriteLine("Response From Juno: {0}", Txresponse); // may have to capture this as soon as we have cr
+
+
+            results = GetIRCurrent.Run();
+
+            myCurrent = results.Token2.ToString();
+            Thread.Sleep(250); // add delay
+
+
+
+            IRCurrent = Convert.ToDouble(myCurrent);
+
+            double ReturnCurrent = 0;
+
+            // add switch for yellow
+
+            switch (channel)
+            {
+                case 0:
+                    led14.OffColor = Color.Yellow;
+                    break;
+
+                case 1:
+                    led15.OffColor = Color.Yellow;
+                    break;
+
+                case 2:
+                    led16.OffColor = Color.Yellow;
+                    break;
+
+                case 3:
+                    led17.OffColor = Color.Yellow;
+                    break;
+
+                case 4:
+                    led18.OffColor = Color.Yellow;
+                    break;
+
+                case 5:
+                    led32.OffColor = Color.Yellow;
+                    break;
+
+                case 6:
+                    led36.OffColor = Color.Yellow;
+                    break;
+
+            }
+
+
+
+
+            this.Refresh();
+
+
+            //  if current is out of spec, run cal
+
+            if (((IRCurrent - ReferenceCurrent) < (limits.ldCurrentNominal - limits.IRCurrentTolerance)) | ((IRCurrent - ReferenceCurrent) > (limits.ldCurrentNominal + limits.IRCurrentTolerance)))
+            {
+                ReturnCurrent = IRSetCurrent(1, 0);  // 1 = low, 2 = mid, 3 = high
+
+                IRCurrent = ReturnCurrent;
+            }
+            else
+            {
+
+
+                MeterReading.Text = IRCurrent.ToString();
+
+                ReturnCurrent = IRCurrent;
+                // record current and ldpot
+                ldcurrent[channel] = IRCurrent;
+
+
+                Txresponse = TxCommand("ldpot");
+                timer3.Enabled = false;
+
+
+                Console.WriteLine("Response From Juno: {0}", Txresponse); // may have to capture this as soon as we have cr
+
+                string[] tokens;
+
+                tokens = Txresponse.Split('=');
+                ldpot[channel] = Convert.ToDouble(tokens[1]);
+
+
+            }
+
+
+            if (((ReturnCurrent - ReferenceCurrent) > (limits.ldCurrentNominal - limits.IRCurrentTolerance)) & ((ReturnCurrent - ReferenceCurrent) < (limits.ldCurrentNominal + limits.IRCurrentTolerance)))
+            {
+                // ToDo: - Make this find the right LED using switch statement?
+                switch (channel)
+                {
+                    case 0:
+                        led14.OffColor = Color.LimeGreen;
+                        break;
+
+                    case 1:
+                        led15.OffColor = Color.LimeGreen;
+                        break;
+
+                    case 2:
+                        led16.OffColor = Color.LimeGreen;
+                        break;
+
+                    case 3:
+                        led17.OffColor = Color.LimeGreen;
+                        break;
+
+                    case 4:
+                        led18.OffColor = Color.LimeGreen;
+                        break;
+
+                    case 5:
+                        led32.OffColor = Color.LimeGreen;
+                        break;
+
+                    case 6:
+                        led36.OffColor = Color.LimeGreen;
+                        break;
+
+                }
+
+
+
+
+
+
+             
+
+
+            }
+            else
+            {
+                // ToDo: - Make this find the right LED using switch statement?
+
+
+                switch (channel)
+                {
+                    case 0:
+                        led14.OffColor = Color.Red;
+                        IRChannel_A_Result = false;
+                        break;
+
+                    case 1:
+                        led15.OffColor = Color.Red;
+                        IRChannel_B_Result = false;
+                        break;
+
+                    case 2:
+                        led16.OffColor = Color.Red;
+                        IRChannel_C_Result = false;
+                        break;
+
+                    case 3:
+                        led17.OffColor = Color.Red;
+                        IRChannel_D_Result = false;
+                        break;
+
+                    case 4:
+                        led18.OffColor = Color.Red;
+                        IRChannel_E_Result = false;
+                        break;
+
+                    case 5:
+                        led32.OffColor = Color.Red;
+                        IRChannel_L1_Result = false;
+                        break;
+
+                    case 6:
+                        led36.OffColor = Color.Red;
+                        IRChannel_L2_Result = false;
+                        break;
+
+                }
+
+
+
+
+
+
+
+
+ 
+            }
+
+            this.Refresh();
+
+            // store data
+
+
+
+
+            // set to MID coverage mode
+
+            Txresponse = TxCommand("cov = 3");
+            timer3.Enabled = false;
+
+
+            Console.WriteLine("Response From Juno: {0}", Txresponse); // may have to capture this as soon as we have cr
+
+            // our results sometimes gets corrupted  - need to fulsh the buffer?
+            results = GetIRCurrent.Run();
+
+            myCurrent = results.Token2.ToString();
+
+            Thread.Sleep(250); // add delay
+
+            IRCurrent = Convert.ToDouble(myCurrent);
+
+            ReturnCurrent = 0;
+
+            // add switch for yellow
+
+            switch (channel)
+            {
+                case 0:
+                    led23.OffColor = Color.Yellow;
+                    break;
+
+                case 1:
+                    led22.OffColor = Color.Yellow;
+                    break;
+
+                case 2:
+                    led21.OffColor = Color.Yellow;
+                    break;
+
+                case 3:
+                    led20.OffColor = Color.Yellow;
+                    break;
+
+                case 4:
+                    led19.OffColor = Color.Yellow;
+                    break;
+
+                case 5:
+                    led31.OffColor = Color.Yellow;
+                    break;
+
+                case 6:
+                    led35.OffColor = Color.Yellow;
+                    break;
+
+            }
+
+
+
+
+
+
+            this.Refresh();
+
+
+            //  if current is out of spec, run cal
+
+            if (((IRCurrent - ReferenceCurrent) < (limits.mdCurrentNominal - limits.IRCurrentTolerance)) | ((IRCurrent - ReferenceCurrent) > (limits.mdCurrentNominal + limits.IRCurrentTolerance)))
+            {
+                ReturnCurrent = IRSetCurrent(3, 0);  // 1 = low, 3 = mid, 5 = high
+
+                IRCurrent = ReturnCurrent;
+            }
+            else
+            {
+
+                MeterReading.Text = IRCurrent.ToString();
+                ReturnCurrent = IRCurrent;
+                // record current and ldpot
+                mdcurrent[channel] = IRCurrent;
+
+
+                Txresponse = TxCommand("mdpot");
+                timer3.Enabled = false;
+
+
+                Console.WriteLine("Response From Juno: {0}", Txresponse); // may have to capture this as soon as we have cr
+
+                string[] tokens;
+
+                tokens = Txresponse.Split('=');
+                mdpot[channel] = Convert.ToDouble(tokens[1]);
+
+            }
+
+
+            if (((IRCurrent - ReferenceCurrent) > (limits.mdCurrentNominal - limits.IRCurrentTolerance)) & ((IRCurrent - ReferenceCurrent) < (limits.mdCurrentNominal + limits.IRCurrentTolerance)))
+            {
+
+                switch (channel)
+                {
+                    case 0:
+                        led23.OffColor = Color.LimeGreen;
+                        break;
+
+                    case 1:
+                        led22.OffColor = Color.LimeGreen;
+                        break;
+
+                    case 2:
+                        led21.OffColor = Color.LimeGreen;
+                        break;
+
+                    case 3:
+                        led20.OffColor = Color.LimeGreen;
+                        break;
+
+                    case 4:
+                        led19.OffColor = Color.LimeGreen;
+                        break;
+
+                    case 5:
+                        led31.OffColor = Color.LimeGreen;
+                        break;
+
+                    case 6:
+                        led35.OffColor = Color.LimeGreen;
+                        break;
+
+                }
+
+
+
+
+            }
+            else
+            {
+
+                switch (channel)
+                {
+                    case 0:
+                        led23.OffColor = Color.Red;
+                        IRChannel_A_Result = false;
+                        break;
+
+                    case 1:
+                        led22.OffColor = Color.Red;
+                        IRChannel_A_Result = false;
+                        break;
+
+                    case 2:
+                        led21.OffColor = Color.Red;
+                        IRChannel_A_Result = false;
+                        break;
+
+                    case 3:
+                        led20.OffColor = Color.Red;
+                        IRChannel_A_Result = false;
+                        break;
+
+                    case 4:
+                        led19.OffColor = Color.Red;
+                        IRChannel_A_Result = false;
+                        break;
+
+                    case 5:
+                        led31.OffColor = Color.Red;
+                        IRChannel_A_Result = false;
+                        break;
+
+                    case 6:
+                        led35.OffColor = Color.Red;
+                        IRChannel_A_Result = false;
+                        break;
+
+                }
+
+
+
+
+     
+
+            }
+
+            this.Refresh();
+
+
+
+
+
+
+            // set to HIGH coverage mode
+
+            Txresponse = TxCommand("cov = 5");
+            timer3.Enabled = false;
+
+
+            Console.WriteLine("Response From Juno: {0}", Txresponse); // may have to capture this as soon as we have cr
+
+
+            results = GetIRCurrent.Run();
+            Thread.Sleep(250); // add delay
+
+            myCurrent = results.Token2.ToString();
+
+
+
+            IRCurrent = Convert.ToDouble(myCurrent);
+
+            ReturnCurrent = 0;
+
+
+            // add switch
+
+
+            switch (channel)
+            {
+                case 0:
+                    led28.OffColor = Color.Yellow;
+                    break;
+
+                case 1:
+                    led27.OffColor = Color.Yellow;
+                    break;
+
+                case 2:
+                    led26.OffColor = Color.Yellow;
+                    break;
+
+                case 3:
+                    led25.OffColor = Color.Yellow;
+                    break;
+
+                case 4:
+                    led24.OffColor = Color.Yellow;
+                    break;
+
+                case 5:
+                    led30.OffColor = Color.Yellow;
+                    break;
+
+                case 6:
+                    led34.OffColor = Color.Yellow;
+                    break;
+
+            }
+
+
+
+
+   
+
+            this.Refresh();
+
+
+            //  if current is out of spec, run cal
+
+            if (((IRCurrent - ReferenceCurrent) < (limits.hdCurrentNominal - limits.IRCurrentTolerance)) | ((IRCurrent - ReferenceCurrent) > (limits.hdCurrentNominal + limits.IRCurrentTolerance)))
+            {
+                ReturnCurrent = IRSetCurrent(5, 0);  // 1 = low, 2 = mid, 3 = high
+
+                IRCurrent = ReturnCurrent;
+            }
+            else
+            {
+                MeterReading.Text = IRCurrent.ToString();
+                ReturnCurrent = IRCurrent;
+                // record current and ldpot
+                hdcurrent[channel] = IRCurrent;
+
+
+                Txresponse = TxCommand("hdpot");
+                timer3.Enabled = false;
+
+
+                Console.WriteLine("Response From Juno: {0}", Txresponse); // may have to capture this as soon as we have cr
+
+                string[] tokens;
+
+                tokens = Txresponse.Split('=');
+                hdpot[channel] = Convert.ToDouble(tokens[1]);
+
+            }
+
+
+            if (((IRCurrent - ReferenceCurrent) > (limits.hdCurrentNominal - limits.IRCurrentTolerance)) & ((IRCurrent - ReferenceCurrent) < (limits.hdCurrentNominal + limits.IRCurrentTolerance)))
+            {
+
+                switch (channel)
+                {
+                    case 0:
+                        led28.OffColor = Color.LimeGreen;
+                        break;
+
+                    case 1:
+                        led27.OffColor = Color.LimeGreen;
+                        break;
+
+                    case 2:
+                        led26.OffColor = Color.LimeGreen;
+                        break;
+
+                    case 3:
+                        led25.OffColor = Color.LimeGreen;
+                        break;
+
+                    case 4:
+                        led24.OffColor = Color.LimeGreen;
+                        break;
+
+                    case 5:
+                        led30.OffColor = Color.LimeGreen;
+                        break;
+
+                    case 6:
+                        led34.OffColor = Color.LimeGreen;
+                        break;
+
+                }
+
+
+
+  
+
+
+            }
+            else
+            {
+
+                switch (channel)
+                {
+                    case 0:
+                        led28.OffColor = Color.Red;
+                        IRChannel_A_Result = false;
+                        break;
+
+                    case 1:
+                        led27.OffColor = Color.Red;
+                        IRChannel_B_Result = false;
+                        break;
+
+                    case 2:
+                        led26.OffColor = Color.Red;
+                        IRChannel_C_Result = false;
+                        break;
+
+                    case 3:
+                        led25.OffColor = Color.Red;
+                        IRChannel_D_Result = false;
+                        break;
+
+                    case 4:
+                        led24.OffColor = Color.Red;
+                        IRChannel_E_Result = false;
+                        break;
+
+                    case 5:
+                        led30.OffColor = Color.Red;
+                        IRChannel_L1_Result = false;
+                        break;
+
+                    case 6:
+                        led34.OffColor = Color.Red;
+                        IRChannel_L2_Result = false;
+                        break;
+
+                }
+
+
+
+            }
+            this.Refresh();
+
+
+
+            //--------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+        }
 
 
 
