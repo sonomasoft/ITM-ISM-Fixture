@@ -1,4 +1,7 @@
-﻿using NationalInstruments;
+﻿#define ALIGNSUB
+
+
+using NationalInstruments;
 using NationalInstruments.UI;
 using NationalInstruments.DAQmx;
 //using NationalInstruments.NI4882;
@@ -39,7 +42,8 @@ using System.Net;
 namespace ITM_ISM_Fixture
 {
     using System.Management;
-    
+
+
 
     public partial class MainForm : Form
     {
@@ -564,7 +568,7 @@ namespace ITM_ISM_Fixture
 
 
 
-           //if(false)  // skip program------------------------------------------------------------------------------------------------------------------------
+         if(false)  // skip program----------------------------------------ToDo -Remark this out for production--------------------------------------------------------------------------------
             if (instumentStatus == 0)
             {
                 led4.OffColor = Color.Yellow;
@@ -887,7 +891,9 @@ namespace ITM_ISM_Fixture
 
                 // 2.  measure charge current
 
+              
 
+               if(false) //------------------------------------------------------------------------remove for production
                 if (instumentStatus == 0)
                     ReadChargeCurrent();
 
@@ -899,6 +905,9 @@ namespace ITM_ISM_Fixture
 
 
             }
+
+         
+
 
 
             // insert LED tests here.   We have to use current to dectect valid LED's
@@ -1486,6 +1495,26 @@ namespace ITM_ISM_Fixture
 
                     //-----------------------------------make this a function call
 
+
+       
+
+#if ALIGNSUB
+int theChannel;
+
+                    for(theChannel = 0; theChannel < 7;theChannel++)
+                    {
+                    alignChannel(theChannel);
+
+
+
+
+                    }
+
+
+
+
+
+#else
 
 
 
@@ -3943,7 +3972,7 @@ namespace ITM_ISM_Fixture
 
 
                     // Save Settings!!--------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
+#endif
 
 
                     Txresponse = TxCommand("setd");
@@ -4578,7 +4607,9 @@ namespace ITM_ISM_Fixture
 
 
 
-        public void stub(int channel)
+
+
+        public void alignChannel(int channel)
         {
 
             //-----------------------------------make this a function call
@@ -5533,23 +5564,52 @@ namespace ITM_ISM_Fixture
             string timestring = DateTime.Now.ToString("yyyyMMddhmmss tt");
 
             string Result = "Pass";
+            string Fail;
+
 
 
             if (TestResult)
+            {
                 Result = "Pass";
+
+                using (StreamWriter sw = File.AppendText(filename))
+                {
+                    sw.WriteLine(textBox1.Text + " " + timestring + " " + Result + " " + frm8.StationName.Text + " " + frm8.RouteStep.Text + " " + frm8.ProductName.Text + " " + frm8.OrderNumber.Text + " " + frm8.Operator.Text + "\n");
+
+                }
+
+
+            }
             else
+            {
                 Result = "Failed";
 
+                // find test steps that failed and add to string
+
+                // check each test
+
+                //VoltageResult
+                //ProgramResult
+                //AuxResult
+                //MicResult
+                //BootResult
+                //ChargeCurrentResult
+                //IRChannel_A_Result)
+                //IRChannel_B_Result)
+                //IRChannel_C_Result)
+                //IRChannel_D_Result)
+                //IRChannel_E_Result)
+                //IRChannel_L1_Result)
+                //IRChannel_L2_Result)
 
 
+                using (StreamWriter sw = File.AppendText(filename))
+                {
+                    sw.WriteLine(textBox1.Text + " " + timestring + " " + Result + " " + frm8.StationName.Text + " " + frm8.RouteStep.Text + " " + frm8.ProductName.Text + " " + frm8.OrderNumber.Text + " " + frm8.Operator.Text + "\n");
 
-            using (StreamWriter sw = File.AppendText(filename))
-                    {
-                        sw.WriteLine(textBox1.Text + " " + timestring + " " + Result + " " + frm8.StationName.Text + " " + frm8.RouteStep.Text + " " + frm8.ProductName.Text + " " + frm8.OrderNumber.Text + " " + frm8.Operator.Text + "\n" );
+                }
 
-                    }
-
-
+            }
 
 
 
